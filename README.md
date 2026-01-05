@@ -1,0 +1,2 @@
+# Monera-TradingApp
+Abschlussprojekt 
