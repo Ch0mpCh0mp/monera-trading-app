@@ -1,7 +1,7 @@
+import { redirect } from 'next/navigation';
+
 export default function Home() {
-  return (
-    <main>
-      <h1>Monera Trading App</h1>
-    </main>
-  );
+  redirect("/auth");
 }
+
+
