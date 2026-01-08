@@ -18,7 +18,7 @@ export default function Logo({ size = 64, ...props }: LogoProps) {
       <path
         d="M64 156 L108 118 L144 138 L188 98"
         fill="none"
-        stroke="#4ADE80"
+        stroke="#00A63E"
         strokeWidth="14"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -26,7 +26,7 @@ export default function Logo({ size = 64, ...props }: LogoProps) {
       <path
         d="M168 98 H188 V118"
         fill="none"
-        stroke="#4ADE80"
+        stroke="#00A63E"
         strokeWidth="14"
         strokeLinecap="round"
         strokeLinejoin="round"
