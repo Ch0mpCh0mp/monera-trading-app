@@ -8,6 +8,10 @@ export default function AuthPage() {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+
   const [error, setError] = useState<string | null>(null);
 
   return (
@@ -57,15 +61,71 @@ export default function AuthPage() {
             e.preventDefault();
             setError(null);
 
+            // passwörter stimmen überein?
+            if (mode === 'register' && password !== confirmPassword) {
+              setError('Passwords do not match');
+              return;
+            }
+
+            // ist was eingetragen?
             if (!email || !password) {
               setError('Please fill in all fields');
               return;
             }
 
             // weg machen wenn ich backend habe
-            console.log({ mode, email, password });
+            console.log({
+              mode,
+              firstName,
+              lastName,
+              email,
+              password,
+              confirmPassword,
+            });
           }}
         >
+          {mode === 'register' && (
+            <>
+              <div className="w-full text-left space-y-2">
+                <label
+                  htmlFor="firstName"
+                  className="text-sm font-medium text-white/80 block"
+                >
+                  First name
+                </label>
+
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="First name"
+                  className="h-11 w-full rounded-xl bg-black/30 border border-white/10 px-3 text-sm text-white/90 placeholder:text-white/40 outline-none focus:ring-4 focus:ring-white/10"
+                />
+              </div>
+
+              <div className="w-full text-left space-y-2">
+                <label
+                  htmlFor="lastName"
+                  className="text-sm font-medium text-white/80 block"
+                >
+                  Last name
+                </label>
+
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Last name"
+                  className="h-11 w-full rounded-xl bg-black/30 border border-white/10 px-3 text-sm text-white/90 placeholder:text-white/40 outline-none focus:ring-4 focus:ring-white/10"
+                />
+              </div>
+            </>
+          )}
+
           <div className="w-full text-left space-y-2">
             <label
               htmlFor="email"
@@ -115,13 +175,40 @@ export default function AuthPage() {
                 placeholder="Your password"
               />
             </div>
+
+            {mode === 'register' && (
+              <div className="w-full text-left space-y-2">
+                <label
+                  htmlFor="confirmPassword"
+                  className="text-sm font-medium text-white/80"
+                >
+                  Confirm Password
+                </label>
+
+                <div className="w-full grid grid-cols-[44px_1fr] items-center h-11 rounded-xl bg-black/30 border border-white/10 focus-within:ring-4 focus-within:ring-white/10">
+                  <span className="grid place-items-center text-white/40">
+                    <Lock size={18} />
+                  </span>
+
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Repeat your password"
+                    className="h-full bg-transparent outline-none text-sm text-white/90 placeholder:text-white/40 pr-3"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Fehlermeldung */}
           {error && <p className="text-sm">{error}</p>}
 
           {/* Submit Button */}
-          <div className='mt-2 mb-2'>
+          <div className="mt-2 mb-2">
             <button
               type="submit"
               className="w-full rounded-lg h-9 text-black text-base bg-green-600 "
