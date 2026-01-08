@@ -7,6 +7,6 @@ interface GoogleCredentialResponse {
 
 declare global {
   interface Window {
-    handleGoogleLogin: (response: GoogleCredentialResponse) => void;
+    handleGoogleLogin?: (response: GoogleCredentialResponse) => void;
   }
 }

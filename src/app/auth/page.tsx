@@ -9,6 +9,13 @@ interface GoogleCredentialResponse {
   clientId?: string;
 }
 
+// Globale Typisierung für window
+declare global {
+  interface Window {
+    handleGoogleLogin?: (response: GoogleCredentialResponse) => void;
+  }
+}
+
 export default function AuthPage() {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
@@ -32,12 +39,29 @@ export default function AuthPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token }),
         });
+
+        if (!res.ok) {
+          const text = await res.text();
+          console.error('HTTP Error:', res.status, text);
+          return;
+        }
+
         const data = await res.json();
-        console.log('Backend Response:', data);
-        // TODO: JWT speichern / Weiterleitung ins Dashboard
+        console.log('Google Backend Response:', data);
+
+        // TODO: JWT speichern und Weiterleitung ins Dashboard
+        // localStorage.setItem('token', data.token);
+        // router.push('/dashboard');
       } catch (err) {
         console.error('Google login error', err);
       }
+    };
+
+    // Cleanup beim Unmount
+    return () => {
+      document.body.removeChild(script);
+      // TypeScript-konformer Delete-Operator
+      window.handleGoogleLogin = undefined;
     };
   }, []);
 
@@ -56,9 +80,18 @@ export default function AuthPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, mode }),
       });
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error('HTTP Error:', res.status, text);
+        setError('Authentication failed');
+        return;
+      }
+
       const data = await res.json();
-      console.log('Email Auth Response:', data);
-      // TODO: JWT speichern / Weiterleitung
+      console.log('Email Backend Response:', data);
+
+      // TODO: JWT speichern und Weiterleitung ins Dashboard
     } catch (err) {
       console.error('Email login error', err);
       setError('Authentication failed');
@@ -140,8 +173,22 @@ export default function AuthPage() {
         <div id="g_id_onload" data-client_id={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID} data-callback="handleGoogleLogin"></div>
         <div className="g_id_signin" data-type="standard"></div>
 
-        <p className="text-white/30 text-sm mt-2">Demo account with $10,000 starting balance</p>
-      </section>
+       
+       <p className="text-white/30 text-sm mt-2">Demo account with $10,000 starting balance</p>
+      {/* Test Button für Fake Google Login */}
+<button
+  type="button"
+  onClick={() => {
+    const fakeResponse = { credential: 'FAKE_TOKEN_FOR_TESTING' };
+    console.log('Simulierter Google Login:', fakeResponse);
+    setError(null);
+    alert('Fake Google Login simuliert – kein Backend-Aufruf.');
+  }}
+>
+  Test Google Login
+</button>
+
+</section>
     </main>
   );
 }

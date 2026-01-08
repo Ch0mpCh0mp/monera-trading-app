@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     const { token } = await req.json();
 
     if (!token) {
-      return NextResponse.json({ error: 'No token provided' }, { status: 400 });
+      return NextResponse.json({ error: 'Token is required' }, { status: 400 });
     }
 
     // 1️⃣ Google Token prüfen
@@ -21,24 +21,24 @@ export async function POST(req: NextRequest) {
 
     const payload = ticket.getPayload();
     if (!payload?.sub || !payload.email) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid Google token' }, { status: 401 });
     }
 
     const googleId = payload.sub;
-    const email = payload.email;
-    const username = payload.name || 'No Name';
+    const email = payload.email.toLowerCase().trim();
+    const name = payload.name || 'No Name';
 
     // 2️⃣ User in DB suchen
-    const userResult = await pool.query('SELECT * FROM users WHERE google_id = $1', [googleId]);
-    let user = userResult.rows[0];
+    const userRes = await pool.query('SELECT * FROM users WHERE google_id = $1', [googleId]);
+    let user = userRes.rows[0];
 
-    // 3️⃣ User erstellen, falls nicht gefunden
+    // 3️⃣ User erstellen, falls nicht vorhanden
     if (!user) {
-      const insertResult = await pool.query(
+      const insertRes = await pool.query(
         'INSERT INTO users (google_id, email, username, balance) VALUES ($1, $2, $3, $4) RETURNING *',
-        [googleId, email, username, 10000]
+        [googleId, email, name, 10000]
       );
-      user = insertResult.rows[0];
+      user = insertRes.rows[0];
     }
 
     // 4️⃣ JWT erstellen
