@@ -29,3 +29,13 @@ CREATE TABLE orders (
     status VARCHAR(50) DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Trades-Tabelle
+CREATE TABLE trades (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id),
+    amount NUMERIC(10,2) NOT NULL,
+    type VARCHAR(50) NOT NULL, -- z.B. 'buy' oder 'sell'
+    pnl NUMERIC(10,2) DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
