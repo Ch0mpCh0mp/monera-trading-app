@@ -15,10 +15,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-2 gap-4 mb-8">
         <StatusCard label="Margin" value="€0,00" />
-         <div className="rounded-2xl bg-white/5 border border-white/10 p-4">
-          <p className="text-xs uppercase tracking-wider text-white/50">Level</p>
-          <p className="text-2xl font-semibold text-white">100%</p>
-        </div>
+         <StatusCard label="Level" value="100%" />
       </div>
     </main>
   );
