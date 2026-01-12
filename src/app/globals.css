@@ -19,6 +19,15 @@
   --foreground: #ededed;
 }
 
+/* navigation aktiv zeigen */
+.nav-item {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.nav-item.active {
+  color: rgba(255, 255, 255, 1);
+}
+
 
 body {
   background: var(--background);
