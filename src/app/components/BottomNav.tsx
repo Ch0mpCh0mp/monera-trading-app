@@ -8,7 +8,7 @@ export default function BottomNav() {
     const pathname = usePathname();
 
     return (
-        <nav className='fixed left-0 right-0 bottom-0 bg-pink-600 p-4'>
+        <nav className='fixed left-0 right-0 bottom-0 border-t-2 border-green-500/40 p-4'>
         <div className='flex justify-around'>
            <span className={pathname === '/dashboard' ? 'nav-item active' : 'nav-item'}><Link href="/dashboard"><House size={28} /></Link></span>
            <span className={pathname === '/portfolio' ? 'nav-item active' : 'nav-item'}><Link href="/portfolio"><ChartPie size={28} /></Link></span>
