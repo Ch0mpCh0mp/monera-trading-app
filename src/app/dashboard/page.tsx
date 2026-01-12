@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import StatusCard from '../components/StatusCard';
 
 export default function DashboardPage() {
@@ -24,9 +25,7 @@ export default function DashboardPage() {
           <p className="text-2xl font-semibold text-white">0,00 €</p>
         </div>
 
-        <button className="mt-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full">
-          Deposit
-        </button>
+        <Link href="/deposit" className="mt-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full">Deposit</Link>
       </div>
     </main>
   );
