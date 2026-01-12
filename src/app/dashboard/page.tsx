@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import StatusCard from '../components/StatusCard';
 import { House, ChartPie, Search, User, Menu } from 'lucide-react';
+import BottomNav from '../components/BottomNav';
 
 export default function DashboardPage() {
   return (
@@ -29,15 +30,7 @@ export default function DashboardPage() {
         <Link href="/deposit" className="mt-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full">Deposit</Link>
       </div>
 
-      <nav className='fixed left-0 right-0 bottom-0 bg-pink-600 p-4'>
-        <div className='flex justify-around'>
-           <Link href="/dashboard" className='text-white'><House size={28} /></Link>
-           <Link href="/portfolio" className='text-white/50'><ChartPie size={28} /></Link>
-           <Link href="/search" className='text-white/50'><Search size={28} /></Link>
-           <Link href="/profile" className='text-white/50'><User size={28} /></Link>
-           <Link href="/menu" className='text-white/50'><Menu size={28} /></Link>
-        </div>
-      </nav>
+      <BottomNav />
     </main>
   );
 }
