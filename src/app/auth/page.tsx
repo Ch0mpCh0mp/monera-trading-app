@@ -18,7 +18,7 @@ export default function AuthPage() {
   const [error, setError] = useState<string | null>(null);
 
   return (
-    <main className="min-h-screen flex items-center justify-center">
+    <main className="min-h-screen px-4 flex items-center justify-center">
       <section className="flex flex-col items-center gap-2 text-center bg-neutral-800/30 w-full max-w-sm p-6 border border-white/10 rounded-xl shadow-md">
         {/* Logo and Header */}
         <header className="flex flex-col items-center gap-2 mb-4">

@@ -7,7 +7,7 @@ export default function DashboardPage() {
   return (
     <main className="min-h-screen bg-black px-6 pt-8 pb-24">
       <section className="mb-8">
-        <p className="text-xs uppercase tracking-wider text-white/50">
+        <p className="text-xs uppercase tracking-wider text-white/50 mb-2">
           Account Value
         </p>
         <p className="text-4xl font-semibold text-white">10.000,00 €</p>
@@ -27,6 +27,16 @@ export default function DashboardPage() {
 
         <Link href="/deposit" className="mt-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full">Deposit</Link>
       </div>
+
+      <nav className='fixed left-0 right-0 bottom-0 bg-pink-600 '>
+        <div className='flex '>
+            <p>HOME</p>
+            <p>TORTE</p>
+            <p>SEARCH</p>
+            <p>PROFILE</p>
+            <p>BURGER MENU</p>
+        </div>
+      </nav>
     </main>
   );
 }
