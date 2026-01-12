@@ -87,11 +87,12 @@ export default function AuthPage() {
             });
 
             // weiter zum dashboard
-            router.push("/dashboard");
+            router.push('/dashboard');
           }}
         >
           {mode === 'register' && (
             <>
+              {/* VORNAME */}
               <div className="w-full text-left space-y-2">
                 <label
                   htmlFor="firstName"
@@ -111,6 +112,7 @@ export default function AuthPage() {
                 />
               </div>
 
+              {/* NACHNAME */}
               <div className="w-full text-left space-y-2">
                 <label
                   htmlFor="lastName"
@@ -132,6 +134,7 @@ export default function AuthPage() {
             </>
           )}
 
+          {/* EMAIL */}
           <div className="w-full text-left space-y-2">
             <label
               htmlFor="email"
@@ -157,6 +160,7 @@ export default function AuthPage() {
             </div>
           </div>
 
+          {/* PASSWORT */}
           <div className="w-full text-left space-y-2">
             <label
               htmlFor="password"
@@ -182,6 +186,7 @@ export default function AuthPage() {
               />
             </div>
 
+            {/* BESTÄTIGE PASSWORT */}
             {mode === 'register' && (
               <div className="w-full text-left space-y-2">
                 <label
@@ -224,6 +229,7 @@ export default function AuthPage() {
           </div>
         </form>
 
+        {/* HINWEIS STARTGUTHABEN */}
         <p className="text-white/30 text-sm">
           Demo account with $10,000 starting balance
         </p>
