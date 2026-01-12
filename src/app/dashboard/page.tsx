@@ -31,7 +31,7 @@ export default function DashboardPage() {
 
       <nav className='fixed left-0 right-0 bottom-0 bg-pink-600 p-4'>
         <div className='flex justify-around '>
-           <span><House size={28} /></span>
+           <Link href="/dashboard"><House size={28} /></Link>
            <span><ChartPie size={28} /></span>
            <span><Search size={28} /></span>
            <span><User size={28} /></span>
