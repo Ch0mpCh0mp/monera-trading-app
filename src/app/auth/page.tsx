@@ -3,8 +3,11 @@
 import Logo from '../components/Logo';
 import { useState } from 'react';
 import { Mail, Lock } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function AuthPage() {
+  const router = useRouter();
+
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -82,6 +85,9 @@ export default function AuthPage() {
               password,
               confirmPassword,
             });
+
+            // weiter zum dashboard
+            router.push("/dashboard");
           }}
         >
           {mode === 'register' && (
