@@ -1,5 +1,7 @@
 'use client';
 
+import StatusCard from "../components/StatusCard";
+
 export default function DashboardPage() {
   return (
     <main className="min-h-screen bg-black px-6 pt-8 pb-24">
@@ -12,10 +14,7 @@ export default function DashboardPage() {
       </section>
 
       <div className="grid grid-cols-2 gap-4 mb-8">
-        <div className="rounded-2xl bg-white/5 border border-white/10 p-4">
-          <p className="text-xs uppercase tracking-wider text-white/50">Margin</p>
-          <p className="text-2xl font-semibold text-white">€0,00</p>
-        </div>
+        <StatusCard label="Margin" value="€0,00" />
          <div className="rounded-2xl bg-white/5 border border-white/10 p-4">
           <p className="text-xs uppercase tracking-wider text-white/50">Level</p>
           <p className="text-2xl font-semibold text-white">100%</p>
