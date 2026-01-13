@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import pool from '@/app/db/client';
 
 export async function authenticate(req: NextRequest) {
+  console.log('Authenticate aufgerufen')
   try {
     // JWT aus Header auslesen
     const authHeader = req.headers.get('Authorization');
@@ -31,6 +32,8 @@ export async function authenticate(req: NextRequest) {
 
 // Middleware für API-Routen
 export async function requireAuth(req: NextRequest, res: NextResponse, callback: (user: any) => Promise<NextResponse>) {
+  console.log('Require Auth')
+
   const user = await authenticate(req);
 
   if (!user) {
