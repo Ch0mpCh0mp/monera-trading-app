@@ -1,59 +1,129 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Logo from '../components/Logo';
-import { useState } from 'react';
 import { Mail, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
+interface GoogleCredentialResponse {
+  credential: string;
+  clientId?: string;
+}
+
+// Globale Typisierung für window
+declare global {
+  interface Window {
+    handleGoogleLogin?: (response: GoogleCredentialResponse) => void;
+  }
+}
+
 export default function AuthPage() {
   const router = useRouter();
-
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-
   const [error, setError] = useState<string | null>(null);
+
+  // Google One Tap Script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+
+    window.handleGoogleLogin = async (response: GoogleCredentialResponse) => {
+      try {
+        const res = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: response.credential }),
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          console.error('Google Auth Error:', res.status, text);
+          setError('Google authentication failed');
+          return;
+        }
+
+        const data = await res.json();
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        router.push('/dashboard');
+      } catch (err) {
+        console.error('Google login error', err);
+        setError('Google authentication failed');
+      }
+    };
+
+    return () => {
+      document.body.removeChild(script);
+      window.handleGoogleLogin = undefined;
+    };
+  }, [router]);
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!email || !password || (mode === 'register' && (!firstName || !lastName || !confirmPassword))) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    if (mode === 'register' && password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    try {
+      const res = await fetch(mode === 'login' ? '/api/auth/login' : '/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(
+          mode === 'login'
+            ? { email, password }
+            : { email, password, firstName, lastName }
+        ),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Authentication failed');
+        return;
+      }
+
+      // Token + User speichern
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      router.push('/dashboard');
+    } catch (err) {
+      console.error('Email auth error', err);
+      setError('Authentication failed');
+    }
+  };
 
   return (
     <main className="min-h-screen px-4 flex items-center justify-center">
       <section className="flex flex-col items-center gap-2 text-center bg-neutral-800/30 w-full max-w-sm p-6 border border-white/10 rounded-xl shadow-md">
-        {/* Logo and Header */}
+
+        {/* Logo */}
         <header className="flex flex-col items-center gap-2 mb-4">
-          <Logo size={64} aria-label="Monera Trading Logo" />
-          <h1 className="text-3xl font-bold mt-3 text-gray-100">
-            Monera Trading
-          </h1>
+          <Logo size={64} />
+          <h1 className="text-3xl font-bold text-gray-100">Monera Trading</h1>
           <p className="text-gray-500">Your Paper Trading Simulator</p>
         </header>
 
         {/* Mode Toggle */}
-        <nav
-          aria-label="Authentication mode"
-          className="w-full gap-1 grid grid-cols-2 p-0.5 rounded-lg bg-white/10"
-        >
-          <button
-            type="button"
-            onClick={() => setMode('login')}
-            aria-pressed={mode === 'login'}
-            className={`h-9 w-full rounded-lg text-sm transition
-    ${mode === 'login' ? 'bg-black/70 text-white/60' : 'text-neutral-300'}
-  `}
-          >
-            Login
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode('register')}
-            aria-pressed={mode === 'register'}
-            className={`h-9 w-full rounded-lg text-sm transition
-    ${mode === 'register' ? 'bg-black/70 text-white/60' : 'text-neutral-300'}
-  `}
-          >
-            Register
-          </button>
+        <nav className="w-full grid grid-cols-2 gap-1 p-1 bg-white/10 rounded-lg">
+          <button type="button" onClick={() => setMode('login')} className={mode === 'login' ? 'bg-black/70 rounded-lg' : ''}>Login</button>
+          <button type="button" onClick={() => setMode('register')} className={mode === 'register' ? 'bg-black/70 rounded-lg' : ''}>Register</button>
         </nav>
 
         {/* Auth Form */}
@@ -133,6 +203,8 @@ export default function AuthPage() {
               </div>
             </>
           )}
+          <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full p-2 rounded bg-black/30" />
+          <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="w-full p-2 rounded bg-black/30" />
 
           {/* EMAIL */}
           <div className="w-full text-left space-y-2">
@@ -228,7 +300,11 @@ export default function AuthPage() {
             </button>
           </div>
         </form>
-
+        
+       {/* Google Login */}
+        <div id="g_id_onload" data-client_id={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID} data-callback="handleGoogleLogin" />
+        <div className="g_id_signin" />
+        
         {/* HINWEIS STARTGUTHABEN */}
         <p className="text-white/30 text-sm">
           Demo account with $10,000 starting balance
