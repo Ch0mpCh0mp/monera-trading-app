@@ -35,6 +35,7 @@ export default function AuthPage() {
     document.body.appendChild(script);
 
     window.handleGoogleLogin = async (response: GoogleCredentialResponse) => {
+     console.log('🔹 Google credential received:', response);
       try {
         const res = await fetch('/api/auth/google', {
           method: 'POST',

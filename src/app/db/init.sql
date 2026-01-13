@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     google_id VARCHAR(255) UNIQUE,
     username VARCHAR(50) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    password_hash VARCHAR(255),
+    password_hash VARCHAR(255)NOT NULL ,
     balance NUMERIC(10,2) DEFAULT 10000,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -93,3 +93,14 @@ INSERT INTO products (name, description, price)
 VALUES 
 ('Demo Product', 'This is a demo product.', 49.99)
 ON CONFLICT (name) DO NOTHING;
+
+-- 9️⃣ Demo Google User einfügen (mit Dummy-Passwort, Google Login)
+INSERT INTO users (username, email, password_hash, google_id, balance)
+VALUES (
+    'Demo Google',
+    'google@demo.com',
+    '$2b$10$z5HhQzQ.z6p2h3hX8e9fOeTQz1H1xQp9iK6b.U1hT8mF6ZV9jF2yG', -- Dummy Passwort
+    'google-demo-id-123',
+    10000
+)
+ON CONFLICT (email) DO NOTHING;
