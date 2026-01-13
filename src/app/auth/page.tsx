@@ -177,9 +177,7 @@ export default function AuthPage() {
               </div>
             </>
           )}
-          <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full p-2 rounded bg-black/30" />
-          <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="w-full p-2 rounded bg-black/30" />
-
+          
           {/* EMAIL */}
           <div className="w-full text-left space-y-2">
             <label
