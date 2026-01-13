@@ -70,7 +70,11 @@ export default function AuthPage() {
     e.preventDefault();
     setError(null);
 
-    if (!email || !password || (mode === 'register' && (!firstName || !lastName || !confirmPassword))) {
+    if (
+      !email ||
+      !password ||
+      (mode === 'register' && (!firstName || !lastName || !confirmPassword))
+    ) {
       setError('Please fill in all fields');
       return;
     }
@@ -81,15 +85,18 @@ export default function AuthPage() {
     }
 
     try {
-      const res = await fetch(mode === 'login' ? '/api/auth/login' : '/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(
-          mode === 'login'
-            ? { email, password }
-            : { email, password, firstName, lastName }
-        ),
-      });
+      const res = await fetch(
+        mode === 'login' ? '/api/auth/login' : '/api/auth/register',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(
+            mode === 'login'
+              ? { email, password }
+              : { email, password, firstName, lastName }
+          ),
+        }
+      );
 
       const data = await res.json();
 
@@ -112,7 +119,6 @@ export default function AuthPage() {
   return (
     <main className="min-h-screen px-4 flex items-center justify-center">
       <section className="flex flex-col items-center gap-2 text-center bg-neutral-800/30 w-full max-w-sm p-6 border border-white/10 rounded-xl shadow-md">
-
         {/* Logo */}
         <header className="flex flex-col items-center gap-2 mb-4">
           <Logo size={64} />
@@ -122,8 +128,20 @@ export default function AuthPage() {
 
         {/* Mode Toggle */}
         <nav className="w-full grid grid-cols-2 gap-1 p-1 bg-white/10 rounded-lg">
-          <button type="button" onClick={() => setMode('login')} className={mode === 'login' ? 'bg-black/70 rounded-lg' : ''}>Login</button>
-          <button type="button" onClick={() => setMode('register')} className={mode === 'register' ? 'bg-black/70 rounded-lg' : ''}>Register</button>
+          <button
+            type="button"
+            onClick={() => setMode('login')}
+            className={mode === 'login' ? 'bg-black/70 rounded-lg' : ''}
+          >
+            Login
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode('register')}
+            className={mode === 'register' ? 'bg-black/70 rounded-lg' : ''}
+          >
+            Register
+          </button>
         </nav>
 
         {/* Auth Form */}
@@ -177,7 +195,7 @@ export default function AuthPage() {
               </div>
             </>
           )}
-          
+
           {/* EMAIL */}
           <div className="w-full text-left space-y-2">
             <label
@@ -272,11 +290,15 @@ export default function AuthPage() {
             </button>
           </div>
         </form>
-        
-       {/* Google Login */}
-        <div id="g_id_onload" data-client_id={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID} data-callback="handleGoogleLogin" />
+
+        {/* Google Login */}
+        <div
+          id="g_id_onload"
+          data-client_id={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
+          data-callback="handleGoogleLogin"
+        />
         <div className="g_id_signin" />
-        
+
         {/* HINWEIS STARTGUTHABEN */}
         <p className="text-white/30 text-sm">
           Demo account with $10,000 starting balance
