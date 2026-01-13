@@ -44,13 +44,16 @@ export default function DashboardPage() {
         <header className="flex items-center justify-between">
           <button>New</button>
           <button>Gold</button>
-          <button className="flex gap-2 bg-pink-600">Scalping</button>
+          <button>Scalping</button>
           <button>Plus</button>
           <button>Write</button>
         </header>
 
-        {/* ICON MIT NAME */}
-        <div className="grid grid-cols-[1fr_60px_100px] gap-4 mt-4">
+        {/* LISTE (scrollbar) */}
+        <div className='mt-4 h-48 overflow-y-auto pr-2'>
+
+          {/* EINZELNE REIHEN */}
+          <div className="grid grid-cols-[1fr_60px_100px] gap-4">
           <div className="flex items-center gap-2">
             <p>icon</p>
             <p>name</p>
@@ -64,6 +67,93 @@ export default function DashboardPage() {
             <p>aktien</p>
             <p>preis</p>
           </div>
+        </div>
+
+         <div className="grid grid-cols-[1fr_60px_100px] gap-4">
+          <div className="flex items-center gap-2">
+            <p>icon</p>
+            <p>name</p>
+          </div>
+
+          {/* KURS */}
+          <div className='flex items-center justify-center'>kurs</div>
+
+          {/* AKTIEN UND PREIS */}
+          <div className='text-right'>
+            <p>aktien</p>
+            <p>preis</p>
+          </div>
+        </div> <div className="grid grid-cols-[1fr_60px_100px] gap-4">
+          <div className="flex items-center gap-2">
+            <p>icon</p>
+            <p>name</p>
+          </div>
+
+          {/* KURS */}
+          <div className='flex items-center justify-center'>kurs</div>
+
+          {/* AKTIEN UND PREIS */}
+          <div className='text-right'>
+            <p>aktien</p>
+            <p>preis</p>
+          </div>
+        </div> <div className="grid grid-cols-[1fr_60px_100px] gap-4">
+          <div className="flex items-center gap-2">
+            <p>icon</p>
+            <p>name</p>
+          </div>
+
+          {/* KURS */}
+          <div className='flex items-center justify-center'>kurs</div>
+
+          {/* AKTIEN UND PREIS */}
+          <div className='text-right'>
+            <p>aktien</p>
+            <p>preis</p>
+          </div>
+        </div> <div className="grid grid-cols-[1fr_60px_100px] gap-4">
+          <div className="flex items-center gap-2">
+            <p>icon</p>
+            <p>name</p>
+          </div>
+
+          {/* KURS */}
+          <div className='flex items-center justify-center'>kurs</div>
+
+          {/* AKTIEN UND PREIS */}
+          <div className='text-right'>
+            <p>aktien</p>
+            <p>preis</p>
+          </div>
+        </div> <div className="grid grid-cols-[1fr_60px_100px] gap-4">
+          <div className="flex items-center gap-2">
+            <p>icon</p>
+            <p>name</p>
+          </div>
+
+          {/* KURS */}
+          <div className='flex items-center justify-center'>kurs</div>
+
+          {/* AKTIEN UND PREIS */}
+          <div className='text-right'>
+            <p>aktien</p>
+            <p>preis</p>
+          </div>
+        </div> <div className="grid grid-cols-[1fr_60px_100px] gap-4">
+          <div className="flex items-center gap-2">
+            <p>icon</p>
+            <p>name</p>
+          </div>
+
+          {/* KURS */}
+          <div className='flex items-center justify-center'>kurs</div>
+
+          {/* AKTIEN UND PREIS */}
+          <div className='text-right'>
+            <p>aktien</p>
+            <p>preis</p>
+          </div>
+        </div>
         </div>
       </section>
 
