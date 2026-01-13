@@ -4,6 +4,7 @@ import Link from 'next/link';
 import StatusCard from '../components/StatusCard';
 import { House, ChartPie, Search, User, Menu } from 'lucide-react';
 import BottomNav from '../components/BottomNav';
+import AssetRow from '../components/AssetRow';
 
 export default function DashboardPage() {
   return (
@@ -51,109 +52,9 @@ export default function DashboardPage() {
 
         {/* LISTE (scrollbar) */}
         <div className='mt-4 h-48 overflow-y-auto pr-2'>
-
-          {/* EINZELNE REIHEN */}
-          <div className="grid grid-cols-[1fr_60px_100px] gap-4">
-          <div className="flex items-center gap-2">
-            <p>icon</p>
-            <p>name</p>
-          </div>
-
-          {/* KURS */}
-          <div className='flex items-center justify-center'>kurs</div>
-
-          {/* AKTIEN UND PREIS */}
-          <div className='text-right'>
-            <p>aktien</p>
-            <p>preis</p>
-          </div>
-        </div>
-
-         <div className="grid grid-cols-[1fr_60px_100px] gap-4">
-          <div className="flex items-center gap-2">
-            <p>icon</p>
-            <p>name</p>
-          </div>
-
-          {/* KURS */}
-          <div className='flex items-center justify-center'>kurs</div>
-
-          {/* AKTIEN UND PREIS */}
-          <div className='text-right'>
-            <p>aktien</p>
-            <p>preis</p>
-          </div>
-        </div> <div className="grid grid-cols-[1fr_60px_100px] gap-4">
-          <div className="flex items-center gap-2">
-            <p>icon</p>
-            <p>name</p>
-          </div>
-
-          {/* KURS */}
-          <div className='flex items-center justify-center'>kurs</div>
-
-          {/* AKTIEN UND PREIS */}
-          <div className='text-right'>
-            <p>aktien</p>
-            <p>preis</p>
-          </div>
-        </div> <div className="grid grid-cols-[1fr_60px_100px] gap-4">
-          <div className="flex items-center gap-2">
-            <p>icon</p>
-            <p>name</p>
-          </div>
-
-          {/* KURS */}
-          <div className='flex items-center justify-center'>kurs</div>
-
-          {/* AKTIEN UND PREIS */}
-          <div className='text-right'>
-            <p>aktien</p>
-            <p>preis</p>
-          </div>
-        </div> <div className="grid grid-cols-[1fr_60px_100px] gap-4">
-          <div className="flex items-center gap-2">
-            <p>icon</p>
-            <p>name</p>
-          </div>
-
-          {/* KURS */}
-          <div className='flex items-center justify-center'>kurs</div>
-
-          {/* AKTIEN UND PREIS */}
-          <div className='text-right'>
-            <p>aktien</p>
-            <p>preis</p>
-          </div>
-        </div> <div className="grid grid-cols-[1fr_60px_100px] gap-4">
-          <div className="flex items-center gap-2">
-            <p>icon</p>
-            <p>name</p>
-          </div>
-
-          {/* KURS */}
-          <div className='flex items-center justify-center'>kurs</div>
-
-          {/* AKTIEN UND PREIS */}
-          <div className='text-right'>
-            <p>aktien</p>
-            <p>preis</p>
-          </div>
-        </div> <div className="grid grid-cols-[1fr_60px_100px] gap-4">
-          <div className="flex items-center gap-2">
-            <p>icon</p>
-            <p>name</p>
-          </div>
-
-          {/* KURS */}
-          <div className='flex items-center justify-center'>kurs</div>
-
-          {/* AKTIEN UND PREIS */}
-          <div className='text-right'>
-            <p>aktien</p>
-            <p>preis</p>
-          </div>
-        </div>
+          <AssetRow name="Bitcoin" symbol="BTC" price="43.210,00 €" changePct="+2,50%" trend="up" />
+          <AssetRow name="Ethereum" symbol="ETH" price="2.345,00 €" changePct="-1,20%" trend="down" />
+          <AssetRow name="Solana" symbol="SOL" price="98,76 €" changePct="+5,30%" trend="up" />
         </div>
       </section>
 
