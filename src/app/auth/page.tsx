@@ -43,6 +43,7 @@ export default function AuthPage() {
     document.body.appendChild(script);
 
     window.handleGoogleLogin = async (response: GoogleCredentialResponse) => {
+     console.log('🔹 Google credential received:', response);
       try {
         const res = await fetch('/api/auth/google', {
           method: 'POST',
@@ -68,10 +69,11 @@ export default function AuthPage() {
     };
 
     return () => {
+      if (document.body.contains(script)){
       document.body.removeChild(script);
-      window.handleGoogleLogin = undefined;
-    };
-  }, [router]);
+    }
+    window.handleGoogleLogin = undefined;
+}}, [router]);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
