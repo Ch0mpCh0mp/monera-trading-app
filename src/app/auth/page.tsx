@@ -131,33 +131,7 @@ export default function AuthPage() {
           className="w-full mt-4 flex flex-col gap-4"
           noValidate
           onSubmit={(e) => {
-            e.preventDefault();
-            setError(null);
-
-            // passwörter stimmen überein?
-            if (mode === 'register' && password !== confirmPassword) {
-              setError('Passwords do not match');
-              return;
-            }
-
-            // ist was eingetragen?
-            if (!email || !password) {
-              setError('Please fill in all fields');
-              return;
-            }
-
-            // weg machen wenn ich backend habe
-            console.log({
-              mode,
-              firstName,
-              lastName,
-              email,
-              password,
-              confirmPassword,
-            });
-
-            // weiter zum dashboard
-            router.push('/dashboard');
+            handleEmailSubmit(e);
           }}
         >
           {mode === 'register' && (
