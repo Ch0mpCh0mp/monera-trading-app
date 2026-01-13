@@ -60,10 +60,11 @@ export default function AuthPage() {
     };
 
     return () => {
+      if (document.body.contains(script)){
       document.body.removeChild(script);
-      window.handleGoogleLogin = undefined;
-    };
-  }, [router]);
+    }
+    window.handleGoogleLogin = undefined;
+}}, [router]);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

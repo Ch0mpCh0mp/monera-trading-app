@@ -70,11 +70,18 @@ BEFORE INSERT ON trades
 FOR EACH ROW
 EXECUTE FUNCTION update_user_balance_pnl();
 
--- 7️⃣ Demo-User einfügen
+-- 7️⃣ Demo-User (Passwort ist intern dokumentiert, nicht im Repo)
+-- Login: demo@user.com
 INSERT INTO users (username, email, password_hash, balance)
-VALUES 
-('Demo User', 'demo@user.com', '$2b$10$wS3ORP/AaRov4e9PqbJDOuVvxRjIf0L2IuR2LRfqMi8axDw/.mQoC', 10000)
+VALUES (
+    'Demo User',
+    'demo@user.com',
+    '$2b$10$wS3ORP/AaRov4e9PqbJDOuVvxRjIf0L2IuR2LRfqMi8axDw/.mQoC',
+    10000
+)
 ON CONFLICT (email) DO NOTHING;
+
+
 
 INSERT INTO users (username, email, password_hash, balance)
 VALUES 

@@ -29,17 +29,41 @@ export async function POST(req: NextRequest) {
     const username = payload.name || 'No Name';
 
     // 2️⃣ User in DB suchen
-    const userResult = await pool.query('SELECT * FROM users WHERE google_id = $1', [googleId]);
-    let user = userResult.rows[0];
+   const userResult = await pool.query(
+  'SELECT * FROM users WHERE google_id = $1',
+  [googleId]
+);
+
+let user = userResult.rows[0];
 
     // 3️⃣ User erstellen, falls nicht gefunden
     if (!user) {
-      const insertResult = await pool.query(
-        'INSERT INTO users (google_id, email, username, balance) VALUES ($1, $2, $3, $4) RETURNING *',
-        [googleId, email, username, 10000]
-      );
-      user = insertResult.rows[0];
-    }
+  const emailResult = await pool.query(
+    'SELECT * FROM users WHERE email = $1',
+    [email]
+  );
+
+  user = emailResult.rows[0];
+
+  // 👉 Existierender User → Google-ID verknüpfen
+  if (user) {
+    await pool.query(
+      'UPDATE users SET google_id = $1 WHERE id = $2',
+      [googleId, user.id]
+    );
+  }
+}
+if (!user) {
+  const insertResult = await pool.query(
+    `INSERT INTO users (username, email, google_id)
+     VALUES ($1, $2, $3)
+     RETURNING *`,
+    [username, email, googleId]
+  );
+
+  user = insertResult.rows[0];
+}
+
 
     // 4️⃣ JWT erstellen
     const jwtToken = jwt.sign(
