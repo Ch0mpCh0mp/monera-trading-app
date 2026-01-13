@@ -55,35 +55,60 @@ export default function AuthPage() {
 
         {/* Auth Form */}
         <form
-          className="w-full mt-4 flex flex-col gap-4"
-          noValidate
-          onSubmit={(e) => {
-            e.preventDefault();
-            setError(null);
+  className="w-full mt-4 flex flex-col gap-4"
+  noValidate
+  onSubmit={async (e) => {
+    e.preventDefault();
+    setError(null);
 
-            // passwörter stimmen überein?
-            if (mode === 'register' && password !== confirmPassword) {
-              setError('Passwords do not match');
-              return;
-            }
+    // passwörter stimmen überein?
+    if (mode === 'register' && password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
 
-            // ist was eingetragen?
-            if (!email || !password) {
-              setError('Please fill in all fields');
-              return;
-            }
+    // ist was eingetragen?
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      return;
+    }
 
-            // weg machen wenn ich backend habe
-            console.log({
-              mode,
-              firstName,
-              lastName,
-              email,
-              password,
-              confirmPassword,
-            });
-          }}
-        >
+    try {
+      const res = await fetch(
+        mode === 'login' ? '/api/auth/login' : '/api/auth/register',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(
+            mode === 'login'
+              ? { email, password }
+              : { email, password, firstName, lastName }
+          ),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Something went wrong');
+        return;
+      }
+
+      // Token speichern
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      console.log('Login/Register success:', data);
+
+      // Hier später zum Dashboard weiterleiten
+      // router.push('/dashboard');
+    } catch (err) {
+      setError('Request failed');
+      console.error(err);
+    }
+  }}
+>
+
           {mode === 'register' && (
             <>
               <div className="w-full text-left space-y-2">
