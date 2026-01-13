@@ -7,6 +7,24 @@ import BottomNav from '../components/BottomNav';
 import AssetRow from '../components/AssetRow';
 
 export default function DashboardPage() {
+
+  const assets: Array<{
+    name: string;
+    symbol: string;
+    price: number;
+    changePct: number;
+    trend: 'up' | 'down' | 'neutral';
+}> = [
+    { name: "Bitcoin", symbol: "BTC", price: 4321.00, changePct: 2.5, trend: 'up' },
+    { name: "Ethereum", symbol: "ETH", price: 2345.00, changePct: -1.2, trend: 'down' },
+    { name: "Solana", symbol: "SOL", price: 98.76, changePct: 5.3, trend: 'up' },
+    { name: "Cardano", symbol: "ADA", price: 1.23, changePct: 0.0, trend: 'neutral' },
+    { name: "Ripple", symbol: "XRP", price: 0.89, changePct: -0.5, trend: 'down' },
+    { name: "Polkadot", symbol: "DOT", price: 25.67, changePct: 3.1, trend: 'up' },
+    { name: "Dogecoin", symbol: "DOGE", price: 0.25, changePct: -2.3, trend: 'down' },
+    { name: "Litecoin", symbol: "LTC", price: 150.45, changePct: 1.8, trend: 'up' }
+  ];
+
   return (
     <main className="min-h-screen bg-black pt-8 pb-24">
       {/* KONTO WERT */}
@@ -52,9 +70,16 @@ export default function DashboardPage() {
 
         {/* LISTE (scrollbar) */}
         <div className='mt-4 h-48 overflow-y-auto pr-2'>
-          <AssetRow name="Bitcoin" symbol="BTC" price="43.210,00 €" changePct="+2,50%" trend="up" />
-          <AssetRow name="Ethereum" symbol="ETH" price="2.345,00 €" changePct="-1,20%" trend="down" />
-          <AssetRow name="Solana" symbol="SOL" price="98,76 €" changePct="+5,30%" trend="up" />
+          {assets.map((asset) => (
+            <AssetRow
+              key={asset.symbol}
+              name={asset.name}
+              symbol={asset.symbol}
+              price={asset.price}
+              changePct={asset.changePct}
+              trend={asset.trend}
+            />
+          ))}
         </div>
       </section>
 
