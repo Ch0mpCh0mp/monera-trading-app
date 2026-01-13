@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Logo from '../components/Logo';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface GoogleCredentialResponse {
@@ -26,6 +26,13 @@ export default function AuthPage() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  const labelCls = 'text-sm font-medium text-white/80 block';
+  const fieldCls = 'w-full text-left space-y-2';
+  const shellCls =
+    'w-full grid grid-cols-[44px_1fr] items-center h-11 rounded-xl bg-black/30 border border-white/10 focus-within:ring-4 focus-within:ring-white/10';
+  const inputCls =
+    'h-full w-full bg-transparent outline-none text-sm text-white/90 placeholder:text-white/40 pr-3';
 
   // Google One Tap Script
   useEffect(() => {
@@ -131,14 +138,18 @@ export default function AuthPage() {
           <button
             type="button"
             onClick={() => setMode('login')}
-            className={mode === 'login' ? 'bg-black/70 rounded-lg' : ''}
+            className={`h-8 rounded-lg text-md ${
+              mode === 'login' ? 'bg-black/70' : 'text-white/70'
+            }`}
           >
             Login
           </button>
           <button
             type="button"
             onClick={() => setMode('register')}
-            className={mode === 'register' ? 'bg-black/70 rounded-lg' : ''}
+            className={`h-8 rounded-lg text-md ${
+              mode === 'register' ? 'bg-black/70' : 'text-white/70'
+            }`}
           >
             Register
           </button>
@@ -155,43 +166,48 @@ export default function AuthPage() {
           {mode === 'register' && (
             <>
               {/* VORNAME */}
-              <div className="w-full text-left space-y-2">
-                <label
-                  htmlFor="firstName"
-                  className="text-sm font-medium text-white/80 block"
-                >
+              <div className={fieldCls}>
+                <label htmlFor="firstName" className={labelCls}>
                   First name
                 </label>
 
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="First name"
-                  className="h-11 w-full rounded-xl bg-black/30 border border-white/10 px-3 text-sm text-white/90 placeholder:text-white/40 outline-none focus:ring-4 focus:ring-white/10"
-                />
+                <div className={shellCls}>
+                  <span className="grid place-items-center text-white/40">
+                    <User size={18} />
+                  </span>
+
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="First name"
+                    className={inputCls}
+                  />
+                </div>
               </div>
 
               {/* NACHNAME */}
-              <div className="w-full text-left space-y-2">
-                <label
-                  htmlFor="lastName"
-                  className="text-sm font-medium text-white/80 block"
-                >
+              <div className={fieldCls}>
+                <label htmlFor="lastName" className={labelCls}>
                   Last name
                 </label>
 
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  placeholder="Last name"
-                  className="h-11 w-full rounded-xl bg-black/30 border border-white/10 px-3 text-sm text-white/90 placeholder:text-white/40 outline-none focus:ring-4 focus:ring-white/10"
-                />
+                <div className={shellCls}>
+                  <span className="grid place-items-center text-white/40">
+                    <User size={18} />
+                  </span>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Last name"
+                    className={inputCls}
+                  />
+                </div>
               </div>
             </>
           )}
@@ -223,15 +239,15 @@ export default function AuthPage() {
           </div>
 
           {/* PASSWORT */}
-          <div className="w-full text-left space-y-2">
+          <div className={fieldCls}>
             <label
               htmlFor="password"
-              className="text-sm font-medium text-white/80"
+              className={labelCls}
             >
               Password
             </label>
 
-            <div className="w-full grid grid-cols-[44px_1fr] items-center h-11 rounded-xl bg-black/30 border border-white/10 focus-within:ring-4 focus-within:ring-white/10">
+            <div className={shellCls}>
               <span className="grid place-items-center text-white/40">
                 <Lock size={18} />
               </span>
@@ -243,22 +259,23 @@ export default function AuthPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="h-full bg-transparent outline-none text-sm text-white/90 placeholder:text-white/40 pr-3"
+                className={inputCls}
                 placeholder="Your password"
               />
             </div>
+          </div>
 
-            {/* BESTÄTIGE PASSWORT */}
+           {/* BESTÄTIGE PASSWORT */}
             {mode === 'register' && (
-              <div className="w-full text-left space-y-2">
+              <div className={fieldCls}>
                 <label
                   htmlFor="confirmPassword"
-                  className="text-sm font-medium text-white/80"
+                  className={labelCls}
                 >
                   Confirm Password
                 </label>
 
-                <div className="w-full grid grid-cols-[44px_1fr] items-center h-11 rounded-xl bg-black/30 border border-white/10 focus-within:ring-4 focus-within:ring-white/10">
+                <div className={shellCls}>
                   <span className="grid place-items-center text-white/40">
                     <Lock size={18} />
                   </span>
@@ -270,12 +287,11 @@ export default function AuthPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Repeat your password"
-                    className="h-full bg-transparent outline-none text-sm text-white/90 placeholder:text-white/40 pr-3"
+                    className={inputCls}
                   />
                 </div>
               </div>
             )}
-          </div>
 
           {/* Fehlermeldung */}
           {error && <p className="text-sm">{error}</p>}
