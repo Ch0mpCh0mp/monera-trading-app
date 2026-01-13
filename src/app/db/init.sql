@@ -6,10 +6,25 @@ CREATE TABLE IF NOT EXISTS users (
     google_id VARCHAR(255) UNIQUE,
     username VARCHAR(50) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    password_hash VARCHAR(255)NOT NULL ,
+    password_hash VARCHAR(255) ,
     balance NUMERIC(10,2) DEFAULT 10000,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- ✅ Spalte password_hash optional für Google-Login
+ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
+
+-- Demo-User für normales Login
+INSERT INTO users (username, email, password_hash, balance)
+VALUES 
+('Demo User', 'demo@user.com', '$2b$10$wS3ORP/AaRov4e9PqbJDOuVvxRjIf0L2IuR2LRfqMi8axDw/.mQoC', 10000)
+ON CONFLICT (email) DO NOTHING;
+
+-- Optional: Google-Demo-User (falls du schon Google-ID hast)
+INSERT INTO users (username, email, google_id, balance)
+VALUES 
+('Demo Google', 'google@demo.com', 'google-demo-id-123', 10000)
+ON CONFLICT (email) DO NOTHING;
 
 -- 2️⃣ Products-Tabelle
 CREATE TABLE IF NOT EXISTS products (
@@ -70,23 +85,6 @@ BEFORE INSERT ON trades
 FOR EACH ROW
 EXECUTE FUNCTION update_user_balance_pnl();
 
--- 7️⃣ Demo-User (Passwort ist intern dokumentiert, nicht im Repo)
--- Login: demo@user.com
-INSERT INTO users (username, email, password_hash, balance)
-VALUES (
-    'Demo User',
-    'demo@user.com',
-    '$2b$10$wS3ORP/AaRov4e9PqbJDOuVvxRjIf0L2IuR2LRfqMi8axDw/.mQoC',
-    10000
-)
-ON CONFLICT (email) DO NOTHING;
-
-
-
-INSERT INTO users (username, email, password_hash, balance)
-VALUES 
-('Test User', 'test@test.de', '$2b$10$G9/FMVE5ibVGAF5m9l/gF.K/QeZ4RtVmnB7g97NbJJA0rhVPX8tJy', 10000)
-ON CONFLICT (email) DO NOTHING;
 
 -- 8️⃣ Beispiel-Produkt einfügen
 INSERT INTO products (name, description, price)
@@ -94,13 +92,3 @@ VALUES
 ('Demo Product', 'This is a demo product.', 49.99)
 ON CONFLICT (name) DO NOTHING;
 
--- 9️⃣ Demo Google User einfügen (mit Dummy-Passwort, Google Login)
-INSERT INTO users (username, email, password_hash, google_id, balance)
-VALUES (
-    'Demo Google',
-    'google@demo.com',
-    '$2b$10$z5HhQzQ.z6p2h3hX8e9fOeTQz1H1xQp9iK6b.U1hT8mF6ZV9jF2yG', -- Dummy Passwort
-    'google-demo-id-123',
-    10000
-)
-ON CONFLICT (email) DO NOTHING;
