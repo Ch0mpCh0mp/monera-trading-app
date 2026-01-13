@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Logo from '../components/Logo';
 import { Mail, Lock } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface GoogleCredentialResponse {
   credential: string;
@@ -17,20 +18,22 @@ declare global {
 }
 
 export default function AuthPage() {
+  const router = useRouter();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  // Google One Tap
   useEffect(() => {
-    // Google One Tap Script laden
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
     script.defer = true;
     document.body.appendChild(script);
 
-    // Callback für Google Login
     window.handleGoogleLogin = async (response: GoogleCredentialResponse) => {
       try {
         const res = await fetch('/api/auth/google', {
@@ -47,11 +50,9 @@ export default function AuthPage() {
         }
 
         const data = await res.json();
-        console.log('Google Login OK:', data);
-
-        // TODO: Token speichern + Redirect
-        // localStorage.setItem('token', data.token);
-        // router.push('/dashboard');
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        router.push('/dashboard');
       } catch (err) {
         console.error('Google login error', err);
         setError('Google authentication failed');
@@ -62,40 +63,43 @@ export default function AuthPage() {
       document.body.removeChild(script);
       window.handleGoogleLogin = undefined;
     };
-  }, []);
+  }, [router]);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    if (!email || !password) {
+    if (!email || !password || (mode === 'register' && (!firstName || !lastName))) {
       setError('Please fill in all fields');
       return;
     }
 
-    const endpoint =
-      mode === 'login'
-        ? '/api/auth/login'
-        : '/api/auth/register';
-
     try {
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      const res = await fetch(
+        mode === 'login' ? '/api/auth/login' : '/api/auth/register',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(
+            mode === 'login'
+              ? { email, password }
+              : { email, password, firstName, lastName }
+          ),
+        }
+      );
+
+      const data = await res.json();
 
       if (!res.ok) {
-        const text = await res.text();
-        console.error('Auth Error:', res.status, text);
-        setError('Authentication failed');
+        setError(data.error || 'Authentication failed');
         return;
       }
 
-      const data = await res.json();
-      console.log('Email Auth OK:', data);
+      // Token + User speichern
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
 
-      // TODO: Token speichern + Redirect
+      router.push('/dashboard');
     } catch (err) {
       console.error('Email auth error', err);
       setError('Authentication failed');
@@ -133,6 +137,25 @@ export default function AuthPage() {
 
         {/* Email Form */}
         <form onSubmit={handleEmailSubmit} className="w-full mt-4 space-y-4">
+          {mode === 'register' && (
+            <>
+              <input
+                type="text"
+                placeholder="First Name"
+                value={firstName}
+                onChange={e => setFirstName(e.target.value)}
+                className="w-full p-2 rounded bg-black/30"
+              />
+              <input
+                type="text"
+                placeholder="Last Name"
+                value={lastName}
+                onChange={e => setLastName(e.target.value)}
+                className="w-full p-2 rounded bg-black/30"
+              />
+            </>
+          )}
+
           <input
             type="email"
             placeholder="Email"
@@ -140,7 +163,6 @@ export default function AuthPage() {
             onChange={e => setEmail(e.target.value)}
             className="w-full p-2 rounded bg-black/30"
           />
-
           <input
             type="password"
             placeholder="Password"
@@ -163,18 +185,6 @@ export default function AuthPage() {
           data-callback="handleGoogleLogin"
         />
         <div className="g_id_signin" />
-
-        {/* Test Button */}
-        <button
-          type="button"
-          onClick={() => {
-            console.log('Fake Google Login OK');
-            alert('Fake Google Login simuliert (Frontend OK)');
-          }}
-          className="mt-3 text-sm text-blue-400"
-        >
-          Test Google Login
-        </button>
 
         <p className="text-white/30 text-sm mt-2">
           Demo account with $10,000 starting balance
