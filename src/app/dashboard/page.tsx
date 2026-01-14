@@ -2,11 +2,23 @@
 
 import Link from 'next/link';
 import StatusCard from '../components/StatusCard';
-import { House, ChartPie, Search, User, Menu } from 'lucide-react';
+import {
+  House,
+  ChartPie,
+  Search,
+  User,
+  Menu,
+  Plus,
+  Pencil,
+} from 'lucide-react';
 import BottomNav from '../components/BottomNav';
 import AssetRow from '../components/AssetRow';
+import { useState } from 'react';
 
 export default function DashboardPage() {
+  const tabs = ['New on Monera', 'Gold', 'Scalping'] as const;
+  const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>(tabs[0]);
+
   const assets: Array<{
     name: string;
     symbol: string;
@@ -108,12 +120,41 @@ export default function DashboardPage() {
       {/* GROSSER AKTIENBLOCK */}
       <section className="border border-white/10 text-white/50 bg-white/5 rounded-2xl mt-8 p-4 gap-2">
         {/* TABS */}
-        <header className="flex items-center justify-between">
-          <button>New</button>
-          <button>Gold</button>
-          <button>Scalping</button>
-          <button>Plus</button>
-          <button>Write</button>
+        <header className="flex items-center justify-between gap-3">
+          {/* Tabs links */}
+          <div className="flex items-center gap-3 overflow-x-auto">
+            {tabs.map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActiveTab(tab)}
+                className={activeTab === tab ? 'text-white' : 'text-white/60'}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          {/* Aktionen rechts (Plus + Stift) */}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              aria-label="Watchlist hinzufügen"
+              onClick={() => console.log('add watchlist')}
+              className="text-white/70"
+            >
+              <Plus size={18} />
+            </button>
+
+            <button
+              type="button"
+              aria-label="Watchlists bearbeiten"
+              onClick={() => console.log('edit watchlists')}
+              className="text-white/70"
+            >
+              <Pencil size={18} />
+            </button>
+          </div>
         </header>
 
         {/* LISTE (scrollbar) */}
