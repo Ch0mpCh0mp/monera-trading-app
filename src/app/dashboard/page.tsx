@@ -7,22 +7,69 @@ import BottomNav from '../components/BottomNav';
 import AssetRow from '../components/AssetRow';
 
 export default function DashboardPage() {
-
   const assets: Array<{
     name: string;
     symbol: string;
     price: number;
     changePct: number;
     trend: 'up' | 'down' | 'neutral';
-}> = [
-    { name: "Bitcoin", symbol: "BTC", price: 4321.00, changePct: 2.5, trend: 'up' },
-    { name: "Ethereum", symbol: "ETH", price: 2345.00, changePct: -1.2, trend: 'down' },
-    { name: "Solana", symbol: "SOL", price: 98.76, changePct: 5.3, trend: 'up' },
-    { name: "Cardano", symbol: "ADA", price: 1.23, changePct: 0.0, trend: 'neutral' },
-    { name: "Ripple", symbol: "XRP", price: 0.89, changePct: -0.5, trend: 'down' },
-    { name: "Polkadot", symbol: "DOT", price: 25.67, changePct: 3.1, trend: 'up' },
-    { name: "Dogecoin", symbol: "DOGE", price: 0.25, changePct: -2.3, trend: 'down' },
-    { name: "Litecoin", symbol: "LTC", price: 150.45, changePct: 1.8, trend: 'up' }
+  }> = [
+    {
+      name: 'Bitcoin',
+      symbol: 'BTC',
+      price: 4321.0,
+      changePct: 2.5,
+      trend: 'up',
+    },
+    {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      price: 2345.0,
+      changePct: -1.2,
+      trend: 'down',
+    },
+    {
+      name: 'Solana',
+      symbol: 'SOL',
+      price: 98.76,
+      changePct: 5.3,
+      trend: 'up',
+    },
+    {
+      name: 'Cardano',
+      symbol: 'ADA',
+      price: 1.23,
+      changePct: 0.0,
+      trend: 'neutral',
+    },
+    {
+      name: 'Ripple',
+      symbol: 'XRP',
+      price: 0.89,
+      changePct: -0.5,
+      trend: 'down',
+    },
+    {
+      name: 'Polkadot',
+      symbol: 'DOT',
+      price: 25.67,
+      changePct: 3.1,
+      trend: 'up',
+    },
+    {
+      name: 'Dogecoin',
+      symbol: 'DOGE',
+      price: 0.25,
+      changePct: -2.3,
+      trend: 'down',
+    },
+    {
+      name: 'Litecoin',
+      symbol: 'LTC',
+      price: 150.45,
+      changePct: 1.8,
+      trend: 'up',
+    },
   ];
 
   return (
@@ -43,18 +90,19 @@ export default function DashboardPage() {
       </div>
 
       {/* CASH UND DEPOSIT BUTTON */}
-      <div className="flex justify-between rounded-2xl bg-white/5 border border-white/10 p-4 mx-6">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-white/50">CASH</p>
-          <p className="text-2xl font-semibold text-white">0,00 €</p>
-        </div>
-
-        <Link
-          href="/deposit"
-          className="mt-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full"
-        >
-          Deposit
-        </Link>
+      <div className="mb-8 px-6">
+        <StatusCard
+          label="Cash"
+          value="0,00 €"
+          rightSide={
+            <Link
+              href="/deposit"
+              className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full"
+            >
+              Deposit
+            </Link>
+          }
+        />
       </div>
 
       {/* GROSSER AKTIENBLOCK */}
@@ -69,7 +117,7 @@ export default function DashboardPage() {
         </header>
 
         {/* LISTE (scrollbar) */}
-        <div className='mt-4 h-48 overflow-y-auto pr-2'>
+        <div className="mt-4 h-48 overflow-y-auto pr-2">
           {assets.map((asset) => (
             <AssetRow
               key={asset.symbol}
