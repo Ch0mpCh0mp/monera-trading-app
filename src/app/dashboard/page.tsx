@@ -7,7 +7,47 @@ import BottomNav from '../components/BottomNav';
 import AssetRow from '../components/AssetRow';
 import { useState } from 'react';
 
+function LevelRing({ percent, size = 42 }: { percent: number, size?: number }) {
+  const stroke = 4;
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const clampedPercent = Math.max(0, Math.min(100, percent));
+  const offset = circumference * (1 - clampedPercent / 100);
+
+  return (
+    <div className='relative' style={{ width: size, height: size }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className='-rotate-90'>
+
+      {/* HINTERGRUND (inaktiv) */}
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke="rgba(0, 166, 62, 0.4)"
+        strokeWidth={stroke}
+      />
+
+      {/* FORTSCHRITT (aktiv) */}
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke="rgba(0, 166, 62, 1)"
+        strokeWidth={stroke}
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+        strokeLinecap='round'
+        />
+    </svg>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
+  const levelPercent = 100;
+
   const tabs = ['New on Monera', 'Gold', 'Scalping'] as const;
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>(tabs[0]);
 
@@ -31,8 +71,10 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-black pt-8 pb-24">
-      {/* KONTO WERT */}
-      <section className="mb-8 px-6">
+
+     <div className='mx-auto max-w-md px-6'>
+       {/* KONTO WERT */}
+      <section className="mb-8">
         <p className="text-xs uppercase tracking-wider text-white/50 mb-2">
           Account Value
         </p>
@@ -41,13 +83,13 @@ export default function DashboardPage() {
       </section>
 
       {/* STATUS KARTEN */}
-      <div className="grid grid-cols-2 gap-4 mb-8 px-6">
+      <div className="grid grid-cols-2 gap-4 mb-8">
         <StatusCard label="Margin" value="0,00 €" />
-        <StatusCard label="Level" value="100%" />
+        <StatusCard label="Level" value={`${levelPercent}%`} rightSide={<LevelRing percent={levelPercent} />} />
       </div>
 
       {/* CASH UND DEPOSIT BUTTON */}
-      <div className="mb-8 px-6">
+      <div className="mb-8">
         <StatusCard
           label="Cash"
           value="0,00 €"
@@ -61,19 +103,21 @@ export default function DashboardPage() {
           }
         />
       </div>
+       </div>
 
       {/* GROSSER AKTIENBLOCK */}
-      <section className="border border-white/10 text-white/50 bg-white/5 rounded-2xl mt-8 p-4 gap-2">
-        {/* TABS */}
+      <section className="border border-white/10 text-white/50 bg-white/5 rounded-2xl mt-8 gap-2">
+       <div className='mx-auto max-w-md px-4 py-4'>
+         {/* TABS */}
         <header className="flex items-center justify-between gap-3">
           {/* Tabs links */}
-          <div className="flex items-center gap-3 overflow-x-auto">
+          <div className="flex items-center gap-2 overflow-hidden whitespace-nowrap text-sm">
             {tabs.map((tab) => (
               <button
                 key={tab}
                 type="button"
                 onClick={() => setActiveTab(tab)}
-                className={activeTab === tab ? 'text-white' : 'text-white/60'}
+                className={`shrink-0 ${activeTab === tab ? 'text-white' : 'text-white/60'}`}
               >
                 {tab}
               </button>
@@ -103,7 +147,7 @@ export default function DashboardPage() {
         </header>
 
         {/* LISTE (scrollbar) */}
-        <div className="mt-4 h-48 overflow-y-auto pr-2">
+        <div className="mt-4 h-48 overflow-y-auto overflow-x-hidden pr-2">
           {assetsByTab[activeTab]?.map((asset) => (
             <AssetRow
               key={asset.symbol}
@@ -115,6 +159,7 @@ export default function DashboardPage() {
             />
           ))}
         </div>
+       </div>
       </section>
 
       {/* BOTTOM NAVIGATION */}

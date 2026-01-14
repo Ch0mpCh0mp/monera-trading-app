@@ -10,23 +10,25 @@ type AssetRowProps = {
 
 export default function AssetRow({ name, symbol, price, changePct, trend }: AssetRowProps) {
   return (
-    <section>
+    <div className="py-3 border-b border-white/10">
          {/* EINZELNE ZEILE */}
-          <div className="grid grid-cols-[1fr_60px_100px] gap-4">
-          <div className="flex items-center gap-2">
-            <p>{symbol}</p>
-            <p>{name}</p>
+          <div className="grid grid-cols-[1fr_48px_96px] items-center gap-3">
+
+            {/* SYMBOL UND NAME */}
+          <div className="min-w-0">
+            <p className="text-white text-sm font-medium">{symbol}</p>
+            <p className="text-white/50 text-xs truncate">{name}</p>
           </div>
 
-          {/* KURS */}
-          <div className='flex items-center justify-center'>{trend}</div>
+          {/* KURS TREND */}
+          <div className='text-center text-xs text-white/50'>{trend}</div>
 
           {/* AKTIEN UND PREIS */}
           <div className='text-right'>
-            <p>{price}</p>
-            <p>{changePct}</p>
+            <p className="text-white text-sm font-medium">{price.toFixed(2)}</p>
+            <p className="text-white/50 text-xs">{changePct > 0 ? '+' : ''}{changePct.toFixed(2)}%</p>
           </div>
         </div>
-    </section>
+    </div>
   );
 }
