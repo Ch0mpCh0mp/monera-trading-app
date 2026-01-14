@@ -2,15 +2,7 @@
 
 import Link from 'next/link';
 import StatusCard from '../components/StatusCard';
-import {
-  House,
-  ChartPie,
-  Search,
-  User,
-  Menu,
-  Plus,
-  Pencil,
-} from 'lucide-react';
+import { Plus, Pencil } from 'lucide-react';
 import BottomNav from '../components/BottomNav';
 import AssetRow from '../components/AssetRow';
 import { useState } from 'react';
@@ -19,70 +11,23 @@ export default function DashboardPage() {
   const tabs = ['New on Monera', 'Gold', 'Scalping'] as const;
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>(tabs[0]);
 
-  const assets: Array<{
-    name: string;
-    symbol: string;
-    price: number;
-    changePct: number;
-    trend: 'up' | 'down' | 'neutral';
-  }> = [
-    {
-      name: 'Bitcoin',
-      symbol: 'BTC',
-      price: 4321.0,
-      changePct: 2.5,
-      trend: 'up',
-    },
-    {
-      name: 'Ethereum',
-      symbol: 'ETH',
-      price: 2345.0,
-      changePct: -1.2,
-      trend: 'down',
-    },
-    {
-      name: 'Solana',
-      symbol: 'SOL',
-      price: 98.76,
-      changePct: 5.3,
-      trend: 'up',
-    },
-    {
-      name: 'Cardano',
-      symbol: 'ADA',
-      price: 1.23,
-      changePct: 0.0,
-      trend: 'neutral',
-    },
-    {
-      name: 'Ripple',
-      symbol: 'XRP',
-      price: 0.89,
-      changePct: -0.5,
-      trend: 'down',
-    },
-    {
-      name: 'Polkadot',
-      symbol: 'DOT',
-      price: 25.67,
-      changePct: 3.1,
-      trend: 'up',
-    },
-    {
-      name: 'Dogecoin',
-      symbol: 'DOGE',
-      price: 0.25,
-      changePct: -2.3,
-      trend: 'down',
-    },
-    {
-      name: 'Litecoin',
-      symbol: 'LTC',
-      price: 150.45,
-      changePct: 1.8,
-      trend: 'up',
-    },
-  ];
+  const assetsByTab = {
+    'New on Monera': [
+      { name: 'Bitcoin', symbol: 'BTC', price: 4321.0, changePct: 2.5, trend: 'up' },
+      { name: 'Ethereum', symbol: 'ETH', price: 2345.0, changePct: -1.2, trend: 'down' },
+      { name: 'Ripple', symbol: 'XRP', price: 0.89, changePct: -0.5, trend: 'down' },
+      { name: 'Polkadot', symbol: 'DOT', price: 25.67, changePct: 3.1, trend: 'up' },
+      { name: 'Dogecoin', symbol: 'DOGE', price: 0.25, changePct: -2.3, trend: 'down' },
+      { name: 'Litecoin', symbol: 'LTC', price: 150.45, changePct: 1.8, trend: 'up' },
+    ],
+    Gold: [
+      { name: 'Gold', symbol: 'XAU', price: 1800.0, changePct: 0.5, trend: 'up' },
+    ],
+    Scalping: [
+      { name: 'Solana', symbol: 'SOL', price: 98.76, changePct: 5.3, trend: 'up' },
+      { name: 'Cardano', symbol: 'ADA', price: 1.23, changePct: 0.0, trend: 'neutral' },
+    ],
+  };
 
   return (
     <main className="min-h-screen bg-black pt-8 pb-24">
@@ -159,7 +104,7 @@ export default function DashboardPage() {
 
         {/* LISTE (scrollbar) */}
         <div className="mt-4 h-48 overflow-y-auto pr-2">
-          {assets.map((asset) => (
+          {assetsByTab[activeTab]?.map((asset) => (
             <AssetRow
               key={asset.symbol}
               name={asset.name}
