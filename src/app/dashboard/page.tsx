@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import StatusCard from '../components/StatusCard';
-import { Plus, Pencil } from 'lucide-react';
 import BottomNav from '../components/BottomNav';
 import AssetRow from '../components/AssetRow';
 import { useState } from 'react';
@@ -75,10 +74,10 @@ export default function DashboardPage() {
     <main className="min-h-screen bg-black pt-6 pb-24">
 
      <div className='mx-auto max-w-md px-4 space-y-6'>
-       {/* KONTO WERT */}
+       {/* ACCOUNT VALUE */}
         <AccountValueCard value={12543.21} changeSumToday={123.45} changePct={0.99} currency="EUR" />
 
-      {/* STATUS KARTEN */}
+      {/* MARGIN & LEVEL */}
       <div className="grid grid-cols-2 gap-4">
         <StatusCard label="Margin" value="0,00 €" />
         <StatusCard label="Level" value={`${levelPercent}%`} rightSide={<LevelRing percent={levelPercent} />} />
