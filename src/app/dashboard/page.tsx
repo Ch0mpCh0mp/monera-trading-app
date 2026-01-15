@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import StatusCard from '../components/StatusCard';
-import { Plus, Pencil } from 'lucide-react';
 import BottomNav from '../components/BottomNav';
 import AssetRow from '../components/AssetRow';
 import { useState } from 'react';
+import AccountValueCard from '../components/AccountValueCard';
+import WatchlistHeader from '../components/WatchlistHeader';
 
 function LevelRing({ percent, size = 42 }: { percent: number, size?: number }) {
   const stroke = 4;
@@ -48,11 +49,11 @@ function LevelRing({ percent, size = 42 }: { percent: number, size?: number }) {
 export default function DashboardPage() {
   const levelPercent = 100;
 
-  const tabs = ['New on Monera', 'Gold', 'Scalping'] as const;
+  const tabs = ['New', 'Gold', 'Scalping'] as const;
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>(tabs[0]);
 
   const assetsByTab = {
-    'New on Monera': [
+    'New': [
       { name: 'Bitcoin', symbol: 'BTC', price: 4321.0, changePct: 2.5, trend: 'up' },
       { name: 'Ethereum', symbol: 'ETH', price: 2345.0, changePct: -1.2, trend: 'down' },
       { name: 'Ripple', symbol: 'XRP', price: 0.89, changePct: -0.5, trend: 'down' },
@@ -70,26 +71,20 @@ export default function DashboardPage() {
   };
 
   return (
-    <main className="min-h-screen bg-black pt-8 pb-24">
+    <main className="min-h-screen bg-black pt-6 pb-24">
 
-     <div className='mx-auto max-w-md px-6'>
-       {/* KONTO WERT */}
-      <section className="mb-8">
-        <p className="text-xs uppercase tracking-wider text-white/50 mb-2">
-          Account Value
-        </p>
-        <p className="text-4xl font-semibold text-white">10.000,00 €</p>
-        <p className="text-sm text-white/70 underline">+0.00 € (0.00%) Today</p>
-      </section>
+     <div className='mx-auto max-w-md px-4 space-y-6'>
+       {/* ACCOUNT VALUE */}
+        <AccountValueCard value={12543.21} changeSumToday={123.45} changePct={0.99} currency="EUR" />
 
-      {/* STATUS KARTEN */}
-      <div className="grid grid-cols-2 gap-4 mb-8">
+      {/* MARGIN & LEVEL */}
+      <div className="grid grid-cols-2 gap-4">
         <StatusCard label="Margin" value="0,00 €" />
         <StatusCard label="Level" value={`${levelPercent}%`} rightSide={<LevelRing percent={levelPercent} />} />
       </div>
 
       {/* CASH UND DEPOSIT BUTTON */}
-      <div className="mb-8">
+      <div>
         <StatusCard
           label="Cash"
           value="0,00 €"
@@ -106,45 +101,16 @@ export default function DashboardPage() {
        </div>
 
       {/* GROSSER AKTIENBLOCK */}
-      <section className="border border-white/10 text-white/50 bg-white/5 rounded-2xl mt-8 gap-2">
+      <section className="border border-white/5 text-white/50 bg-white/5 rounded-2xl mt-6">
        <div className='mx-auto max-w-md px-4 py-4'>
-         {/* TABS */}
-        <header className="flex items-center justify-between gap-3">
-          {/* Tabs links */}
-          <div className="flex items-center gap-2 overflow-hidden whitespace-nowrap text-sm">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setActiveTab(tab)}
-                className={`shrink-0 ${activeTab === tab ? 'text-white' : 'text-white/60'}`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
-          {/* Aktionen rechts (Plus + Stift) */}
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              type="button"
-              aria-label="Watchlist hinzufügen"
-              onClick={() => console.log('add watchlist')}
-              className="text-white/70"
-            >
-              <Plus size={18} />
-            </button>
-
-            <button
-              type="button"
-              aria-label="Watchlists bearbeiten"
-              onClick={() => console.log('edit watchlists')}
-              className="text-white/70"
-            >
-              <Pencil size={18} />
-            </button>
-          </div>
-        </header>
+         {/* TABS PLUS UND BEARBEITEN */}
+        <WatchlistHeader
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onAddClick={() => console.log("add watchlist")}
+          onEditClick={() => console.log("edit watchlists")}
+        />
 
         {/* LISTE (scrollbar) */}
         <div className="mt-4 h-48 overflow-y-auto overflow-x-hidden pr-2">
