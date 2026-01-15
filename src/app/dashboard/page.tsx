@@ -6,6 +6,7 @@ import { Plus, Pencil } from 'lucide-react';
 import BottomNav from '../components/BottomNav';
 import AssetRow from '../components/AssetRow';
 import { useState } from 'react';
+import AccountValueCard from '../components/AccountValueCard';
 
 function LevelRing({ percent, size = 42 }: { percent: number, size?: number }) {
   const stroke = 4;
@@ -70,26 +71,20 @@ export default function DashboardPage() {
   };
 
   return (
-    <main className="min-h-screen bg-black pt-8 pb-24">
+    <main className="min-h-screen bg-black pt-6 pb-24">
 
-     <div className='mx-auto max-w-md px-6'>
+     <div className='mx-auto max-w-md px-4 space-y-6'>
        {/* KONTO WERT */}
-      <section className="mb-8">
-        <p className="text-xs uppercase tracking-wider text-white/50 mb-2">
-          Account Value
-        </p>
-        <p className="text-4xl font-semibold text-white">10.000,00 €</p>
-        <p className="text-sm text-white/70 underline">+0.00 € (0.00%) Today</p>
-      </section>
+        <AccountValueCard value={12543.21} changeSumToday={123.45} changePct={0.99} currency="EUR" />
 
       {/* STATUS KARTEN */}
-      <div className="grid grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-2 gap-4">
         <StatusCard label="Margin" value="0,00 €" />
         <StatusCard label="Level" value={`${levelPercent}%`} rightSide={<LevelRing percent={levelPercent} />} />
       </div>
 
       {/* CASH UND DEPOSIT BUTTON */}
-      <div className="mb-8">
+      <div>
         <StatusCard
           label="Cash"
           value="0,00 €"
@@ -106,7 +101,7 @@ export default function DashboardPage() {
        </div>
 
       {/* GROSSER AKTIENBLOCK */}
-      <section className="border border-white/10 text-white/50 bg-white/5 rounded-2xl mt-8 gap-2">
+      <section className="border border-white/5 text-white/50 bg-white/5 rounded-2xl mt-6 backdrop-blur">
        <div className='mx-auto max-w-md px-4 py-4'>
          {/* TABS */}
         <header className="flex items-center justify-between gap-3">
