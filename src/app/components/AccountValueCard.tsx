@@ -19,6 +19,7 @@ function formatCurrency(amount: number, currency: 'USD' | 'EUR'): string {
 export default function AccountValueCard({ value, changeSumToday, changePct, currency = 'USD' }: AccountValueCardProps) {
     const isPositive = changeSumToday > 0;
     const sign = isPositive ? '+' : '';
+    const colorClass = changeSumToday > 0 ? 'text-green-400' : changeSumToday < 0 ? 'text-red-400' : 'text-white/70';
 
   return (
     <>
@@ -31,7 +32,7 @@ export default function AccountValueCard({ value, changeSumToday, changePct, cur
           {' '}
           {formatCurrency(value, currency)} 
         </p>
-        <p className="text-sm text-white/70 underline">
+        <p className={`text-sm underline ${colorClass}`}>
           {' '}
           {sign}{formatCurrency(changeSumToday, currency)} ({changePct.toFixed(2)}%) Today
         </p>
