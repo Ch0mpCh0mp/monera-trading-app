@@ -29,7 +29,8 @@ ON CONFLICT (email) DO NOTHING;
 -- 2️⃣ Products-Tabelle
 CREATE TABLE IF NOT EXISTS products (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    -- ich schreibe name UNIQUE damit ich beim Einfügen von Demo-Produkten keine Duplikate bekomme
+    name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
     price NUMERIC(10,2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
