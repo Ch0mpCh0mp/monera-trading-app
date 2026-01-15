@@ -7,6 +7,7 @@ import BottomNav from '../components/BottomNav';
 import AssetRow from '../components/AssetRow';
 import { useState } from 'react';
 import AccountValueCard from '../components/AccountValueCard';
+import WatchlistHeader from '../components/WatchlistHeader';
 
 function LevelRing({ percent, size = 42 }: { percent: number, size?: number }) {
   const stroke = 4;
@@ -101,45 +102,16 @@ export default function DashboardPage() {
        </div>
 
       {/* GROSSER AKTIENBLOCK */}
-      <section className="border border-white/5 text-white/50 bg-white/5 rounded-2xl mt-6 backdrop-blur">
+      <section className="border border-white/5 text-white/50 bg-white/5 rounded-2xl mt-6">
        <div className='mx-auto max-w-md px-4 py-4'>
-         {/* TABS */}
-        <header className="flex items-center justify-between gap-3">
-          {/* Tabs links */}
-          <div className="flex flex-1 items-center gap-2 text-sm">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setActiveTab(tab)}
-               className={`flex-1 px-2 py-1.5 rounded-full text-sm text-center transition ${activeTab === tab ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white/80'}`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
-          {/* Aktionen rechts (Plus + Stift) */}
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              type="button"
-              aria-label="Watchlist hinzufügen"
-              onClick={() => console.log('add watchlist')}
-              className="text-white/70"
-            >
-              <Plus size={18} />
-            </button>
-
-            <button
-              type="button"
-              aria-label="Watchlists bearbeiten"
-              onClick={() => console.log('edit watchlists')}
-              className="text-white/70"
-            >
-              <Pencil size={18} />
-            </button>
-          </div>
-        </header>
+         {/* TABS PLUS UND BEARBEITEN */}
+        <WatchlistHeader
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onAddClick={() => console.log("add watchlist")}
+          onEditClick={() => console.log("edit watchlists")}
+        />
 
         {/* LISTE (scrollbar) */}
         <div className="mt-4 h-48 overflow-y-auto overflow-x-hidden pr-2">
