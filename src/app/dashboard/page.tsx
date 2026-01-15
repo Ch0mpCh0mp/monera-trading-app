@@ -49,11 +49,11 @@ function LevelRing({ percent, size = 42 }: { percent: number, size?: number }) {
 export default function DashboardPage() {
   const levelPercent = 100;
 
-  const tabs = ['New on Monera', 'Gold', 'Scalping'] as const;
+  const tabs = ['New', 'Gold', 'Scalping'] as const;
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>(tabs[0]);
 
   const assetsByTab = {
-    'New on Monera': [
+    'New': [
       { name: 'Bitcoin', symbol: 'BTC', price: 4321.0, changePct: 2.5, trend: 'up' },
       { name: 'Ethereum', symbol: 'ETH', price: 2345.0, changePct: -1.2, trend: 'down' },
       { name: 'Ripple', symbol: 'XRP', price: 0.89, changePct: -0.5, trend: 'down' },
@@ -106,13 +106,13 @@ export default function DashboardPage() {
          {/* TABS */}
         <header className="flex items-center justify-between gap-3">
           {/* Tabs links */}
-          <div className="flex items-center gap-2 overflow-hidden whitespace-nowrap text-sm">
+          <div className="flex flex-1 items-center gap-2 text-sm">
             {tabs.map((tab) => (
               <button
                 key={tab}
                 type="button"
                 onClick={() => setActiveTab(tab)}
-                className={`shrink-0 ${activeTab === tab ? 'text-white' : 'text-white/60'}`}
+               className={`flex-1 px-2 py-1.5 rounded-full text-sm text-center transition ${activeTab === tab ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white/80'}`}
               >
                 {tab}
               </button>
