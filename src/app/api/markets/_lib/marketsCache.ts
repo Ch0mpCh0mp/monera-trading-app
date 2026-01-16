@@ -1,4 +1,4 @@
-import { fetchCrypto, fetchStocks, Crypto, Stock } from './markets'
+import { fetchCrypto, fetchStocks, Crypto, Stock } from '../_lib/markets'
 
 interface Cache {
   crypto: Crypto[] | null
