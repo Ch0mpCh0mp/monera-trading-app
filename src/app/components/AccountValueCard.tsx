@@ -20,8 +20,13 @@ export default function AccountValueCard({ value, changeSumToday, changePct, cur
 
   return (
       <section aria-labelledby="account-value-title">
+        {/* ACCOUNT VALUE BEREICH */}
+
+        {/* ÜBERSCHRIFT */}
         <p id="account-value-title" className="text-[12px] sm:text-[14px] uppercase tracking-wider text-white/40 mb-2">Account Value</p>
-        <p className="mt-1 text-4xl font-semibold text-white leading-tight whitespace-nowrap">{formatCurrency(value, currency)}</p>
+        {/* GESAMTGUTHABEN */}
+        <p className="mt-1 text-4xl font-medium text-white leading-tight whitespace-nowrap">{formatCurrency(value, currency)}</p>
+        {/* VERÄNDERUNG DES TAGES */}
         <p className={`mt-1 text-sm underline underline-offset-4 decoration-white/20 ${colorClass}`}>{sign}{formatCurrency(changeSumToday, currency)} ({changePct.toFixed(2)}%) Today</p>
       </section>
   );
