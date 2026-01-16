@@ -93,3 +93,15 @@ VALUES
 ('Demo Product', 'This is a demo product.', 49.99)
 ON CONFLICT (name) DO NOTHING;
 
+
+-- Markets Tabelle (optional)
+CREATE TABLE IF NOT EXISTS markets (
+    id SERIAL PRIMARY KEY,
+    symbol VARCHAR(20) NOT NULL UNIQUE,
+    name VARCHAR(100),
+    type VARCHAR(20), -- 'crypto' oder 'stock'
+    price NUMERIC(20,2),
+    market_cap NUMERIC(20,2),
+    last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
