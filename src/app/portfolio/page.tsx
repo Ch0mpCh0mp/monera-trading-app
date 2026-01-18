@@ -1,16 +1,15 @@
-import BottomNav from '../components/BottomNav';
 import { getWatchlist, getAccountSummary } from '@/data/tradingClient';
 import AssetRow from '../components/AssetRow';
 import TopBar from '../components/Topbar';
-import Container from '../components/layout/Container';
+import AppShell from '../components/layout/AppShell';
 
 export default async function PortfolioPage() {
   const watchlist = await getWatchlist();
   const account = await getAccountSummary();
 
   return (
-    <main className="min-h-screen bg-black pt-6 pb-24">
-      <Container className="mt-4 space-y-6">
+    
+      <AppShell containerClassName="mt-4 space-y-6">
         <TopBar />
         <section>
           <div className="flex items-start justify-between">
@@ -47,8 +46,7 @@ export default async function PortfolioPage() {
             />
           ))}
         </section>
-      </Container>
-      <BottomNav />
-    </main>
+      </AppShell>
+      
   );
 }

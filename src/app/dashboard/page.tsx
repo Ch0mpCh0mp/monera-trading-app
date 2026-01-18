@@ -2,13 +2,12 @@
 
 import Link from 'next/link';
 import StatusCard from '../components/StatusCard';
-import BottomNav from '../components/BottomNav';
 import AssetRow from '../components/AssetRow';
 import { useState } from 'react';
 import AccountValueCard from '../components/AccountValueCard';
 import WatchlistHeader from '../components/WatchlistHeader';
 import TopBar from '../components/Topbar';
-import Container from '../components/layout/Container';
+import AppShell from '../components/layout/AppShell';
 
 function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
   const stroke = 4;
@@ -131,72 +130,67 @@ export default function DashboardPage() {
   };
 
   return (
-    <main className="h-screen overflow-hidden bg-black pt-6 pb-24">
-      <Container className="mt-4 flex flex-col h-full gap-3">
-        {/* LOGO MIT GLOCKE */}
-        <TopBar />
+    <AppShell containerClassName="flex flex-col flex-1 min-h-0 gap-3">
+      {/* LOGO MIT GLOCKE */}
+      <TopBar />
 
-        {/* ACCOUNT VALUE */}
-        <AccountValueCard
-          value={12543.21}
-          changeSumToday={123.45}
-          changePct={0.99}
-          currency="EUR"
-        />
+      {/* ACCOUNT VALUE */}
+      <AccountValueCard
+        value={12543.21}
+        changeSumToday={123.45}
+        changePct={0.99}
+        currency="EUR"
+      />
 
-        {/* MARGIN & LEVEL */}
-        <div className="grid grid-cols-2 gap-4 mt-6">
-          <StatusCard label="Margin" value="0,00 €" />
-          <StatusCard
-            label="Level"
-            value={`${levelPercent}%`}
-            rightSide={<LevelRing percent={levelPercent} />}
-          />
-        </div>
-
-        {/* CASH UND DEPOSIT BUTTON */}
+      {/* MARGIN & LEVEL */}
+      <div className="grid grid-cols-2 gap-4 mt-6">
+        <StatusCard label="Margin" value="0,00 €" />
         <StatusCard
-          label="Cash"
-          value="0,00 €"
-          rightSide={
-            <Link
-              href="/deposit"
-              className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full"
-            >
-              Deposit
-            </Link>
-          }
+          label="Level"
+          value={`${levelPercent}%`}
+          rightSide={<LevelRing percent={levelPercent} />}
         />
+      </div>
 
-        {/* GROSSER AKTIENBLOCK */}
-        <section className="border border-white/5 text-white/50 bg-white/5 rounded-2xl flex flex-col flex-1 min-h-0">
-          <div className="px-4 py-4 flex flex-col flex-1 min-h-0">
-            <WatchlistHeader
-              tabs={tabs}
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-              onAddClick={() => console.log('add watchlist')}
-              onEditClick={() => console.log('edit watchlists')}
-            />
+      {/* CASH UND DEPOSIT BUTTON */}
+      <StatusCard
+        label="Cash"
+        value="0,00 €"
+        rightSide={
+          <Link
+            href="/deposit"
+            className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full"
+          >
+            Deposit
+          </Link>
+        }
+      />
 
-            <div className="mt-4 overflow-y-auto overflow-x-hidden pr-2 flex-1 min-h-0">
-              {assetsByTab[activeTab]?.map((asset) => (
-                <AssetRow
-                  key={asset.symbol}
-                  name={asset.name}
-                  symbol={asset.symbol}
-                  price={asset.price}
-                  changePct={asset.changePct}
-                  trend={asset.trend}
-                />
-              ))}
-            </div>
+      {/* GROSSER AKTIENBLOCK */}
+      <section className="border border-white/5 text-white/50 bg-white/5 rounded-2xl flex flex-col flex-1 min-h-0">
+        <div className="px-4 py-4 flex flex-col flex-1 min-h-0">
+          <WatchlistHeader
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            onAddClick={() => console.log('add watchlist')}
+            onEditClick={() => console.log('edit watchlists')}
+          />
+
+          <div className="mt-4 overflow-y-auto overflow-x-hidden pr-2 flex-1 min-h-0">
+            {assetsByTab[activeTab]?.map((asset) => (
+              <AssetRow
+                key={asset.symbol}
+                name={asset.name}
+                symbol={asset.symbol}
+                price={asset.price}
+                changePct={asset.changePct}
+                trend={asset.trend}
+              />
+            ))}
           </div>
-        </section>
-      </Container>
-
-      {/* BOTTOM NAVIGATION */}
-      <BottomNav />
-    </main>
+        </div>
+      </section>
+    </AppShell>
   );
 }

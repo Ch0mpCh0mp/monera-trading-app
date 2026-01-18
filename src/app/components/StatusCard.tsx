@@ -14,15 +14,7 @@ export default function StatusCard({
 }: StatusCardProps) {
   return (
     <div
-      className="
-        rounded-2xl
-        bg-white/5
-        border border-white/5
-        px-4 py-3
-        flex items-center justify-between
-        gap-3
-      "
-    >
+      className="rounded-2xl bg-white/5 border border-white/5 px-4 py-3 flex items-center justify-between gap-3">
       <div className="min-w-0">
         <p className="text-[11px] uppercase tracking-wide text-white/50 leading-none">
           {label}
