@@ -7,6 +7,7 @@ import AssetRow from '../components/AssetRow';
 import { useState } from 'react';
 import AccountValueCard from '../components/AccountValueCard';
 import WatchlistHeader from '../components/WatchlistHeader';
+import TopBar from '../components/Topbar';
 
 function LevelRing({ percent, size = 42 }: { percent: number, size?: number }) {
   const stroke = 4;
@@ -72,8 +73,9 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-black pt-6 pb-24">
+      <TopBar />
 
-     <div className='mx-auto max-w-md px-4 space-y-6'>
+     <div className='mx-auto max-w-md px-4 mt-4 space-y-6'>
        {/* ACCOUNT VALUE */}
         <AccountValueCard value={12543.21} changeSumToday={123.45} changePct={0.99} currency="EUR" />
 
