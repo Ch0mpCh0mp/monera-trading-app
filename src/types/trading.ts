@@ -12,17 +12,19 @@ export type AccountSummary = {
     cash: Money;
 }
 
+export type Trend = 'up' | 'down' | 'neutral';
+
 export type Asset = {
-    id: string;
-    symbol: string;
-    name: string;
-    price: number;
-    changePct: number;
-    sparkline?: number[];
+  id: string;
+  name: string;
+  symbol: string;
+  price: number;
+  changePct: number;
+  trend?: Trend;
 }
 
 export type PortfolioDiscoverCard = {
-    id: 'stocks' | 'indices' | 'comodities' | 'forex';
+    id: 'stocks' | 'indices' | 'commodities' | 'forex';
     title: string;
     cta: string;
 }
