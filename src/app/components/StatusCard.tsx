@@ -9,7 +9,7 @@ type StatusCardProps = {
 
 export default function StatusCard({ label, value, rightSide, }: StatusCardProps) {
   return (
-    <div className="rounded-2xl bg-white/5 border border-white/10 p-4 flex items-center justify-between gap-3">
+    <div className="rounded-2xl bg-white/5 border border-white/10 p-2 flex items-center justify-between gap-3">
       <div className="min-w-0">
         <p className="text-xs uppercase tracking-wider text-white/50">
           {label}

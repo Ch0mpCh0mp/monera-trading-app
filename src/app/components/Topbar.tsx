@@ -3,7 +3,7 @@ import { Bell, ChevronDown } from 'lucide-react';
 
 export default function TopBar() {
   return (
-    <header className="flex items-center justify-between px-4 pt-6">
+    <header className="flex items-center justify-between">
       <div className="flex items-center gap-2">
         <Logo size={30} />
         <button className="flex items-center gap-1 text-white text-xl font-semibold tracking-wide">
