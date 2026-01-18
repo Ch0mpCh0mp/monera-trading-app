@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
 type StatusCardProps = {
   label: string;
@@ -7,15 +7,31 @@ type StatusCardProps = {
   rightSide?: ReactNode;
 };
 
-export default function StatusCard({ label, value, rightSide, }: StatusCardProps) {
+export default function StatusCard({
+  label,
+  value,
+  rightSide,
+}: StatusCardProps) {
   return (
-    <div className="rounded-2xl bg-white/5 border border-white/10 p-2 flex items-center justify-between gap-3">
+    <div
+      className="
+        rounded-2xl
+        bg-white/5
+        border border-white/5
+        px-4 py-3
+        flex items-center justify-between
+        gap-3
+      "
+    >
       <div className="min-w-0">
-        <p className="text-xs uppercase tracking-wider text-white/50">
+        <p className="text-[11px] uppercase tracking-wide text-white/50 leading-none">
           {label}
         </p>
-        <p className="text-2xl font-semibold text-white">{value}</p>
+        <p className="text-xl font-medium text-white leading-tight mt-1">
+          {value}
+        </p>
       </div>
+
       {rightSide ? <div className="shrink-0">{rightSide}</div> : null}
     </div>
   );

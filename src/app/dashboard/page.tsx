@@ -131,8 +131,8 @@ export default function DashboardPage() {
   };
 
   return (
-    <main className="min-h-screen bg-black pt-6 pb-24">
-      <Container className="mt-4 space-y-3">
+    <main className="h-screen overflow-hidden bg-black pt-6 pb-24">
+      <Container className="mt-4 flex flex-col h-full gap-3">
         {/* LOGO MIT GLOCKE */}
         <TopBar />
 
@@ -169,9 +169,8 @@ export default function DashboardPage() {
         />
 
         {/* GROSSER AKTIENBLOCK */}
-        <section className="border border-white/5 text-white/50 bg-white/5 rounded-2xl mt-6">
-          <div className="py-4">
-            {/* TABS PLUS UND BEARBEITEN */}
+        <section className="border border-white/5 text-white/50 bg-white/5 rounded-2xl flex flex-col flex-1 min-h-0">
+          <div className="px-4 py-4 flex flex-col flex-1 min-h-0">
             <WatchlistHeader
               tabs={tabs}
               activeTab={activeTab}
@@ -180,8 +179,7 @@ export default function DashboardPage() {
               onEditClick={() => console.log('edit watchlists')}
             />
 
-            {/* LISTE (scrollbar) */}
-            <div className="mt-4 h-48 overflow-y-auto overflow-x-hidden pr-2">
+            <div className="mt-4 overflow-y-auto overflow-x-hidden pr-2 flex-1 min-h-0">
               {assetsByTab[activeTab]?.map((asset) => (
                 <AssetRow
                   key={asset.symbol}
