@@ -31,6 +31,9 @@ export default function AuthPage() {
   const googleWrapRef = useRef<HTMLDivElement | null>(null);
   const googleBtnRef = useRef<HTMLDivElement | null>(null);
 
+  // VERHINDERT MEHRFACHES INITIALISIEREN DES SCRIPTS
+  const googleInitRef = useRef(false);
+
   const labelCls = 'text-sm font-medium text-white/80 block';
   const fieldCls = 'w-full text-left space-y-2';
   const shellCls =
@@ -39,130 +42,141 @@ export default function AuthPage() {
     'h-full w-full bg-transparent outline-none text-sm text-white/90 placeholder:text-white/40 pr-3';
 
   // Google One Tap Script  ALTER CODE VON ANDREA AUSGETAUSCHT GEGEN DEN UNTEN STEHENDEN RESPONSIVEN CODE
-//   useEffect(() => {
-//     const script = document.createElement('script');
-//     script.src = 'https://accounts.google.com/gsi/client';
-//     script.async = true;
-//     script.defer = true;
-//     document.body.appendChild(script);
+  //   useEffect(() => {
+  //     const script = document.createElement('script');
+  //     script.src = 'https://accounts.google.com/gsi/client';
+  //     script.async = true;
+  //     script.defer = true;
+  //     document.body.appendChild(script);
 
-//     window.handleGoogleLogin = async (response: GoogleCredentialResponse) => {
-//      console.log('🔹 Google credential received:', response);
-//       try {
-//         const res = await fetch('/api/auth/google', {
-//           method: 'POST',
-//           headers: { 'Content-Type': 'application/json' },
-//           body: JSON.stringify({ token: response.credential }),
-//         });
+  //     window.handleGoogleLogin = async (response: GoogleCredentialResponse) => {
+  //      console.log('🔹 Google credential received:', response);
+  //       try {
+  //         const res = await fetch('/api/auth/google', {
+  //           method: 'POST',
+  //           headers: { 'Content-Type': 'application/json' },
+  //           body: JSON.stringify({ token: response.credential }),
+  //         });
 
-//         if (!res.ok) {
-//           const text = await res.text();
-//           console.error('Google Auth Error:', res.status, text);
-//           setError('Google authentication failed');
-//           return;
-//         }
+  //         if (!res.ok) {
+  //           const text = await res.text();
+  //           console.error('Google Auth Error:', res.status, text);
+  //           setError('Google authentication failed');
+  //           return;
+  //         }
 
-//         const data = await res.json();
-//         localStorage.setItem('token', data.token);
-//         localStorage.setItem('user', JSON.stringify(data.user));
-//         router.push('/dashboard');
-//       } catch (err) {
-//         console.error('Google login error', err);
-//         setError('Google authentication failed');
-//       }
-//     };
+  //         const data = await res.json();
+  //         localStorage.setItem('token', data.token);
+  //         localStorage.setItem('user', JSON.stringify(data.user));
+  //         router.push('/dashboard');
+  //       } catch (err) {
+  //         console.error('Google login error', err);
+  //         setError('Google authentication failed');
+  //       }
+  //     };
 
-//     return () => {
-//       if (document.body.contains(script)){
-//       document.body.removeChild(script);
-//     }
-//     window.handleGoogleLogin = undefined;
-// }}, [router]);
+  //     return () => {
+  //       if (document.body.contains(script)){
+  //       document.body.removeChild(script);
+  //     }
+  //     window.handleGoogleLogin = undefined;
+  // }}, [router]);
 
   useEffect(() => {
-  // SCRIPT DYNAMISCH LADEN
-  const script = document.createElement('script');
-  script.src = 'https://accounts.google.com/gsi/client';
-  script.async = true;
-  script.defer = true;
-  document.body.appendChild(script);
+    // SCRIPT DYNAMISCH LADEN
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
 
-  // CALLBACK FUNKTION DEFINIEREN
-  window.handleGoogleLogin = async (response: GoogleCredentialResponse) => {
-    console.log('🔹 Google credential received:', response);
+    // CALLBACK FUNKTION DEFINIEREN
+    window.handleGoogleLogin = async (response: GoogleCredentialResponse) => {
+      console.log('🔹 Google credential received:', response);
 
-    try {
-      const res = await fetch('/api/auth/google', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: response.credential }),
-      });
+      try {
+        const res = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: response.credential }),
+        });
 
-      if (!res.ok) {
-        const text = await res.text();
-        console.error('Google Auth Error:', res.status, text);
+        if (!res.ok) {
+          const text = await res.text();
+          console.error('Google Auth Error:', res.status, text);
+          setError('Google authentication failed');
+          return;
+        }
+
+        const data = await res.json();
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        router.push('/dashboard');
+      } catch (err) {
+        console.error('Google login error', err);
         setError('Google authentication failed');
-        return;
+      }
+    };
+
+    const renderGoogleButton = () => {
+      const wrap = googleWrapRef.current;
+      const btn = googleBtnRef.current;
+
+      if (!wrap || !btn) return;
+
+      const width = Math.round(wrap.getBoundingClientRect().width);
+
+      // google ist erst nach script load verfügbar
+      // @ts-expect-error injected by Google script
+      // if (!window.google?.accounts?.id) return;
+
+      const googleId = window.google?.accounts?.id;
+      if (!googleId) return;
+
+      // if (!googleInitRef.current) {
+      //   googleId.initialize({
+      //     client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+      //     callback: window.handleGoogleLogin,
+      //   });
+      //   googleInitRef.current = true;
+      // }
+
+      if (!googleInitRef.current) {
+        googleId.initialize({
+          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+          callback: window.handleGoogleLogin,
+        });
+        googleInitRef.current = true;
       }
 
-      const data = await res.json();
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      router.push('/dashboard');
-    } catch (err) {
-      console.error('Google login error', err);
-      setError('Google authentication failed');
-    }
-  };
+      // BEI RESIZE NEU RENDERN
+      btn.innerHTML = '';
 
-  const renderGoogleButton = () => {
-    const wrap = googleWrapRef.current;
-    const btn = googleBtnRef.current;
+      googleId.renderButton(btn, {
+        type: 'standard',
+        theme: 'filled_black',
+        size: 'large',
+        shape: 'pill',
+        text: 'signin_with',
+        logo_alignment: 'left',
+        width,
+      });
+    };
 
-    if (!wrap || !btn) return;
+    script.onload = () => {
+      renderGoogleButton();
+    };
 
-    const width = Math.round(wrap.getBoundingClientRect().width);
+    // WENN DIE BREITE SICH ÄNDERT
+    const ro = new ResizeObserver(() => renderGoogleButton());
+    if (googleWrapRef.current) ro.observe(googleWrapRef.current);
 
-    // google ist erst nach script load verfügbar
-    // @ts-expect-error injected by Google script
-    if (!window.google?.accounts?.id) return;
-
-    // @ts-expect-error injected by Google script
-    window.google.accounts.id.initialize({
-      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-      callback: window.handleGoogleLogin,
-    });
-
-    // BEI RESIZE NEU RENDERN
-    btn.innerHTML = '';
-
-    // @ts-expect-error injected by Google script
-    window.google.accounts.id.renderButton(btn, {
-      type: 'standard',
-      theme: 'filled_black',
-      size: 'large',
-      shape: 'pill',
-      text: 'signin_with',
-      logo_alignment: 'left',
-      width,
-    });
-  };
-
-  script.onload = () => {
-    renderGoogleButton();
-  };
-
-  // WENN DIE BREITE SICH ÄNDERT
-  const ro = new ResizeObserver(() => renderGoogleButton());
-  if (googleWrapRef.current) ro.observe(googleWrapRef.current);
-
-  return () => {
-    ro.disconnect();
-    if (document.body.contains(script)) document.body.removeChild(script);
-    window.handleGoogleLogin = undefined;
-  };
-}, [router]);
-
+    return () => {
+      ro.disconnect();
+      if (document.body.contains(script)) document.body.removeChild(script);
+      window.handleGoogleLogin = undefined;
+    };
+  }, [router]);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -331,10 +345,7 @@ export default function AuthPage() {
 
           {/* PASSWORT */}
           <div className={fieldCls}>
-            <label
-              htmlFor="password"
-              className={labelCls}
-            >
+            <label htmlFor="password" className={labelCls}>
               Password
             </label>
 
@@ -356,33 +367,30 @@ export default function AuthPage() {
             </div>
           </div>
 
-           {/* BESTÄTIGTES PASSWORT */}
-            {mode === 'register' && (
-              <div className={fieldCls}>
-                <label
-                  htmlFor="confirmPassword"
-                  className={labelCls}
-                >
-                  Confirm Password
-                </label>
+          {/* BESTÄTIGTES PASSWORT */}
+          {mode === 'register' && (
+            <div className={fieldCls}>
+              <label htmlFor="confirmPassword" className={labelCls}>
+                Confirm Password
+              </label>
 
-                <div className={shellCls}>
-                  <span className="grid place-items-center text-white/40">
-                    <Lock size={18} />
-                  </span>
+              <div className={shellCls}>
+                <span className="grid place-items-center text-white/40">
+                  <Lock size={18} />
+                </span>
 
-                  <input
-                    type="password"
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Repeat your password"
-                    className={inputCls}
-                  />
-                </div>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Repeat your password"
+                  className={inputCls}
+                />
               </div>
-            )}
+            </div>
+          )}
 
           {/* FEHLERMELDUNG */}
           {error && <p className="text-sm">{error}</p>}
@@ -425,8 +433,6 @@ export default function AuthPage() {
         <div ref={googleWrapRef} className="w-full">
           <div ref={googleBtnRef} className="w-full" />
         </div>
-
-
 
         {/* HINWEIS STARTGUTHABEN */}
         <div className="text-white/30 text-xs">
