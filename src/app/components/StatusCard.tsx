@@ -13,7 +13,7 @@ export default function StatusCard({
   rightSide,
 }: StatusCardProps) {
   return (
-    <div className="rounded-2xl bg-white/5 border border-white/10 p-2 flex items-center justify-between gap-3">
+    <section className="rounded-2xl bg-white/5 border border-white/10 p-2 flex items-center justify-between gap-3">
 
       {/* MARGIN LEVEL UND CASH BEREICH */}
       <div className="min-w-0">
@@ -24,6 +24,6 @@ export default function StatusCard({
       </div>
       {/* DEPOSIT BUTTON */}
       {rightSide ? <div className="shrink-0">{rightSide}</div> : null}
-    </div>
+    </section>
   );
 }
