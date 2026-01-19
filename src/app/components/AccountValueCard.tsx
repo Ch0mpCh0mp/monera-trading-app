@@ -1,16 +1,13 @@
 'use client';
 
+import { formatCurrency } from "@/lib/formatCurrency";
+
 type AccountValueCardProps = {
   value: number;
   changeSumToday: number;
   changePct: number;
   currency?: 'EUR' | 'USD';
 };
-
-function formatCurrency(amount: number, currency: 'USD' | 'EUR'): string {
-  const locale = currency === 'EUR' ? 'de-DE' : 'en-US';
-  return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(amount);
-}
 
 export default function AccountValueCard({ value, changeSumToday, changePct, currency = 'USD' }: AccountValueCardProps) {
   const isPositive = changeSumToday > 0;
