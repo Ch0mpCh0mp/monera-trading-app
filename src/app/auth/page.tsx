@@ -5,35 +5,57 @@ import Logo from '../components/Logo';
 import { Mail, Lock, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
+// GOOGLE EIGENES OBJEKT
 interface GoogleCredentialResponse {
   credential: string;
   clientId?: string;
 }
 
-// Globale Typisierung für window
+// DAMIT TS NICHT MECKERT WEIL GOOGLE DAS SELBER INJIZIERT
 declare global {
   interface Window {
-    handleGoogleLogin?: (response: GoogleCredentialResponse) => void;
+    google?: {
+      accounts?: {
+        id?: {
+          initialize: (opts: {
+            client_id: string;
+            callback: (response: GoogleCredentialResponse) => void;
+          }) => void;
+
+          renderButton: (
+            parent: HTMLElement,
+            opts: Record<string, any>
+          ) => void;
+        };
+      };
+    };
   }
 }
 
 export default function AuthPage() {
   const router = useRouter();
+
+  // LOGIN ODER REGISTRIEREN
   const [mode, setMode] = useState<'login' | 'register'>('login');
+
+  // FORMULAR EINGABEN
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+
+  // FEHLERANZEIGE AUS DEN APIS
   const [error, setError] = useState<string | null>(null);
 
-  // FÜR DEN GOOGLE BUTTON
-  const googleWrapRef = useRef<HTMLDivElement | null>(null);
-  const googleBtnRef = useRef<HTMLDivElement | null>(null);
+  // FÜR DAS RESPONSIVE RENDERN DEs GOOGLE BUTTONS
+  const googleWrapRef = useRef<HTMLDivElement | null>(null); // CONTAINER DESSEN BREITE WIR MESSEN
+  const googleBtnRef = useRef<HTMLDivElement | null>(null); // DIV IN DIE GOOGLE RENDERT
 
   // VERHINDERT MEHRFACHES INITIALISIEREN DES SCRIPTS
   const googleInitRef = useRef(false);
 
+  // TAILWIND KLASSEN ALS KONSTANTE DAMIT ES ÜBERSICHTLICHER BLEIBT
   const labelCls = 'text-sm font-medium text-white/80 block';
   const fieldCls = 'w-full text-left space-y-2';
   const shellCls =
@@ -41,57 +63,23 @@ export default function AuthPage() {
   const inputCls =
     'h-full w-full bg-transparent outline-none text-sm text-white/90 placeholder:text-white/40 pr-3';
 
-  // Google One Tap Script  ALTER CODE VON ANDREA AUSGETAUSCHT GEGEN DEN UNTEN STEHENDEN RESPONSIVEN CODE
-  //   useEffect(() => {
-  //     const script = document.createElement('script');
-  //     script.src = 'https://accounts.google.com/gsi/client';
-  //     script.async = true;
-  //     script.defer = true;
-  //     document.body.appendChild(script);
-
-  //     window.handleGoogleLogin = async (response: GoogleCredentialResponse) => {
-  //      console.log('🔹 Google credential received:', response);
-  //       try {
-  //         const res = await fetch('/api/auth/google', {
-  //           method: 'POST',
-  //           headers: { 'Content-Type': 'application/json' },
-  //           body: JSON.stringify({ token: response.credential }),
-  //         });
-
-  //         if (!res.ok) {
-  //           const text = await res.text();
-  //           console.error('Google Auth Error:', res.status, text);
-  //           setError('Google authentication failed');
-  //           return;
-  //         }
-
-  //         const data = await res.json();
-  //         localStorage.setItem('token', data.token);
-  //         localStorage.setItem('user', JSON.stringify(data.user));
-  //         router.push('/dashboard');
-  //       } catch (err) {
-  //         console.error('Google login error', err);
-  //         setError('Google authentication failed');
-  //       }
-  //     };
-
-  //     return () => {
-  //       if (document.body.contains(script)){
-  //       document.body.removeChild(script);
-  //     }
-  //     window.handleGoogleLogin = undefined;
-  // }}, [router]);
-
   useEffect(() => {
-    // SCRIPT DYNAMISCH LADEN
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
+    // SCRIPT DYNAMISCH LADEN ABER NUR WENN ES NOCH NICHT EXISTIERT
+    const src = 'https://accounts.google.com/gsi/client';
+
+    let script = document.querySelector<HTMLScriptElement>(
+      `script[src="${src}"]`
+    );
+    if (!script) {
+      script = document.createElement('script');
+      script.src = src;
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+    }
 
     // CALLBACK FUNKTION DEFINIEREN
-    window.handleGoogleLogin = async (response: GoogleCredentialResponse) => {
+    const handleGoogleLogin = async (response: GoogleCredentialResponse) => {
       console.log('🔹 Google credential received:', response);
 
       try {
@@ -118,6 +106,7 @@ export default function AuthPage() {
       }
     };
 
+    // GOOGLE BUTTON RESPONSIVE RENDERN
     const renderGoogleButton = () => {
       const wrap = googleWrapRef.current;
       const btn = googleBtnRef.current;
@@ -125,26 +114,16 @@ export default function AuthPage() {
       if (!wrap || !btn) return;
 
       const width = Math.round(wrap.getBoundingClientRect().width);
+      if (width < 200) return;
 
-      // google ist erst nach script load verfügbar
-      // @ts-expect-error injected by Google script
-      // if (!window.google?.accounts?.id) return;
-
+      // ERST NACH LADEN INJIZIEREN
       const googleId = window.google?.accounts?.id;
       if (!googleId) return;
-
-      // if (!googleInitRef.current) {
-      //   googleId.initialize({
-      //     client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-      //     callback: window.handleGoogleLogin,
-      //   });
-      //   googleInitRef.current = true;
-      // }
 
       if (!googleInitRef.current) {
         googleId.initialize({
           client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-          callback: window.handleGoogleLogin,
+          callback: handleGoogleLogin,
         });
         googleInitRef.current = true;
       }
@@ -163,25 +142,31 @@ export default function AuthPage() {
       });
     };
 
-    script.onload = () => {
+    // WENN GOOGLE VORHANDEN SOFORT RENDERN, SONST NACH SCRIPT LOAD
+    if (window.google?.accounts?.id) {
       renderGoogleButton();
-    };
+    } else {
+      script.onload = () => {
+        renderGoogleButton();
+      };
+    }
 
-    // WENN DIE BREITE SICH ÄNDERT
+    // WENN DIE BREITE SICH ÄNDERT NEU RENDERN
     const ro = new ResizeObserver(() => renderGoogleButton());
     if (googleWrapRef.current) ro.observe(googleWrapRef.current);
 
+    // NICHT WEG MACHEN, DARF GLOBAL BLEIBEN
     return () => {
       ro.disconnect();
-      if (document.body.contains(script)) document.body.removeChild(script);
-      window.handleGoogleLogin = undefined;
     };
   }, [router]);
 
+  // EMAIL REGISTRIERUNG
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
+    // PFLICHTFELD PRÜFUNG
     if (
       !email ||
       !password ||
@@ -191,6 +176,7 @@ export default function AuthPage() {
       return;
     }
 
+    // STIMMT PASSWORT?
     if (mode === 'register' && password !== confirmPassword) {
       setError('Passwords do not match');
       return;
@@ -212,12 +198,13 @@ export default function AuthPage() {
 
       const data = await res.json();
 
+      // WENN FEHLER
       if (!res.ok) {
         setError(data.error || 'Authentication failed');
         return;
       }
 
-      // TOKEN UND USER IM LOCALSTORAGE SPEICHERN
+      // TOKEN UND USER IM LOCALSTORAGE SPEICHERN UND WEITERLEITEN
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
@@ -405,29 +392,6 @@ export default function AuthPage() {
             </button>
           </div>
         </form>
-
-        {/* GOOGLE LOGIN */}
-
-        {/* ALTER CODE VON ANDREA AUSGETAUSCHT GEGEN DEN UNTEN STEHENDEN RESPONSIVEN CODE */}
-        {/* <div
-          id="g_id_onload"
-          data-client_id={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
-          data-callback="handleGoogleLogin"
-        />
-
-      // ALTER CODE VON ANDREA AUSGETAUSCHT GEGEN DEN UNTEN STEHENDEN RESPONSIVEN CODE
-        <div className="w-full">
-          <div
-            className="g_id_signin w-full"
-            data-type="standard"
-            data-size="medium"
-            data-shape="pill"
-            data-theme="filled_black"
-            data-text="signin_with"
-            data-logo_alignment="left"
-            data-width="360"
-          />
-        </div>   */}
 
         {/* GOOGLE LOGIN RESPONSIVE GEMACHT*/}
         <div ref={googleWrapRef} className="w-full">
