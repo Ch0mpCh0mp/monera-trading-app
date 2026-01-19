@@ -18,6 +18,8 @@ export default function WatchlistHeader<T extends string>({ tabs, activeTab, onT
 
   return (
     <header className="flex items-center justify-between gap-3">
+      {/* ÜBERSICHTSSEITEN HEADER */}
+
       {/* TABS LINKS */}
       <div className="flex flex-1 items-center gap-2">
         {tabs.map((tab) => (
@@ -32,8 +34,9 @@ export default function WatchlistHeader<T extends string>({ tabs, activeTab, onT
         ))}
       </div>
 
-      {/* BUTTONS RECHTS(Plus + Stift) */}
+      {/* BUTTONS RECHTS */}
       <div className="flex items-center gap-2 shrink-0">
+        {/* PLUS BUTTON */}
         <button
           type="button"
           aria-label="Watchlist hinzufügen"
@@ -44,6 +47,7 @@ export default function WatchlistHeader<T extends string>({ tabs, activeTab, onT
           <Plus size={18} />
         </button>
 
+        {/* STIFT BUTTON */}
         <button
           type="button"
           aria-label="Watchlists bearbeiten"
