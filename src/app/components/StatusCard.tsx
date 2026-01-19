@@ -13,17 +13,16 @@ export default function StatusCard({
   rightSide,
 }: StatusCardProps) {
   return (
-    <div
-      className="rounded-2xl bg-white/5 border border-white/5 px-4 py-3 flex items-center justify-between gap-3">
-      <div className="min-w-0">
-        <p className="text-[11px] uppercase tracking-wide text-white/50 leading-none">
-          {label}
-        </p>
-        <p className="text-xl font-medium text-white leading-tight mt-1">
-          {value}
-        </p>
-      </div>
+    <div className="rounded-2xl bg-white/5 border border-white/10 p-2 flex items-center justify-between gap-3">
 
+      {/* MARGIN LEVEL UND CASH BEREICH */}
+      <div className="min-w-0">
+        {/* LABEL */}
+        <p className="text-sm uppercase tracking-wider text-white/50">{label}</p>
+        {/* WERT */}
+        <p className="text-lg font-medium text-white">{value}</p>
+      </div>
+      {/* DEPOSIT BUTTON */}
       {rightSide ? <div className="shrink-0">{rightSide}</div> : null}
     </div>
   );
