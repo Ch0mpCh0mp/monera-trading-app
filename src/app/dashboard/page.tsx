@@ -6,7 +6,7 @@ import AssetRow from '../components/AssetRow';
 import { useState } from 'react';
 import AccountValueCard from '../components/AccountValueCard';
 import WatchlistHeader from '../components/WatchlistHeader';
-import TopBar from '../components/Topbar';
+import TopBar from '../components/TopBar';
 import AppShell from '../components/layout/AppShell';
 
 function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
