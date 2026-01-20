@@ -41,7 +41,7 @@ export default function AssetRow({ name, symbol, price, changePct, trend, }: Ass
         {/* AKTUELLER PREIS */}
         <p className="text-white text-sm font-medium tabular-nums">{price.toFixed(2)}</p>
         {/* VERÄNDERUNGSPROZENT */}
-        <p className={`text-[11px] tabular-nums ${changeColorClass}`}>{isPositive ? '+' : ''}{changePct.toFixed(2)}%</p>
+        <p className={`text-[11px] tabular-nums ${changeColorClass}`}>{isPositive ? '+' : ''}{Number.isFinite(changePct) ? changePct.toFixed(2) : '0.00'}%</p>
       </div>
     </div>
   );

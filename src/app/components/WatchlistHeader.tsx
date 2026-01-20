@@ -40,7 +40,7 @@ export default function WatchlistHeader<T extends string>({ tabs, activeTab, onT
         <button
           type="button"
           aria-label="Watchlist hinzufügen"
-          onClick={onAddClick}
+          onClick={onAddClick ?? undefined}
           disabled={!onAddClick}
           className={`${iconBtnBase} ${onAddClick ? 'hover:bg-white/15 hover:text-white' : 'opacity-40 cursor-not-allowed'}`}
         >
@@ -51,7 +51,7 @@ export default function WatchlistHeader<T extends string>({ tabs, activeTab, onT
         <button
           type="button"
           aria-label="Watchlists bearbeiten"
-          onClick={onEditClick}
+          onClick={onEditClick ?? undefined}
           disabled={!onEditClick}
           className={`${iconBtnBase} ${onEditClick ? 'hover:bg-white/15 hover:text-white' : 'opacity-40 cursor-not-allowed'}`}
         >
