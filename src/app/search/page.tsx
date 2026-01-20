@@ -23,24 +23,24 @@ export default function SearchPage() {
         aria-label="Ticker"
         className="no-scrollbar flex flex-nowrap overflow-x-auto overflow-y-hidden"
       >
-        <div className="flex items-center space-x-3 mr-3 h-8 px-6 rounded-lg bg-white/5 border border-white/10">
-          <p>Silver</p>
-          <p>5,44 %</p>
+        <div className="flex items-center space-x-3 mr-3 h-8 px-3 rounded-xl bg-white/5 border border-white/10">
+          <p className='text-sm'>Silver</p>
+          <p className='whitespace-nowrap text-sm'>5,44 %</p>
+        </div>
+
+        <div className="flex items-center space-x-3 mr-3 h-8 px-3 rounded-xl bg-white/5 border border-white/10">
+          <p className='text-sm'>Gold</p>
+          <p className='whitespace-nowrap text-sm'>1,06 %</p>
         </div>
 
         <div className="flex items-center space-x-3 mr-3 h-8 px-6 rounded-xl bg-white/5 border border-white/10">
-          <p>Gold</p>
-          <p>1,06 %</p>
-        </div>
-
-        <div className="flex items-center space-x-3 mr-3 h-8 px-6 rounded-lg bg-white/5 border border-white/10">
-          <p>Silver</p>
-          <p>5,44 %</p>
+          <p className='text-sm'>Silver</p>
+          <p className='whitespace-nowrap text-sm'>5,44 %</p>
         </div>
 
         <div className="flex items-center space-x-3 mr-3 h-8 px-6 rounded-xl bg-white/5 border border-white/10">
-          <p>Gold</p>
-          <p>1,06 %</p>
+          <p className='text-sm'>Gold</p>
+          <p className='whitespace-nowrap text-sm'>1,06 %</p>
         </div>
       </section>
 
@@ -50,7 +50,7 @@ export default function SearchPage() {
       >
         <button
           type="button"
-          className="flex items-center space-x-3 mr-3 h-8 px-6 rounded-xl bg-white/25 border border-white/10 outline-none focus-visible:ring-4 focus-visible:ring-white/10"
+          className="flex items-center space-x-3 mr-3 h-8 px-3 rounded-xl bg-white/25 border border-white/10 outline-none focus-visible:ring-4 focus-visible:ring-white/10"
         >
           <p>Icon</p>
           <p>Meistgehandelt</p>
@@ -58,7 +58,7 @@ export default function SearchPage() {
 
         <button
           type="button"
-          className="flex items-center space-x-3 mr-3 h-8 px-6 rounded-xl bg-white/5 border border-white/10"
+          className="flex items-center space-x-3 mr-3 h-8 px-3 rounded-xl bg-white/5 border border-white/10"
         >
           <p>Icon</p>
           <p>Meistgekauft</p>
@@ -66,7 +66,7 @@ export default function SearchPage() {
 
         <button
           type="button"
-          className="flex items-center space-x-3 mr-3 h-8 px-6 rounded-xl bg-white/25 border border-white/10 outline-none focus-visible:ring-4 focus-visible:ring-white/10"
+          className="flex items-center space-x-3 mr-3 h-8 px-3 rounded-xl bg-white/25 border border-white/10 outline-none focus-visible:ring-4 focus-visible:ring-white/10"
         >
           <p>Icon</p>
           <p>Meistgehandelt</p>
@@ -74,7 +74,7 @@ export default function SearchPage() {
 
         <button
           type="button"
-          className="flex items-center space-x-3 mr-3 h-8 px-6 rounded-xl bg-white/5 border border-white/10"
+          className="flex items-center space-x-3 mr-3 h-8 px-3 rounded-xl bg-white/5 border border-white/10"
         >
           <p>Icon</p>
           <p>Meistgekauft</p>
@@ -82,6 +82,50 @@ export default function SearchPage() {
       </section>
 
       <section aria-label="Assets" className="grid grid-cols-2 mt-6 gap-4">
+        <div className="flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
+          <div>
+            <p>Icon</p>
+            <p className="text-sm text-white/50">Name</p>
+          </div>
+          <div className="flex flex-col self-stretch items-end text-right">
+            <p className="text-xl">Price</p>
+            <p className="text-sm text-green-500">↑ Percent</p>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
+          <div>
+            <p>Icon</p>
+            <p className="text-sm text-white/50">Name</p>
+          </div>
+          <div className="flex flex-col self-stretch items-end text-right">
+            <p className="text-xl">Price</p>
+            <p className="text-sm text-red-500">↓ Percent</p>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
+          <div>
+            <p>Icon</p>
+            <p className="text-sm text-white/50">Name</p>
+          </div>
+          <div className="flex flex-col self-stretch items-end text-right">
+            <p className="text-xl">Price</p>
+            <p className="text-sm text-green-500">↑ Percent</p>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
+          <div>
+            <p>Icon</p>
+            <p className="text-sm text-white/50">Name</p>
+          </div>
+          <div className="flex flex-col self-stretch items-end text-right">
+            <p className="text-xl">Price</p>
+            <p className="text-sm text-red-500">↓ Percent</p>
+          </div>
+        </div>
+
         <div className="flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
           <div>
             <p>Icon</p>
