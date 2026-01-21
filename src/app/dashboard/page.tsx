@@ -3,11 +3,23 @@
 import Link from 'next/link';
 import StatusCard from '../components/StatusCard';
 import AssetRow from '../components/AssetRow';
-import { useState } from 'react';
+import { useState , useEffect} from 'react';
 import AccountValueCard from '../components/AccountValueCard';
 import WatchlistHeader from '../components/WatchlistHeader';
 import TopBar from '../components/TopBar';
 import AppShell from '../components/layout/AppShell';
+
+
+// =====================
+// Typ für Assets
+// =====================
+interface Asset {
+  name: string;
+  symbol: string;
+  price: number;
+  changePct: number;
+  trend: 'up' | 'down' | 'neutral';
+}
 
 function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
   const stroke = 4;
@@ -57,77 +69,41 @@ export default function DashboardPage() {
   const tabs = ['New', 'Gold', 'Scalping'] as const;
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>(tabs[0]);
 
-  const assetsByTab = {
-    New: [
-      {
-        name: 'Bitcoin',
-        symbol: 'BTC',
-        price: 4321.0,
-        changePct: 2.5,
-        trend: 'up',
-      },
-      {
-        name: 'Ethereum',
-        symbol: 'ETH',
-        price: 2345.0,
-        changePct: -1.2,
-        trend: 'down',
-      },
-      {
-        name: 'Ripple',
-        symbol: 'XRP',
-        price: 0.89,
-        changePct: -0.5,
-        trend: 'down',
-      },
-      {
-        name: 'Polkadot',
-        symbol: 'DOT',
-        price: 25.67,
-        changePct: 3.1,
-        trend: 'up',
-      },
-      {
-        name: 'Dogecoin',
-        symbol: 'DOGE',
-        price: 0.25,
-        changePct: -2.3,
-        trend: 'down',
-      },
-      {
-        name: 'Litecoin',
-        symbol: 'LTC',
-        price: 150.45,
-        changePct: 1.8,
-        trend: 'up',
-      },
-    ],
-    Gold: [
-      {
-        name: 'Gold',
-        symbol: 'XAU',
-        price: 1800.0,
-        changePct: 0.5,
-        trend: 'up',
-      },
-    ],
-    Scalping: [
-      {
-        name: 'Solana',
-        symbol: 'SOL',
-        price: 98.76,
-        changePct: 5.3,
-        trend: 'up',
-      },
-      {
-        name: 'Cardano',
-        symbol: 'ADA',
-        price: 1.23,
-        changePct: 0.0,
-        trend: 'neutral',
-      },
-    ],
-  };
+// --- FETCH MARKETS ANSTATT MOCKDATEN ---
+const [assetsByTab, setAssetsByTab] = useState<{
+  New: Asset[];
+  Gold: Asset[];
+  Scalping: Asset[];
+}>({
+  New: [],
+  Gold: [],
+  Scalping: [],
+});
+
+  useEffect(() => {
+    async function fetchMarkets() {
+      try {
+        const res = await fetch('/api/markets');
+        const data = await res.json();
+
+        // Scalping aus Crypto filtern (Beispiel: SOL + ADA)
+        const scalpingAssets = (data.crypto || []).filter(
+          (c: Asset) => c.symbol === 'SOL' || c.symbol === 'ADA'
+        );
+
+        setAssetsByTab({
+          New: data.crypto || [],
+          Gold: data.stocks || [],
+          Scalping: scalpingAssets,
+        });
+      } catch (err) {
+        console.error('Failed to fetch markets:', err);
+      }
+    }
+
+    fetchMarkets();
+  }, []);
+  // --- ENDE FETCH ---
 
   return (
     <AppShell containerClassName="flex flex-col flex-1 min-h-0 gap-3">

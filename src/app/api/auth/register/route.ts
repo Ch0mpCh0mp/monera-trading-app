@@ -38,13 +38,23 @@ export async function POST(req: NextRequest) {
     const user = rows[0];
 
     // 4️⃣ JWT erstellen
-    const token = jwt.sign(
-      { userId: user.id },
-      process.env.JWT_SECRET || 'secret',
-      { expiresIn: '7d' }
-    );
+    // 4️⃣ JWT erstellen
+const token = jwt.sign(
+  { userId: user.id, email: user.email }, // optional weitere Felder
+  process.env.JWT_SECRET || 'secret',
+  { expiresIn: '7d' }
+);
 
-    return NextResponse.json({ token, user });
+// Nur sichere Felder zurückgeben
+const safeUser = {
+  id: user.id,
+  email: user.email,
+  username: user.username,
+  balance: user.balance
+};
+
+return NextResponse.json({ token: token, user: safeUser });
+
   } catch (err) {
     console.error('Register error:', err);
     return NextResponse.json({ error: 'Registration failed' }, { status: 500 });
