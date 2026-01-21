@@ -13,6 +13,8 @@ import {
 import TopBar from '../components/TopBar';
 import { useAccountSummary } from '@/hooks/useAccountSummary';
 import { formatCurrency } from '@/lib/formatCurrency';
+import { usePortfolio } from '../context/PortfolioContext';
+
 
 function PromoCard({
   title,
@@ -51,7 +53,8 @@ function PromoCard({
 }
 
 export default function PortfolioPage() {
-  const account = useAccountSummary();
+const { balance: accountValue, levelPct, currency } = usePortfolio(); // aus PortfolioContext
+
 
   return (
     <AppShell containerClassName="space-y-6">
@@ -64,6 +67,7 @@ export default function PortfolioPage() {
           <div>
             <p className="text-white/70 text-lg">Wert</p>
             <p className="text-white text-4xl font-light mt-1">{formatCurrency(account.accountValue, account.currency)}</p>
+            {formatCurrency(accountValue, currency)}
           </div>
 
           <button
@@ -78,8 +82,9 @@ export default function PortfolioPage() {
         {/* Margin level pill */}
         <button
           type="button"
-          className="mt-5 w-full rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white py-3 flex items-center justify-center gap-2 text-sm">
-          Margin-Level • {account.levelPct} %
+          className="mt-5 w-full rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white py-3 flex items-center justify-center gap-2 text-sm"
+          >
+          Margin-Level • {levelPct} %
           <ChevronDown size={16} className="text-white/90" />
         </button>
       </section>
