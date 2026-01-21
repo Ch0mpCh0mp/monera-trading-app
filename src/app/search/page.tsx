@@ -81,8 +81,8 @@ export default function SearchPage() {
         </button>
       </section>
 
-      <section aria-label="Assets" className="grid grid-cols-2 mt-6 gap-4">
-        <div className="flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
+      <section aria-label="Assets" className="no-scrollbar mt-6 flex gap-4 overflow-x-auto overflow-y-hidden pb-2">
+        <div className="shrink-0 w-[130px] flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
           <div>
             <p>Icon</p>
             <p className="text-sm text-white/50">Name</p>
@@ -93,7 +93,7 @@ export default function SearchPage() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
+        <div className="shrink-0 w-[130px] flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
           <div>
             <p>Icon</p>
             <p className="text-sm text-white/50">Name</p>
@@ -104,7 +104,7 @@ export default function SearchPage() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
+        <div className="shrink-0 w-[130px] flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
           <div>
             <p>Icon</p>
             <p className="text-sm text-white/50">Name</p>
@@ -115,7 +115,7 @@ export default function SearchPage() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
+        <div className="shrink-0 w-[130px] flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
           <div>
             <p>Icon</p>
             <p className="text-sm text-white/50">Name</p>
@@ -126,7 +126,7 @@ export default function SearchPage() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
+        <div className="shrink-0 w-[130px] flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
           <div>
             <p>Icon</p>
             <p className="text-sm text-white/50">Name</p>
@@ -137,7 +137,7 @@ export default function SearchPage() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
+        <div className="shrink-0 w-[130px] flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
           <div>
             <p>Icon</p>
             <p className="text-sm text-white/50">Name</p>
@@ -148,7 +148,7 @@ export default function SearchPage() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
+        <div className="shrink-0 w-[130px] flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
           <div>
             <p>Icon</p>
             <p className="text-sm text-white/50">Name</p>
@@ -159,7 +159,7 @@ export default function SearchPage() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
+        <div className="shrink-0 w-[130px] flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]">
           <div>
             <p>Icon</p>
             <p className="text-sm text-white/50">Name</p>
