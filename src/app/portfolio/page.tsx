@@ -33,13 +33,7 @@ function PromoCard({
         <button
           type="button"
           className="
-            mt-3 inline-flex items-center
-            rounded-full
-            bg-[rgba(0,166,62,0.9)]
-            hover:bg-[rgba(0,166,62,1)]
-            text-white text-xs
-            px-4 py-2
-          "
+            mt-3 inline-flex items-center rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white text-xs  px-4 py-2"
         >
           {cta}
         </button>
