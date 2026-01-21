@@ -149,6 +149,15 @@ const goldAssets: Asset[] = (rawData.stocks || [])
     };
   });
 
+  //  HIER XAU/USD HINZUFÜGEN 
+goldAssets.unshift({
+  name: 'Gold (XAU/USD)',
+  symbol: 'XAUUSD',
+  price: 4950.12,          // Hier kannst du einen aktuellen Goldpreis einsetzen
+  changePct: 0.35,         // Beispielwert für die Veränderung
+  trend: 0.35 > 0 ? 'up' : 0.35 < 0 ?'down' : 'neutral',
+  image: '/public/gold.png', // optional, wenn du ein Icon hast, sonst weglassen
+});
 
       // Scalping aus Crypto filtern
       const scalpingAssets = newAssets.filter(
