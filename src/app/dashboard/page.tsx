@@ -133,20 +133,22 @@ const newAssets: Asset[] = (rawData.crypto || []).map((c) => ({
 }));
 
 
-      // Stocks für Gold-Tab
-      const goldAssets: Asset[] = (rawData.stocks || [])
-        .filter((s): s is StockRaw => s !== null && s !== undefined)
-        .map((s) => {
-          const changePctNum = Number(s['10. change percent']?.replace('%', '')) || 0;
-          return {
-            name: s['01. symbol'] || 'Unknown',
-            symbol: s['01. symbol'] || 'UNK',
-            price: Number(s['05. price']) || 0,
-            changePct: changePctNum,
-            trend:
-              changePctNum > 0 ? 'up' : changePctNum < 0 ? 'down' : 'neutral',
-          };
-        });
+    
+// Stocks für Gold-Tab
+const goldAssets: Asset[] = (rawData.stocks || [])
+  .filter((s): s is StockRaw => s !== null && s !== undefined)
+  .map((s) => {
+    const changePctNum = Number(s['10. change percent']?.replace('%', '')) || 0;
+    return {
+      name: s['01. symbol'] || 'Unknown',
+      symbol: s['01. symbol'] || 'UNK',
+      price: Number(s['05. price']) || 0,
+      changePct: changePctNum,
+      trend:
+        changePctNum > 0 ? 'up' : changePctNum < 0 ? 'down' : 'neutral',
+    };
+  });
+
 
       // Scalping aus Crypto filtern
       const scalpingAssets = newAssets.filter(
