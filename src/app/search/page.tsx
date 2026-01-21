@@ -1,10 +1,8 @@
 'use client';
 
 import SearchShell from '../components/layout/SearchShell';
-import { Search } from 'lucide-react';
-import { useState } from 'react';
-import { ReactNode } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { Search, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useRef, ReactNode } from 'react';
 
 // TYPES
 type TickerItem = {
@@ -100,19 +98,56 @@ function ScrollRow({
   className?: string;
   children: ReactNode;
 }) {
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const [showChevron, setShowChevron] = useState(false);
+
+  const updateChevron = () => {
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    const canScroll = el.scrollWidth > el.clientWidth;
+    const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
+
+    // ZEIG PFEIL NUR WENN ES WAS ZU SCROLLEN GIBT
+    setShowChevron(canScroll && !atEnd);
+  };
+
+  useEffect(() => {
+    updateChevron();
+
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    // REAGIERE AUFS SCROLLEN
+    el.addEventListener('scroll', updateChevron, { passive: true });
+
+    // REAGIERE WENN BREITE SICH VERÄNDERT
+    window.addEventListener('resize', updateChevron);
+
+    return () => {
+      el.removeEventListener('scroll', updateChevron);
+      window.removeEventListener('resize', updateChevron);
+    };
+  }, []);
+
   return (
     <section aria-label={ariaLabel} className={`relative w-full ${className}`}>
       {/* SEITLICHER SCROLL BEREICH */}
-      <div className="no-scrollbar flex flex-nowrap gap-3 overflow-x-auto overflow-y-hidden pr-14">
+      <div
+        ref={scrollerRef}
+        className="no-scrollbar flex flex-nowrap gap-3 overflow-x-auto overflow-y-hidden pr-12"
+      >
         {children}
       </div>
 
-      {/* PFEIL ZUM SEITLICHEN SCROLLEN */}
-      <div className="pointer-events-none absolute right-0 top-0 h-full w-14 bg-gradient-to-l from-black/90 via-black/40 to-transparent flex items-center justify-end pr-2">
-        <div className="h-9 w-9 rounded-full bg-white/10 border border-white/10 flex items-center justify-center">
-          <ChevronRight className="h-5 w-5 text-white/80" />
+      {/* PFEIL NUR WENN GEBRAUCHT WIRD */}
+      {showChevron && (
+        <div className="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-black/90 via-black/40 to-transparent flex items-center justify-end pr-1.5">
+          <div className="h-7 w-7 rounded-full bg-white/10 border border-white/10 flex items-center justify-center">
+            <ChevronRight className="h-4 w-4 text-white/80" />
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 }
@@ -137,6 +172,7 @@ export default function SearchPage() {
         </form>
       </header>
 
+      {/* TICKER BEREICH */}
       <ScrollRow ariaLabel="Ticker">
         {TICKER_ITEMS.map((item) => (
           <div
@@ -150,51 +186,7 @@ export default function SearchPage() {
             </span>
           </div>
         ))}
-        {/* <div className="flex items-center space-x-3 mr-3 h-10 px-3 rounded-xl bg-white/5 border border-white/10 shrink-0 w-[130px] sm:w-[140px] md:w-[150px]">
-          <p className="text-sm">Silver</p>
-          <p className="whitespace-nowrap text-sm">5,44 %</p>
-        </div>
-
-        <div className="flex items-center space-x-3 mr-3 h-10 px-3 rounded-xl bg-white/5 border border-white/10 shrink-0 w-[130px] sm:w-[140px] md:w-[150px]">
-          <p className="text-sm">Gold</p>
-          <p className="whitespace-nowrap text-sm">1,06 %</p>
-        </div>
-
-        <div className="flex items-center space-x-3 mr-3 h-10 px-3 rounded-xl bg-white/5 border border-white/10 shrink-0 w-[130px] sm:w-[140px] md:w-[150px]">
-          <p className="text-sm">Silver</p>
-          <p className="whitespace-nowrap text-sm">5,44 %</p>
-        </div>
-
-        <div className="flex items-center space-x-3 mr-3 h-10 px-3 rounded-xl bg-white/5 border border-white/10 shrink-0 w-[130px] sm:w-[140px] md:w-[150px]">
-          <p className="text-sm">Gold</p>
-          <p className="whitespace-nowrap text-sm">1,06 %</p>
-        </div> */}
       </ScrollRow>
-
-      {/* <section
-        aria-label="Ticker"
-        className="no-scrollbar flex flex-nowrap overflow-x-auto overflow-y-hidden"
-      >
-        <div className="flex items-center space-x-3 mr-3 h-8 px-3 rounded-xl bg-white/5 border border-white/10">
-          <p className="text-sm">Silver</p>
-          <p className="whitespace-nowrap text-sm">5,44 %</p>
-        </div>
-
-        <div className="flex items-center space-x-3 mr-3 h-8 px-3 rounded-xl bg-white/5 border border-white/10">
-          <p className="text-sm">Gold</p>
-          <p className="whitespace-nowrap text-sm">1,06 %</p>
-        </div>
-
-        <div className="flex items-center space-x-3 mr-3 h-8 px-6 rounded-xl bg-white/5 border border-white/10">
-          <p className="text-sm">Silver</p>
-          <p className="whitespace-nowrap text-sm">5,44 %</p>
-        </div>
-
-        <div className="flex items-center space-x-3 mr-3 h-8 px-6 rounded-xl bg-white/5 border border-white/10">
-          <p className="text-sm">Gold</p>
-          <p className="whitespace-nowrap text-sm">1,06 %</p>
-        </div>
-      </section> */}
 
       {/* TABS BEREICH */}
       <ScrollRow ariaLabel="Tabs" className="mt-6">
@@ -212,7 +204,9 @@ export default function SearchPage() {
                   : 'bg-white/5 border-white/10'
               }`}
             >
-              <span className="text-base leading-none">{ICONS[tab === 'Raw materials' ? 'gold' : 'silver']}</span>
+              <span className="text-base leading-none">
+                {ICONS[tab === 'Raw materials' ? 'gold' : 'silver']}
+              </span>
               <p className="text-[12px] leading-tight text-white/80">{tab}</p>
             </button>
           );
@@ -244,31 +238,6 @@ export default function SearchPage() {
             </div>
           </div>
         ))}
-
-        {/* <section
-        aria-label="Tabs"
-        className="no-scrollbar flex flex-nowrap mt-6 overflow-x-auto overflow-y-hidden"
-      >
-        {TABS.map((tab) => {
-          const isActive = activeTab === tab;
-
-          return (
-            <button
-              key={tab}
-              type="button"
-              onClick={() => setActiveTab(tab)}
-              className={`flex items-center space-x-3 mr-3 h-8 px-3 rounded-xl border outline-none focus-visible:ring-4 focus-visible:ring-white/10 ${
-                isActive
-                  ? 'bg-white/25 border-white/10'
-                  : 'bg-white/5 border-white/10'
-              }`}
-            >
-              <p>Icon</p>
-              <p className="whitespace-nowrap">{tab}</p>
-            </button>
-          );
-        })}
-      </section> */}
       </section>
     </SearchShell>
   );
