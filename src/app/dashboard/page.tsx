@@ -20,6 +20,8 @@ interface Asset {
   price: number;
   changePct: number;
   trend: 'up' | 'down' | 'neutral';
+  image?: string; // optionales Feld für das Logo
+
 }
 
 interface StockRaw {
@@ -117,6 +119,8 @@ useEffect(() => {
             : c.price_change_percentage_24h < 0
             ? 'down'
             : 'neutral',
+        image: `https://cryptoicons.org/api/icon/${c.symbol.toLowerCase()}/32` // Logo von cryptoicons.org
+
       }));
 
 // Stocks für Gold-Tab umwandeln
