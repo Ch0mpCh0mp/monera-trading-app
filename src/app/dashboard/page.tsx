@@ -36,6 +36,7 @@ interface CryptoRaw {
   symbol: string;
   current_price: number;
   price_change_percentage_24h: number;
+  image: string;
 }
 
 function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
@@ -106,6 +107,9 @@ useEffect(() => {
 
       // Nur einmal res.json() lesen, Typ CryptoRaw + StockRaw
       const rawData = await res.json() as { crypto: CryptoRaw[]; stocks: StockRaw[] };
+      console.log('rawData:', rawData);
+
+
 
       // Crypto für New-Tab (Live-Daten)
       const newAssets: Asset[] = (rawData.crypto || []).map((c) => ({
@@ -119,7 +123,7 @@ useEffect(() => {
             : c.price_change_percentage_24h < 0
             ? 'down'
             : 'neutral',
-        image: `https://cryptoicons.org/api/icon/${c.symbol.toLowerCase()}/32` // Logo von cryptoicons.org
+        image: c.image,
 
       }));
 
@@ -228,6 +232,7 @@ const goldAssets: Asset[] = (rawData.stocks || [])
                 price={asset.price}
                 changePct={asset.changePct}
                 trend={asset.trend}
+               image={asset.image}
               />
             ))}
           </div>
