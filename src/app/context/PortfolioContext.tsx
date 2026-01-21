@@ -13,7 +13,7 @@ const PortfolioContext = createContext<PortfolioContextType | undefined>(undefin
 
 export function PortfolioProvider({ children }: { children: ReactNode }) {
   const [balance, setBalance] = useState(10000); // Startbetrag
-  const [levelPct, setLevelPct] = useState(100);  // Start-Level
+  const [levelPct] = useState(100);  // Start-Level
   const currency: 'EUR' | 'USD' = 'EUR';          // Standard-Währung
 
   return (
