@@ -2,22 +2,28 @@
 
 import { createContext, useContext, useState, ReactNode } from 'react';
 
-type PortfolioContextType = {
+interface PortfolioContextType {
   balance: number;
+  levelPct: number; // <-- hinzufügen
+  currency: 'EUR' | 'USD';
   setBalance: (amount: number) => void;
-};
+}
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
 
 export function PortfolioProvider({ children }: { children: ReactNode }) {
   const [balance, setBalance] = useState(10000); // Startbetrag
+  const [levelPct, setLevelPct] = useState(100);  // Start-Level
+  const currency: 'EUR' | 'USD' = 'EUR';          // Standard-Währung
 
   return (
-    <PortfolioContext.Provider value={{ balance, setBalance }}>
+    <PortfolioContext.Provider value={{ balance, setBalance, levelPct, currency }}>
       {children}
     </PortfolioContext.Provider>
   );
 }
+
+
 
 export function usePortfolio() {
   const context = useContext(PortfolioContext);

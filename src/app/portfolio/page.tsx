@@ -66,7 +66,7 @@ const { balance: accountValue, levelPct, currency } = usePortfolio(); // aus Por
         <div className="flex items-start justify-between">
           <div>
             <p className="text-white/70 text-lg">Wert</p>
-            <p className="text-white text-4xl font-light mt-1">{formatCurrency(account.accountValue, account.currency)}</p>
+            <p className="text-white text-4xl font-light mt-1"></p>
             {formatCurrency(accountValue, currency)}
           </div>
 
