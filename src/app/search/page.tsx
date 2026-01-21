@@ -1,7 +1,7 @@
 'use client';
 
 import SearchShell from '../components/layout/SearchShell';
-import { Search, ChevronRight } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState, useEffect, useRef, ReactNode } from 'react';
 
 // TYPES
@@ -99,17 +99,20 @@ function ScrollRow({
   children: ReactNode;
 }) {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
-  const [showChevron, setShowChevron] = useState(false);
+  const [showLeft, setShowLeft] = useState(false);
+  const [showRight, setShowRight] = useState(false);
 
   const updateChevron = () => {
     const el = scrollerRef.current;
     if (!el) return;
 
     const canScroll = el.scrollWidth > el.clientWidth;
+
+    const atStart = el.scrollLeft <= 1;
     const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
 
-    // ZEIG PFEIL NUR WENN ES WAS ZU SCROLLEN GIBT
-    setShowChevron(canScroll && !atEnd);
+    setShowLeft(canScroll && !atStart);
+    setShowRight(canScroll && !atEnd);
   };
 
   useEffect(() => {
@@ -130,6 +133,24 @@ function ScrollRow({
     };
   }, []);
 
+  const scrollPrev = () => {
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    const amount = Math.round(el.clientWidth * 0.85);
+    el.scrollBy({ left: -amount, behavior: 'smooth' });
+  };
+
+  const scrollNext = () => {
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    // Scrollt ungefähr 1 "Screen" weiter (fühlt sich wie Netflix an)
+    const amount = Math.round(el.clientWidth * 0.85);
+
+    el.scrollBy({ left: amount, behavior: 'smooth' });
+  };
+
   return (
     <section aria-label={ariaLabel} className={`relative w-full ${className}`}>
       {/* SEITLICHER SCROLL BEREICH */}
@@ -141,11 +162,29 @@ function ScrollRow({
       </div>
 
       {/* PFEIL NUR WENN GEBRAUCHT WIRD */}
-      {showChevron && (
-        <div className="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-black/90 via-black/40 to-transparent flex items-center justify-end pr-1.5">
-          <div className="h-7 w-7 rounded-full bg-white/10 border border-white/10 flex items-center justify-center">
+      {showLeft && (
+        <div className="absolute left-0 top-0 h-full w-12 bg-gradient-to-r from-black/90 via-black/40 to-transparent flex items-center justify-start pl-1.5">
+          <button
+            type="button"
+            onClick={scrollPrev}
+            aria-label="Scroll left"
+            className="h-7 w-7 rounded-full bg-white/10 border border-white/10 flex items-center justify-center active:scale-95 transition-transform"
+          >
+            <ChevronLeft className="h-4 w-4 text-white/80" />
+          </button>
+        </div>
+      )}
+
+      {showRight && (
+        <div className="absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-black/90 via-black/40 to-transparent flex items-center justify-end pr-1.5">
+          <button
+            type="button"
+            onClick={scrollNext}
+            aria-label="Scroll right"
+            className="h-7 w-7 rounded-full bg-white/10 border border-white/10 flex items-center justify-center active:scale-95 transition-transform"
+          >
             <ChevronRight className="h-4 w-4 text-white/80" />
-          </div>
+          </button>
         </div>
       )}
     </section>
