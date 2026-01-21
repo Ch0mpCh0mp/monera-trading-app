@@ -37,6 +37,9 @@ interface CryptoRaw {
   current_price: number;
   price_change_percentage_24h: number;
   image: string;
+  sparkline_in_7d?: {
+    price: number[];
+  };
 }
 
 function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
@@ -104,51 +107,46 @@ useEffect(() => {
   async function fetchMarkets() {
     try {
       const res = await fetch('/api/markets');
-
-      // Nur einmal res.json() lesen, Typ CryptoRaw + StockRaw
-      const rawData = await res.json() as { crypto: CryptoRaw[]; stocks: StockRaw[] };
+      const rawData = await res.json() as { crypto: any[]; stocks: StockRaw[] };
       console.log('rawData:', rawData);
 
+     // Crypto für New-Tab (Live-Daten) inkl. Sparkline
+const newAssets: Asset[] = (rawData.crypto || []).map((c) => ({
+  name: c.name,
+  symbol: c.symbol.toUpperCase(),
+  price: c.current_price || 0,
+  changePct: c.price_change_percentage_24h || 0,
+  trend:
+    c.price_change_percentage_24h > 0
+      ? 'up'
+      : c.price_change_percentage_24h < 0
+      ? 'down'
+      : 'neutral',
+  image: c.image,
+  // Wenn echte Sparkline nicht existiert, generiere Testwerte (leicht variiert)
+  sparklineData:
+    c.sparkline_in_7d?.price && c.sparkline_in_7d.price.length > 0
+      ? c.sparkline_in_7d.price
+      : Array.from({ length: 10 }, (_, i) =>
+          c.current_price + Math.sin(i / 2) * (c.current_price * 0.01)
+        ),
+}));
 
 
-      // Crypto für New-Tab (Live-Daten)
-      const newAssets: Asset[] = (rawData.crypto || []).map((c) => ({
-        name: c.name,
-        symbol: c.symbol.toUpperCase(),
-        price: c.current_price || 0,
-        changePct: c.price_change_percentage_24h || 0,
-        trend:
-          c.price_change_percentage_24h > 0
-            ? 'up'
-            : c.price_change_percentage_24h < 0
-            ? 'down'
-            : 'neutral',
-        image: c.image,
-
-      }));
-
-// Stocks für Gold-Tab umwandeln
-const goldAssets: Asset[] = (rawData.stocks || [])
-  // --- Schritt 1: undefined/ null entfernen ---
-  .filter((s): s is StockRaw => s !== null && s !== undefined)
-  // --- Schritt 2: StockRaw -> Asset umwandeln ---
-  .map((s) => {
-    const changePctNum = Number(s['10. change percent']?.replace('%', '')) || 0;
-    return {
-      name: s['01. symbol'] || 'Unknown',
-      symbol: s['01. symbol'] || 'UNK',
-      price: Number(s['05. price']) || 0,        // default 0
-      changePct: changePctNum,
-      trend:
-        changePctNum > 0
-          ? 'up'
-          : changePctNum < 0
-          ? 'down'
-          : 'neutral',
-    };
-  });
-
-
+      // Stocks für Gold-Tab
+      const goldAssets: Asset[] = (rawData.stocks || [])
+        .filter((s): s is StockRaw => s !== null && s !== undefined)
+        .map((s) => {
+          const changePctNum = Number(s['10. change percent']?.replace('%', '')) || 0;
+          return {
+            name: s['01. symbol'] || 'Unknown',
+            symbol: s['01. symbol'] || 'UNK',
+            price: Number(s['05. price']) || 0,
+            changePct: changePctNum,
+            trend:
+              changePctNum > 0 ? 'up' : changePctNum < 0 ? 'down' : 'neutral',
+          };
+        });
 
       // Scalping aus Crypto filtern
       const scalpingAssets = newAssets.filter(

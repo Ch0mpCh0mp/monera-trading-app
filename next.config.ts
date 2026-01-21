@@ -3,6 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactCompiler: true,
 
+  images: {
+    domains: ['coin-images.coingecko.com'],
+  },
+
   webpack(config) {
     // 1) Find the rule that handles images (and likely svg too)
     const fileLoaderRule = config.module.rules.find((rule: any) => {
