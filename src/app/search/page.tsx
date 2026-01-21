@@ -145,7 +145,7 @@ function ScrollRow({
     const el = scrollerRef.current;
     if (!el) return;
 
-    // Scrollt ungefähr 1 "Screen" weiter (fühlt sich wie Netflix an)
+    // NUR EINE CARD WEITER GEHEN
     const amount = Math.round(el.clientWidth * 0.85);
 
     el.scrollBy({ left: amount, behavior: 'smooth' });
@@ -253,31 +253,30 @@ export default function SearchPage() {
       </ScrollRow>
 
       {/* ASSET BEREICH */}
-      <section
-        aria-label="Assets"
-        className="no-scrollbar mt-6 flex gap-4 overflow-x-auto overflow-y-hidden pb-2"
-      >
+      <ScrollRow ariaLabel="Assets" className="mt-6">
         {assets.map((a) => (
           <div
             key={a.name}
-            className="shrink-0 w-[130px] flex flex-col items-center justify-between rounded-2xl bg-white/5 border border-white/10 p-2 min-h-[160px]"
+            className="shrink-0 w-[130px] sm:w-[140px] md:w-[150px] min-h-[160px] p-2 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between"
           >
             <div className="self-start">
-              <p className="text-sm text-white/50">{ICONS[a.icon]}</p>
+              <span className="text-sm text-white/50">{ICONS[a.icon]}</span>
               <p className="font-medium">{a.name}</p>
             </div>
 
-            <div className="flex flex-col self-stretch items-end text-right">
+            <div className="flex flex-col items-end text-right">
               <p className="text-xl">{a.price}</p>
               <p
-                className={`text-sm ${a.direction === 'up' ? 'text-green-500' : 'text-red-500'}`}
+                className={`text-sm ${
+                  a.direction === 'up' ? 'text-green-500' : 'text-red-500'
+                }`}
               >
                 {a.direction === 'up' ? '↑' : '↓'} {a.change}
               </p>
             </div>
           </div>
         ))}
-      </section>
+      </ScrollRow>
     </SearchShell>
   );
 }
