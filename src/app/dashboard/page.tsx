@@ -8,6 +8,7 @@ import AccountValueCard from '../components/AccountValueCard';
 import WatchlistHeader from '../components/WatchlistHeader';
 import TopBar from '../components/TopBar';
 import AppShell from '../components/layout/AppShell';
+import { usePortfolio } from '../context/PortfolioContext';
 
 
 // =====================
@@ -79,6 +80,8 @@ function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
 
 export default function DashboardPage() {
   const levelPercent = 100;
+  const { balance } = usePortfolio();
+
 
   const tabs = ['New', 'Gold', 'Scalping'] as const;
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>(tabs[0]);
@@ -168,11 +171,11 @@ const goldAssets: Asset[] = (rawData.stocks || [])
 
       {/* ACCOUNT VALUE */}
       <AccountValueCard
-        value={12543.21}
-        changeSumToday={123.45}
-        changePct={0.99}
-        currency="EUR"
-      />
+  value={balance}          // vorher 12543.21
+  changeSumToday={0}       // optional: wir starten mit 0 Veränderung
+  changePct={0}            // optional: 0%
+  currency="EUR"
+/>
 
       {/* MARGIN & LEVEL */}
       <div className="grid grid-cols-2 gap-4 mt-6">
@@ -186,17 +189,18 @@ const goldAssets: Asset[] = (rawData.stocks || [])
 
       {/* CASH UND DEPOSIT BUTTON */}
       <StatusCard
-        label="Cash"
-        value="0,00 €"
-        rightSide={
-          <Link
-            href="/deposit"
-            className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full"
-          >
-            Depositº
-          </Link>
-        }
-      />
+  label="Cash"
+  value={`${balance.toFixed(2)} €`}
+  rightSide={
+    <Link
+      href="/deposit"
+      className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full"
+    >
+      Deposit
+    </Link>
+  }
+/>
+
 
       {/* GROSSER AKTIENBLOCK */}
       <section className="border border-white/5 text-white/50 bg-white/5 rounded-2xl flex flex-col flex-1 min-h-0">
