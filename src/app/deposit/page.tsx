@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 // HAB ICH HINZUGEFÜGT
 import Logo from '../components/Logo';
-import { CreditCard, ArrowLeft } from 'lucide-react';
+import { CreditCard } from 'lucide-react';
 
 export default function DepositPage() {
   const { balance, setBalance } = usePortfolio();
@@ -24,24 +24,24 @@ export default function DepositPage() {
   return (
     <div className="min-h-screen text-white bg-black">
       {/* AUTH PAGE HINTERGRUND */}
-      <div className="absolute inset-0 -z-10">
+      {/* <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.12),transparent_55%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.08),transparent_50%)]" />
-      </div>
+      </div> */}
 
-      <div className="min-h-screen flex items-center justify-center px-6 py-10">
+      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 py-10">
         <div className="w-full max-w-md">
           {/* CARD WIE IN DER AUTH */}
-          <div className="relative rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)] backdrop-blur">
+          <div className="relative rounded-xl border border-white/10 bg-white/5 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)] backdrop-blur">
             {/* BACK BUTTON */}
-            <button
+            {/* <button
               type="button"
               onClick={() => router.push('/dashboard')}
               className="absolute right-6 bottom-8 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/80 hover:bg-white/10"
             >
               <ArrowLeft size={16} />
               Back
-            </button>
+            </button> */}
 
             {/* LOGO UND NAME */}
             <div className="flex flex-col items-center text-center pt-2">
@@ -57,7 +57,7 @@ export default function DepositPage() {
               </p>
 
               {/* WOLLEN WIR DAS BEHALTEN? */}
-              <p className="mt-3 text-sm text-white/70">Deposit</p>
+              {/* <p className="mt-3 text-sm text-white/70">Deposit</p> */}
             </div>
 
             {/* FORM */}
@@ -84,7 +84,7 @@ export default function DepositPage() {
 
               <p className="text-xs text-white/45">
                 Your current balance:{' '}
-                <span className="text-white/70">€{balance}</span>
+                <span className="text-white/40">€{balance}</span>
               </p>
             </div>
 
@@ -97,7 +97,7 @@ export default function DepositPage() {
                   intent: 'capture',
                 }}
               >
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                <div className="rounded-xl border border-white/10 bg-white/5 sm:p-3 max-h-[320px] overflow-auto sm:max-h-none sm:overflow-visible">
                   <PayPalButtons
                     style={{ layout: 'vertical' }}
                     createOrder={(data, actions) => {
@@ -123,8 +123,16 @@ export default function DepositPage() {
               </PayPalScriptProvider>
             </div>
 
+            <button
+              type="button"
+              onClick={() => router.push('/dashboard')}
+              className="w-full mt-6 rounded-lg h-9 text-black text-base bg-green-600 hover:bg-green-500"
+            >
+              Back
+            </button>
+
             <p className="mt-6 text-center text-xs text-white/40">
-              Payments are processed by PayPal.
+              Payments are processed by PayPal
             </p>
           </div>
         </div>
