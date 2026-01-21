@@ -80,7 +80,7 @@ function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
 
 export default function DashboardPage() {
   const levelPercent = 100;
-  const { balance } = usePortfolio();
+  const { balance , setBalance} = usePortfolio();
 
 
   const tabs = ['New', 'Gold', 'Scalping'] as const;
@@ -188,16 +188,18 @@ const goldAssets: Asset[] = (rawData.stocks || [])
       </div>
 
       {/* CASH UND DEPOSIT BUTTON */}
-      <StatusCard
+      {/* CASH UND DEPOSIT BUTTON */}
+<StatusCard
   label="Cash"
   value={`${balance.toFixed(2)} €`}
   rightSide={
-    <Link
-      href="/deposit"
+    <button
+      type="button"
       className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full"
+      onClick={() => setBalance(balance + 1000)} // Beispiel: 1000 € einzahlen
     >
       Deposit
-    </Link>
+    </button>
   }
 />
 
