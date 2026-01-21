@@ -33,13 +33,25 @@ export async function POST(req: NextRequest) {
     }
 
     // 3️⃣ JWT erstellen
-    const token = jwt.sign(
-      { userId: user.id },
-      process.env.JWT_SECRET || 'secret',
-      { expiresIn: '7d' }
-    );
+    // 3️⃣ JWT erstellen
+const token = jwt.sign(
+  { userId: user.id },
+  process.env.JWT_SECRET || 'secret',
+  { expiresIn: '7d' }
+);
 
-    return NextResponse.json({ token, user });
+// Nur sichere Felder zurückgeben
+const safeUser = {
+  id: user.id,
+  email: user.email,
+  username: user.username,
+  balance: user.balance,
+};
+
+return NextResponse.json({ token: token, user: safeUser });
+
+
+
   } catch (err) {
     console.error('Login error:', err);
     return NextResponse.json({ error: 'Login failed' }, { status: 500 });
