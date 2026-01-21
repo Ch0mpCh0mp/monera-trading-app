@@ -21,6 +21,12 @@ interface Asset {
   trend: 'up' | 'down' | 'neutral';
 }
 
+interface StockRaw {
+  '01. symbol': string;
+  '05. price': string;
+  '10. change percent': string;
+}
+
 function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
   const stroke = 4;
   const radius = (size - stroke) / 2;
@@ -80,29 +86,53 @@ const [assetsByTab, setAssetsByTab] = useState<{
   Scalping: [],
 });
 
-  useEffect(() => {
-    async function fetchMarkets() {
-      try {
-        const res = await fetch('/api/markets');
-        const data = await res.json();
+useEffect(() => {
+  async function fetchMarkets() {
+    try {
+ const res = await fetch('/api/markets');
 
-        // Scalping aus Crypto filtern (Beispiel: SOL + ADA)
-        const scalpingAssets = (data.crypto || []).filter(
-          (c: Asset) => c.symbol === 'SOL' || c.symbol === 'ADA'
-        );
 
-        setAssetsByTab({
-          New: data.crypto || [],
-          Gold: data.stocks || [],
-          Scalping: scalpingAssets,
-        });
-      } catch (err) {
-        console.error('Failed to fetch markets:', err);
-      }
+const data: { crypto: Asset[]; stocks: StockRaw[] } = await res.json();
+
+      // Crypto für New-Tab
+      const newAssets: Asset[] = data.crypto || [];
+
+      // Stocks für Gold-Tab umwandeln
+const goldAssets: Asset[] = (data.stocks || [])
+  .filter((s): s is StockRaw => s !== null && s !== undefined)
+  .map((s) => ({
+    name: s['01. symbol'] || 'Unknown',
+    symbol: s['01. symbol'] || 'UNK',
+    price: Number(s['05. price']) || 0,        // <-- 0 als default
+    changePct: Number(s['10. change percent']) || 0, // <-- 0 als default
+    trend:
+      Number(s['10. change percent']) > 0
+        ? 'up'
+        : Number(s['10. change percent']) < 0
+        ? 'down'
+        : 'neutral',
+  }));
+
+
+      // Scalping aus Crypto filtern
+      const scalpingAssets = newAssets.filter(
+        (c) => c.symbol === 'SOL' || c.symbol === 'ADA'
+      );
+
+      setAssetsByTab({
+        New: newAssets,
+        Gold: goldAssets,
+        Scalping: scalpingAssets,
+      });
+    } catch (err) {
+      console.error('Failed to fetch markets:', err);
     }
+  }
 
-    fetchMarkets();
-  }, []);
+  fetchMarkets();
+}, []);
+
+  
   // --- ENDE FETCH ---
 
   return (
@@ -137,7 +167,7 @@ const [assetsByTab, setAssetsByTab] = useState<{
             href="/deposit"
             className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full"
           >
-            Deposit
+            Depositº
           </Link>
         }
       />
