@@ -71,6 +71,7 @@ const router = useRouter();
           <button
             type="button"
             aria-label="Add"
+            onClick={() => router.push('/deposit')}
             className="mt-2 w-12 h-12 rounded-full bg-[rgba(0,166,62,1)] hover:bg-[rgba(0,166,62,0.85)] flex items-center justify-center text-white"
           >
             <Plus size={22} />
