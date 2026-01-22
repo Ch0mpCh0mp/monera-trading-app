@@ -56,10 +56,10 @@ const router = useRouter();
 
   return (
     <AppShell containerClassName="space-y-6">
-      {/* Top bar */}
+      {/* TOPBAR */}
       <TopBar />
 
-      {/* Value + plus button */}
+      {/* VALUE + PLUS BUTTON */}
       <section>
         <div className="flex items-start justify-between">
           <div>
@@ -78,7 +78,7 @@ const router = useRouter();
           </button>
         </div>
 
-        {/* Margin level pill */}
+        {/* MARGIN LEVEL PILL */}
         <button
           type="button"
           className="mt-5 w-full rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white py-3 flex items-center justify-center gap-2 text-sm"
@@ -88,7 +88,7 @@ const router = useRouter();
         </button>
       </section>
 
-      {/* Promo cards */}
+      {/* PROMO CARDS */}
       <section className="space-y-4">
         <PromoCard
           title="Handel mit über 9.000 Aktien, long und short Positionen"

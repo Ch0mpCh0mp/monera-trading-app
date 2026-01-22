@@ -34,3 +34,15 @@ body {
   /* HIER FONTFAMILY VERÄNDERT */
   font-family: var(--font-sans), system-ui, sans-serif;
 }
+
+/* BEI SEARCH DIE HORIZONTALE SCROLLBAR NICHT ZEIGEN */
+/* FIREFOX & EDGE */
+.no-scrollbar {
+  scrollbar-width: none; 
+  -ms-overflow-style: none;
+}
+
+/* CHROME SAFARI */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
