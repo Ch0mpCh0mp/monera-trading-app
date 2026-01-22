@@ -76,9 +76,15 @@ export default function DepositPage() {
               intent: 'capture',
             }}
           >
-            <div className="rounded-xl border border-white/10 bg-white/5 p-2 sm:p-3 max-h-[320px] overflow-auto sm:max-h-none sm:overflow-visible">
+            <div className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
               <PayPalButtons
-                style={{ layout: 'vertical' }}
+                style={{
+                  layout: 'vertical',
+                  shape: "pill",
+                  height: 30,
+                  tagline: false,
+                  disableMaxWidth: true,
+                }}
                 createOrder={(data, actions) =>
                   actions.order.create({
                     intent: 'CAPTURE',
