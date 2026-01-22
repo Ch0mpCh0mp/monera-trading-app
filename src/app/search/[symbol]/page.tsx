@@ -2,6 +2,7 @@ import AppShell from "@/app/components/layout/AppShell";
 import SymbolHeader from "./SymbolHeader";
 import BuySellCard from "./BuySellCard";
 import { Gem } from "lucide-react";
+import PerformanceRow from "./PerformanceRow";
 
 export default async function SymbolPage({
   params,
@@ -15,6 +16,7 @@ export default async function SymbolPage({
       <SymbolHeader />
       <h1 className="text-white/90 text-2xl font-semibold text-center mt-2">{symbol}</h1>
       <BuySellCard sellPrice="4.442,64 €" buyPrice="4.443,65 €" assetIcon={<Gem className="w-6 h-6 text-yellow-400" />} />
+      <PerformanceRow value={242.14} percent={5.76}/>
     </AppShell>
   );
 }

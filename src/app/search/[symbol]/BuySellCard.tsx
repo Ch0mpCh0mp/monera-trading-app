@@ -76,7 +76,6 @@ export default function BuySellCard({
         </div> */}
       </div>
 
-      <p className="">pfeilsymbol preis (prozente) in the last month</p>
     </section>
   );
 }
