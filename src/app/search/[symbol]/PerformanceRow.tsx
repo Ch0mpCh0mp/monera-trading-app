@@ -1,3 +1,5 @@
+import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
+
 type PerformanceRowProps = {
   value: number;
   percent: number;
@@ -12,20 +14,43 @@ export default function PerformanceRow({
   const isPositive = value >= 0;
 
   return (
-    <p
-      className={`mt-3 text-sm font-medium ${
+    <div
+      className={`mt-3 flex items-center justify-center gap-1 text-sm font-medium ${
         isPositive ? 'text-green-500' : 'text-red-500'
       }`}
     >
-      {isPositive ? '↗' : '↘'}{' '}
-      {Math.abs(value).toLocaleString('de-DE', {
-        minimumFractionDigits: 2,
-      })}{' '}
-      (
-      {Math.abs(percent).toLocaleString('de-DE', {
-        minimumFractionDigits: 2,
-      })}
-      %) {periodLabel}
-    </p>
+      {isPositive ? (
+        <ArrowUpRight className="w-4 h-4" />
+      ) : (
+        <ArrowDownRight className="w-4 h-4" />
+      )}
+
+      <span>
+        {Math.abs(value).toLocaleString('de-DE', {
+          minimumFractionDigits: 2,
+        })}{' '}
+        (
+        {Math.abs(percent).toLocaleString('de-DE', {
+          minimumFractionDigits: 2,
+        })}
+        %) {periodLabel}
+      </span>
+    </div>
+
+    // <p
+    //   className={`mt-3 text-sm text-center font-medium ${
+    //     isPositive ? 'text-green-500' : 'text-red-500'
+    //   }`}
+    // >
+    //   {isPositive ? '↗' : '↘'}{' '}
+    //   {Math.abs(value).toLocaleString('de-DE', {
+    //     minimumFractionDigits: 2,
+    //   })}{' '}
+    //   (
+    //   {Math.abs(percent).toLocaleString('de-DE', {
+    //     minimumFractionDigits: 2,
+    //   })}
+    //   %) {periodLabel}
+    // </p>
   );
 }
