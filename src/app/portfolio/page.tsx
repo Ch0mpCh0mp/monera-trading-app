@@ -14,16 +14,18 @@ import TopBar from '../components/TopBar';
 import { useAccountSummary } from '@/hooks/useAccountSummary';
 import { formatCurrency } from '@/lib/formatCurrency';
 import { usePortfolio } from '../context/PortfolioContext';
-
+import { useRouter } from 'next/navigation';
 
 function PromoCard({
   title,
   cta,
   icon,
+  onClick,
 }: {
   title: string;
   cta: string;
   icon: React.ReactNode;
+  onClick: () => void;
 }) {
   return (
     <div className="rounded-2xl bg-white/5 border border-white/10 p-4 flex items-center justify-between">
@@ -32,6 +34,7 @@ function PromoCard({
 
         <button
           type="button"
+          onClick={onClick}
           className="
             mt-3 inline-flex items-center rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white text-xs  px-4 py-2"
         >
@@ -48,6 +51,7 @@ function PromoCard({
 
 export default function PortfolioPage() {
 const { balance: accountValue, levelPct, currency } = usePortfolio(); // aus PortfolioContext
+const router = useRouter();
 
 
   return (
@@ -89,21 +93,28 @@ const { balance: accountValue, levelPct, currency } = usePortfolio(); // aus Por
           title="Handel mit über 9.000 Aktien, long und short Positionen"
           cta="Aktien durchsuchen"
           icon={<Boxes className="text-white/90" size={28} />}
+        onClick={() => router.push('/markets')}
         />
         <PromoCard
           title="Trade die wichtigsten Indizes der Welt wie den USA 500, USA 30 und UK 100"
           cta="Indizes durchsuchen"
           icon={<Globe className="text-white/90" size={28} />}
+        onClick={() => router.push('/markets')}
+        
         />
         <PromoCard
           title="Handel mit Rohstoffen wie Edelmetallen, Öl, Holz, Vieh und mehr"
           cta="Durchstöbere Rohstoffe"
           icon={<Droplets className="text-white/90" size={28} />}
+        onClick={() => router.push('/markets')}
+        
         />
         <PromoCard
           title="Handel mit Forex – über 180 Paare verfügbar 24/5"
           cta="Forex durchsuchen"
           icon={<DollarSign className="text-white/90" size={28} />}
+        onClick={() => router.push('/markets')}
+        
         />
       </section>
     </AppShell>
