@@ -1,3 +1,5 @@
+'use client';
+
 import type { ReactNode } from "react";
 import Container from "./Container";
 import BottomNav from "../BottomNav";
