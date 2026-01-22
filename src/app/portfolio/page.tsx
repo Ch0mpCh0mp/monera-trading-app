@@ -93,27 +93,27 @@ const router = useRouter();
           title="Handel mit über 9.000 Aktien, long und short Positionen"
           cta="Aktien durchsuchen"
           icon={<Boxes className="text-white/90" size={28} />}
-        onClick={() => router.push('/markets')}
+        onClick={() => router.push('/search')}
         />
         <PromoCard
           title="Trade die wichtigsten Indizes der Welt wie den USA 500, USA 30 und UK 100"
           cta="Indizes durchsuchen"
           icon={<Globe className="text-white/90" size={28} />}
-        onClick={() => router.push('/markets')}
+        onClick={() => router.push('/search')}
         
         />
         <PromoCard
           title="Handel mit Rohstoffen wie Edelmetallen, Öl, Holz, Vieh und mehr"
           cta="Durchstöbere Rohstoffe"
           icon={<Droplets className="text-white/90" size={28} />}
-        onClick={() => router.push('/markets')}
+        onClick={() => router.push('/search')}
         
         />
         <PromoCard
           title="Handel mit Forex – über 180 Paare verfügbar 24/5"
           cta="Forex durchsuchen"
           icon={<DollarSign className="text-white/90" size={28} />}
-        onClick={() => router.push('/markets')}
+        onClick={() => router.push('/search')}
         
         />
       </section>
