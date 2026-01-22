@@ -36,21 +36,5 @@ export default function PerformanceRow({
         %) {periodLabel}
       </span>
     </div>
-
-    // <p
-    //   className={`mt-3 text-sm text-center font-medium ${
-    //     isPositive ? 'text-green-500' : 'text-red-500'
-    //   }`}
-    // >
-    //   {isPositive ? '↗' : '↘'}{' '}
-    //   {Math.abs(value).toLocaleString('de-DE', {
-    //     minimumFractionDigits: 2,
-    //   })}{' '}
-    //   (
-    //   {Math.abs(percent).toLocaleString('de-DE', {
-    //     minimumFractionDigits: 2,
-    //   })}
-    //   %) {periodLabel}
-    // </p>
   );
 }
