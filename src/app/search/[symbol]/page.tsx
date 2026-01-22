@@ -10,7 +10,8 @@ export default async function SymbolPage({
 
   return (
     <AppShell>
-      <SymbolHeader symbol={symbol} />
+      <SymbolHeader />
+      <h1 className="text-white text-2xl font-semibold text-center mt-2">{symbol}</h1>
     </AppShell>
   );
 }

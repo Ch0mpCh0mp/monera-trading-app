@@ -3,19 +3,16 @@
 import { useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 
-export default function SymbolHeader({ symbol }: { symbol: string }) {
+export default function SymbolHeader() {
   const router = useRouter();
 
   return (
-    <header>
+    <header className='flex items-center justify-between bg-pink-300'>
       <button
         type="button"
-        onClick={() => router.back()}
-        className="bg-pink-300"
-      >
+        onClick={() => router.back()}>
         <ChevronLeft />
       </button>
-      {/* <p className="text-white">{symbol}</p> */}
     </header>
   );
 }
