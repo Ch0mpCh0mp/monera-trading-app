@@ -19,8 +19,8 @@ type PortfolioContextType = {
   balance: number;
   positions: Position[];
   setBalance: (value: number) => void;
-  buy: (symbol: string, price: number, amount: number) => void;
-  sell: (symbol: string, price: number, amount: number) => void;
+  buy: (symbol: string, price: number, amount: number, leverage?: number) => void;
+  sell: (symbol: string, price: number, amount: number, leverage?: number) => void;
 };
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
