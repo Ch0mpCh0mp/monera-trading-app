@@ -21,6 +21,8 @@ type BuySellCardProps = {
   onSell?: (amount: number) => void;
 
   position?: PositionPreview; // 👈 NEU
+
+  onClosePosition?: () => void;
 };
 
 
@@ -35,6 +37,7 @@ export default function BuySellCard({
   onBuy,
   onSell,
   position,
+  onClosePosition,
 }: BuySellCardProps) {
   const [amount, setAmount] = useState<number>(1);
 
@@ -77,24 +80,29 @@ export default function BuySellCard({
           >
             {buyLabel}
           </button>
+
         </div>
-         {position && (
-  <div className="mt-3 p-2 rounded-md bg-white/5 text-xs text-white">
-    <p>
-      Position: {position.amount}
-    </p>
-    <p>
-      Einstieg: {position.entryPrice.toFixed(2)}
-    </p>
-    <p
-      className={
-        position.pnl >= 0 ? 'text-green-400' : 'text-red-400'
-      }
+{position && (
+  <div className="relative mt-3 p-2 rounded-md bg-white/5 text-xs text-white">
+    {/* X-Button zum Schließen */}
+    <button
+      onClick={onClosePosition} // <-- bleibt so
+      className="absolute top-1 right-1 text-white/70 hover:text-white font-bold"
     >
+      ×
+    </button>
+
+    <p>Position: {position.amount}</p>
+    <p>Einstieg: {position.entryPrice.toFixed(2)}</p>
+    <p className={position.pnl >= 0 ? 'text-green-400' : 'text-red-400'}>
       PnL: {position.pnl.toFixed(2)}
     </p>
   </div>
 )}
+
+    
+
+
       </div>
     </section>
   );

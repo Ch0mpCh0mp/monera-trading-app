@@ -13,6 +13,7 @@ import TradeModal from './TradeModal';
 export default function SymbolPage({ params }: { params: { symbol: string } }) {
   const { symbol } = params;
   const { buy, sell, positions, balance } = usePortfolio();
+  const [hidePosition, setHidePosition] = useState(false);
 
   const [tradeType, setTradeType] = useState<'buy' | 'sell' | null>(null);
 
@@ -22,13 +23,14 @@ export default function SymbolPage({ params }: { params: { symbol: string } }) {
   const sellPrice = assetPosition ? assetPosition.avgPrice - 0.5 : 4442.64;
   const buyPrice = assetPosition ? assetPosition.avgPrice + 0.5 : 4443.65;
 
-  const positionPreview = assetPosition
-    ? {
-        amount: assetPosition.amount,
-        entryPrice: assetPosition.avgPrice,
-        pnl: (buyPrice - assetPosition.avgPrice) * assetPosition.amount,
-      }
-    : undefined;
+  const positionPreview = assetPosition && !hidePosition
+  ? {
+      amount: assetPosition.amount,
+      entryPrice: assetPosition.avgPrice,
+      pnl: (buyPrice - assetPosition.avgPrice) * assetPosition.amount,
+    }
+  : undefined;
+
 
   // --- Demo Chart-Daten ---
   const demoPoints: ChartPoint[] = [
@@ -67,12 +69,13 @@ export default function SymbolPage({ params }: { params: { symbol: string } }) {
 
       <BuySellCard
         sellPrice={sellPrice}
-        buyPrice={buyPrice}
-        assetIcon={<Gem className="w-6 h-6 text-yellow-400" />}
-        onBuy={() => setTradeType('buy')}
-        onSell={() => setTradeType('sell')}
-        position={positionPreview}
-      />
+  buyPrice={buyPrice}
+  assetIcon={<Gem className="w-6 h-6 text-yellow-400" />}
+  onBuy={() => setTradeType('buy')}
+  onSell={() => setTradeType('sell')}
+  position={positionPreview}
+  onClosePosition={() => setHidePosition(true)} // <-- NEU
+/>
 
       {/* Performance Row */}
       <PerformanceRow value={242.14} percent={5.76} />

@@ -24,21 +24,33 @@ const [amount, setAmount] = useState<number>(1);      // <-- NEU
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 flex items-end justify-center">
-      <div className="w-full max-w-md bg-[#0b1220] rounded-t-2xl p-4">
+       <div className="relative w-full max-w-md bg-[#0b1220] rounded-t-2xl p-4">
+<button
+  onClick={onClose}
+  className="absolute top-2 right-2 text-white/70 hover:text-white text-lg font-bold"
+>
+  ×
+</button>
+
         <h2 className="text-white text-lg font-semibold mb-3">
           {type === 'buy' ? 'Buy' : 'Sell'} Order
         </h2>
 
-        {/* Betrag */}
-        <input
-          type="number"
-          placeholder="Amount"
-          value={amount}
-          onChange={(e) => setAmount(Number(e.target.value))}
-          className="w-full mb-3 px-3 py-2 rounded-md text-sm"
-        />
+        {/* Close Button oben rechts */}
 
-        {/* Leverage */}
+
+{/* Betrag */}
+<div className="text-white/70 text-sm mb-1">Amount (Einheiten Gold, z.B. 10)</div>
+<input
+  type="number"
+  placeholder="Amount"
+  value={amount}
+  onChange={(e) => setAmount(Number(e.target.value))}
+  className="w-full mb-3 px-3 py-2 rounded-md text-sm"
+/>
+
+{/* Leverage */}
+<div className="text-white/70 text-sm mb-1">Leverage (Hebel, z.B. 2x)</div>
 <input
   type="number"
   placeholder="Leverage"
@@ -49,9 +61,8 @@ const [amount, setAmount] = useState<number>(1);      // <-- NEU
   className="w-full mb-3 px-3 py-2 rounded-md text-sm"
 />
 
-{/* Invested / Effective */}
 <div className="text-white/70 text-sm mb-4">
-  Invested: {invested.toFixed(2)} € | Effective: {effective.toFixed(2)} €
+  Dein Einsatz: {invested.toFixed(2)} € | Kontrollierter Wert (inkl. Hebel): {effective.toFixed(2)} €
 </div>
 
         {/* Preis */}
