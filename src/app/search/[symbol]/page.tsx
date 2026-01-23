@@ -7,13 +7,34 @@ import { Gem } from 'lucide-react';
 import PerformanceRow from './PerformanceRow';
 import ChartCard, { type ChartPoint } from './ChartCard';
 import { usePortfolio } from '../../context/PortfolioContext';
-import { useState } from 'react';
-
+import { useState, useEffect } from 'react';
 
 export default function SymbolPage({ params }: { params: { symbol: string } }) {
   const { symbol } = params;
   const { buy, sell, positions, balance } = usePortfolio();
 
+  // --- State für dynamische Preise ---
+  const [sellPrice, setSellPrice] = useState<number>(4442.64);
+  const [buyPrice, setBuyPrice] = useState<number>(4443.65);
+
+  // --- State für Positionsanzeige ---
+  const [position, setPosition] = useState<number>(
+    positions.find(p => p.symbol === symbol)?.amount ?? 0
+  );
+
+  // --- Effekt um Preise und Position zu setzen, wenn Portfolio sich ändert ---
+  useEffect(() => {
+    const asset = positions.find(p => p.symbol === symbol);
+    if (asset) {
+      setSellPrice(asset.avgPrice - 0.5); // kleines Spread
+      setBuyPrice(asset.avgPrice + 0.5);
+      setPosition(asset.amount);
+    } else {
+      setSellPrice(4442.64);
+      setBuyPrice(4443.65);
+      setPosition(0);
+    }
+  }, [positions, symbol]);
 
   // --- Demo Chart-Daten ---
   const demoPoints: ChartPoint[] = [
@@ -25,26 +46,16 @@ export default function SymbolPage({ params }: { params: { symbol: string } }) {
     { t: '2026-01-22', p: 4442.64 },
   ];
 
-  // --- Position State ---
-const [position, setPosition] = useState<number>(
-  positions.find(p => p.symbol === symbol)?.amount ?? 0
-);
-
   // --- Buy / Sell Callbacks ---
   function handleBuy(amount: number) {
-  buy(symbol, buyPrice, amount);       // 💰 PortfolioContext aufrufen
-  setPosition(prev => prev + amount);  // lokal für Anzeige aktualisieren
-}
+    buy(symbol, buyPrice, amount);       // PortfolioContext aktualisieren
+    setPosition(prev => prev + amount);  // lokal aktualisieren
+  }
 
-function handleSell(amount: number) {
-  sell(symbol, sellPrice, amount);     // 💰 PortfolioContext aufrufen
-  setPosition(prev => prev - amount);  // lokal für Anzeige aktualisieren
-}
-
-
-  // Beispielpreise
-  const sellPrice = 4442.64;
-  const buyPrice = 4443.65;
+  function handleSell(amount: number) {
+    sell(symbol, sellPrice, amount);     // PortfolioContext aktualisieren
+    setPosition(prev => prev - amount);  // lokal aktualisieren
+  }
 
   return (
     <AppShell>
