@@ -2,8 +2,8 @@
 
 import Image from 'next/image';
 import { Sparklines, SparklinesLine } from 'react-sparklines';
-import { useMemo } from 'react';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 type Trend = 'up' | 'down' | 'neutral';
 
@@ -28,6 +28,9 @@ export default function AssetRow({
   sparklineData,
   onClick,
 }: AssetRowProps) {
+  const router = useRouter();
+
+  // Farben für die Veränderung
   const isPositive = changePct > 0;
   const isNegative = changePct < 0;
   const changeColorClass = isPositive
@@ -36,22 +39,28 @@ export default function AssetRow({
     ? 'text-red-400'
     : 'text-white/70';
 
+  // Klick-Handler: leitet auf Symbol-Seite weiter
+  const handleClick = () => {
+    if (onClick) onClick(); // optionalen Callback ausführen
+    router.push(`/symbol/${symbol.toLowerCase()}?price=${price}`);
+  };
+
+  // Sparkline-Daten vorbereiten
   const [data] = useState<number[]>(() => {
-  if (sparklineData && sparklineData.length > 1) return sparklineData;
+    if (sparklineData && sparklineData.length > 1) return sparklineData;
 
-  // Testwerte einmalig erzeugen ±10% um den Preis
-  return Array.from({ length: 10 }, (_, i) => price + (Math.random() - 0.5) * price * 0.1);
-});
-
+    // Testwerte ±10% um den Preis
+    return Array.from({ length: 10 }, (_, i) => price + (Math.random() - 0.5) * price * 0.1);
+  });
 
   const sparklineColor = data[data.length - 1] >= data[0] ? '#34D399' : '#F87171';
 
   return (
     <div
       className="grid grid-cols-[1fr_80px_96px] items-center gap-3 py-4 min-h-[56px] border-b border-white/5 hover:bg-white/10 cursor-pointer"
-      onClick={onClick} // ✅ hier richtig
+      onClick={handleClick} // <-- hier richtig
     >
-        {/* Name + Symbol */}
+      {/* Name + Symbol */}
       <div className="flex items-center gap-2 min-w-0">
         <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10">
           {image ? (
