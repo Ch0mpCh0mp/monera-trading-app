@@ -14,7 +14,7 @@ type AssetRowProps = {
   changePct: number;
   trend: Trend;
   image?: string;
-  sparklineData?: number[]; // kleine Linie
+  sparklineData?: number[];
   onClick?: () => void;
 };
 
@@ -30,7 +30,6 @@ export default function AssetRow({
 }: AssetRowProps) {
   const router = useRouter();
 
-  // Farben für die Veränderung
   const isPositive = changePct > 0;
   const isNegative = changePct < 0;
   const changeColorClass = isPositive
@@ -39,17 +38,14 @@ export default function AssetRow({
     ? 'text-red-400'
     : 'text-white/70';
 
-  // Klick-Handler: leitet auf Symbol-Seite weiter
+  // --- Nur die Funktion hier ---
   const handleClick = () => {
-    if (onClick) onClick(); // optionalen Callback ausführen
-    router.push(`/symbol/${symbol.toLowerCase()}?price=${price}`);
+    if (onClick) onClick(); // optionaler Callback
+    router.push(`/search/${symbol.toLowerCase()}`);
   };
 
-  // Sparkline-Daten vorbereiten
   const [data] = useState<number[]>(() => {
     if (sparklineData && sparklineData.length > 1) return sparklineData;
-
-    // Testwerte ±10% um den Preis
     return Array.from({ length: 10 }, (_, i) => price + (Math.random() - 0.5) * price * 0.1);
   });
 
@@ -58,7 +54,7 @@ export default function AssetRow({
   return (
     <div
       className="grid grid-cols-[1fr_80px_96px] items-center gap-3 py-4 min-h-[56px] border-b border-white/5 hover:bg-white/10 cursor-pointer"
-      onClick={handleClick} // <-- hier richtig
+      onClick={handleClick} // Layout unverändert, nur Klick hinzugefügt
     >
       {/* Name + Symbol */}
       <div className="flex items-center gap-2 min-w-0">
