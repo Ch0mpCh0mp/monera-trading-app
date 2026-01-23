@@ -51,7 +51,45 @@ export default function AssetRow({
       className="grid grid-cols-[1fr_80px_96px] items-center gap-3 py-4 min-h-[56px] border-b border-white/5 hover:bg-white/10 cursor-pointer"
       onClick={onClick} // ✅ hier richtig
     >
-      {/* ...Rest bleibt gleich */}
+        {/* Name + Symbol */}
+      <div className="flex items-center gap-2 min-w-0">
+        <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10">
+          {image ? (
+            <Image
+              src={image}
+              alt={symbol}
+              width={32}
+              height={32}
+              className="object-contain w-auto h-auto"
+            />
+          ) : (
+            <span className="text-white/50">{symbol}</span>
+          )}
+        </div>
+        <div className="min-w-0">
+          <p className="text-white text-sm font-medium truncate">{symbol}</p>
+          <p className="text-white/50 text-[11px] truncate">{name}</p>
+        </div>
+      </div>
+
+      {/* Sparkline */}
+      <div className="justify-self-center w-20 h-8">
+        <Sparklines data={data} width={80} height={32} margin={0}>
+          <SparklinesLine
+            color={sparklineColor}
+            style={{ strokeWidth: 2, fill: 'none' }}
+          />
+        </Sparklines>
+      </div>
+
+      {/* Preis + Veränderung */}
+      <div className="text-right">
+        <p className="text-white text-sm font-medium tabular-nums">{price.toFixed(2)}</p>
+        <p className={`text-[11px] tabular-nums ${changeColorClass}`}>
+          {isPositive ? '+' : ''}
+          {Number.isFinite(changePct) ? changePct.toFixed(2) : '0.00'}%
+        </p>
+      </div>
     </div>
   );
 }
