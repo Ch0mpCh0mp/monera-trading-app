@@ -2,16 +2,28 @@
 
 import { useState, ReactNode } from 'react';
 
+type PositionPreview = {
+  amount: number;
+  entryPrice: number;
+  pnl: number;
+};
+
 type BuySellCardProps = {
   sellLabel?: string;
   buyLabel?: string;
   sellPrice: number;
   buyPrice: number;
+
   assetIcon?: ReactNode;
   assetIconAriaLabel?: string;
+
   onBuy?: (amount: number) => void;
   onSell?: (amount: number) => void;
+
+  position?: PositionPreview; // 👈 NEU
 };
+
+
 
 export default function BuySellCard({
   sellLabel = 'Sell',
@@ -22,6 +34,7 @@ export default function BuySellCard({
   assetIconAriaLabel = 'Asset icon',
   onBuy,
   onSell,
+  position,
 }: BuySellCardProps) {
   const [amount, setAmount] = useState<number>(1);
 
@@ -65,6 +78,23 @@ export default function BuySellCard({
             {buyLabel}
           </button>
         </div>
+         {position && (
+  <div className="mt-3 p-2 rounded-md bg-white/5 text-xs text-white">
+    <p>
+      Position: {position.amount}
+    </p>
+    <p>
+      Einstieg: {position.entryPrice.toFixed(2)}
+    </p>
+    <p
+      className={
+        position.pnl >= 0 ? 'text-green-400' : 'text-red-400'
+      }
+    >
+      PnL: {position.pnl.toFixed(2)}
+    </p>
+  </div>
+)}
       </div>
     </section>
   );
