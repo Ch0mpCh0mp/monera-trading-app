@@ -21,7 +21,7 @@ interface Asset {
   changePct: number;
   trend: 'up' | 'down' | 'neutral';
   image?: string; // optionales Feld für das Logo
-
+  onClick?: () => void; 
 }
 
 interface StockRaw {
@@ -241,6 +241,12 @@ goldAssets.unshift({
                 changePct={asset.changePct}
                 trend={asset.trend}
                image={asset.image}
+                onClick={() => {
+                if (asset.symbol === 'Gold'){
+                  router.push(`/search/${asset.symbol.toLocaleLowerCase()}`);
+                }
+               }}
+          
               />
             ))}
           </div>
