@@ -1,15 +1,19 @@
 'use client';
 
-import { useState } from 'react';
 import AppShell from '@/app/components/layout/AppShell';
 import SymbolHeader from './SymbolHeader';
 import BuySellCard from './BuySellCard';
 import { Gem } from 'lucide-react';
 import PerformanceRow from './PerformanceRow';
 import ChartCard, { type ChartPoint } from './ChartCard';
+import { usePortfolio } from '../../context/PortfolioContext';
+import { useState } from 'react';
+
 
 export default function SymbolPage({ params }: { params: { symbol: string } }) {
   const { symbol } = params;
+  const { buy, sell, positions, balance } = usePortfolio();
+
 
   // --- Demo Chart-Daten ---
   const demoPoints: ChartPoint[] = [
@@ -22,18 +26,21 @@ export default function SymbolPage({ params }: { params: { symbol: string } }) {
   ];
 
   // --- Position State ---
-  const [position, setPosition] = useState<number>(0);
+const [position, setPosition] = useState<number>(
+  positions.find(p => p.symbol === symbol)?.amount ?? 0
+);
 
   // --- Buy / Sell Callbacks ---
   function handleBuy(amount: number) {
-    setPosition(prev => prev + amount);
-    console.log(`Bought ${amount} of ${symbol}, new position: ${position + amount}`);
-  }
+  buy(symbol, buyPrice, amount);       // 💰 PortfolioContext aufrufen
+  setPosition(prev => prev + amount);  // lokal für Anzeige aktualisieren
+}
 
-  function handleSell(amount: number) {
-    setPosition(prev => prev - amount);
-    console.log(`Sold ${amount} of ${symbol}, new position: ${position - amount}`);
-  }
+function handleSell(amount: number) {
+  sell(symbol, sellPrice, amount);     // 💰 PortfolioContext aufrufen
+  setPosition(prev => prev - amount);  // lokal für Anzeige aktualisieren
+}
+
 
   // Beispielpreise
   const sellPrice = 4442.64;
