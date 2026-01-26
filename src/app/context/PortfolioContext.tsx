@@ -10,17 +10,18 @@ export type Position = {
   currentPrice?: number;
   type: 'buy' | 'sell';
   pnl?: number;
+  margin: number; // immer Margin speichern
 };
 
 export type PortfolioContextType = {
-  balance: number;
+  balance: number; // frei verfügbare Balance
   positions: Position[];
   setBalance: (value: number) => void;
   buy: (symbol: string, price: number, amount: number, leverage?: number) => void;
   sell: (symbol: string, price: number, amount: number, leverage?: number) => void;
   updatePositionPrice: (symbol: string, newPrice: number) => void;
   openPositions: () => Position[];
-  closePosition: (symbol: string, type: 'buy' | 'sell') => void;
+  closePosition: (symbol: string) => void;
 };
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
@@ -41,91 +42,152 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [positions]);
 
+  // 🔹 Preis einer Position updaten + PnL berechnen
   const updatePositionPrice = (symbol: string, newPrice: number) => {
     setPositions(prev =>
       prev.map(p => {
         if (p.symbol !== symbol) return p;
         const pnl =
           p.type === 'buy'
-            ? (newPrice - p.entryPrice) * p.amount * (p.leverage ?? 1)
-            : (p.entryPrice - newPrice) * p.amount * (p.leverage ?? 1);
+            ? (newPrice - p.entryPrice) * p.amount
+            : (p.entryPrice - newPrice) * p.amount;
         return { ...p, currentPrice: newPrice, pnl };
       })
     );
   };
 
-  const buy = (symbol: string, price: number, amount: number, leverage = 1) => {
-    const invested = price * amount;
-    if (invested > balance) {
+ const buy = (symbol: string, price: number, amount: number, leverage = 1) => {
+  const marginForTrade = (price * amount) / leverage;
+
+  // Prüfe, ob Position schon existiert
+  const existing = positions.find(p => p.symbol === symbol && p.type === 'buy');
+
+  if (existing) {
+    const totalAmount = existing.amount + amount;
+    const newEntryPrice = (existing.entryPrice * existing.amount + price * amount) / totalAmount;
+    const totalMargin = (totalAmount * newEntryPrice) / leverage;
+    const marginDiff = totalMargin - existing.margin;
+
+    if (marginDiff > balance) {
+      alert('Nicht genug Cash für diese Erhöhung');
+      return;
+    }
+
+    // ⚡ Nur einmal Balance abziehen
+    setBalance(prev => prev - marginDiff);
+
+    setPositions(prev =>
+      prev.map(p =>
+        p.symbol === symbol && p.type === 'buy'
+          ? {
+              ...p,
+              amount: totalAmount,
+              entryPrice: newEntryPrice,
+              currentPrice: price,
+              margin: totalMargin,
+              avgPrice: (existing.avgPrice * existing.amount + price * amount) / totalAmount
+            }
+          : p
+      )
+    );
+  } else {
+    if (marginForTrade > balance) {
       alert('Nicht genug Cash');
       return;
     }
-    setBalance(prev => prev - invested);
-    setPositions(prev => {
-      const existing = prev.find(p => p.symbol === symbol && p.type === 'buy');
-      if (existing) {
-        const totalAmount = existing.amount + amount;
-        const avgPrice = (existing.avgPrice * existing.amount + price * amount) / totalAmount;
-        return prev.map(p =>
-          p.symbol === symbol && p.type === 'buy'
-            ? { ...p, amount: totalAmount, avgPrice, currentPrice: price }
-            : p
-        );
-      } else {
-        return [...prev, { symbol, amount, avgPrice: price, entryPrice: price, currentPrice: price, type: 'buy' }];
-      }
-    });
-  };
 
-  const sell = (symbol: string, price: number, amount: number, leverage = 1) => {
-    const margin = (price * amount) / leverage;
-    if (margin > balance) {
+    setBalance(prev => prev - marginForTrade);
+
+    setPositions(prev => [
+      ...prev,
+      { symbol, amount, avgPrice: price, entryPrice: price, currentPrice: price, type: 'buy', leverage, margin: marginForTrade }
+    ]);
+  }
+};
+
+      
+
+  // 🔹 Sell-Position öffnen oder erhöhen
+  
+      // 🔹 Sell-Position öffnen oder erhöhen
+const sell = (symbol: string, price: number, amount: number, leverage = 1) => {
+  const marginForTrade = (price * amount) / leverage;
+
+  // Prüfe, ob Position schon existiert
+  const existing = positions.find(p => p.symbol === symbol && p.type === 'sell');
+
+  if (existing) {
+    const totalAmount = existing.amount + amount;
+    const newEntryPrice = (existing.entryPrice * existing.amount + price * amount) / totalAmount;
+    const totalMargin = (totalAmount * newEntryPrice) / leverage;
+    const marginDiff = totalMargin - existing.margin;
+
+    if (marginDiff > balance) {
+      alert('Nicht genug Cash für diese Erhöhung');
+      return;
+    }
+
+    setBalance(prev => prev - marginDiff);
+
+    setPositions(prev =>
+      prev.map(p =>
+        p.symbol === symbol && p.type === 'sell'
+          ? {
+              ...p,
+              amount: totalAmount,
+              entryPrice: newEntryPrice,
+              currentPrice: price,
+              margin: totalMargin,
+              avgPrice: (existing.avgPrice * existing.amount + price * amount) / totalAmount
+            }
+          : p
+      )
+    );
+  } else {
+    if (marginForTrade > balance) {
       alert('Nicht genug Cash für Margin');
       return;
     }
-    setBalance(prev => prev - margin);
-    setPositions(prev => {
-      const existing = prev.find(p => p.symbol === symbol && p.type === 'sell');
-      if (existing) {
-        const totalAmount = existing.amount + amount;
-        const avgPrice = (existing.avgPrice * existing.amount + price * amount) / totalAmount;
-        return prev.map(p =>
-          p.symbol === symbol && p.type === 'sell'
-            ? { ...p, amount: totalAmount, avgPrice, currentPrice: price }
-            : p
-        );
-      } else {
-        return [...prev, { symbol, amount, avgPrice: price, entryPrice: price, currentPrice: price, type: 'sell', leverage }];
-      }
-    });
-  };
 
-  const openPositions = () => positions.filter(p => p.amount > 0);
+    setBalance(prev => prev - marginForTrade);
 
-  const closePosition = (symbol: string, type: 'buy' | 'sell') => {
-    setPositions(prev => {
-      const pos = prev.find(p => p.symbol === symbol && p.type === type);
-      if (!pos) return prev;
+    setPositions(prev => [
+      ...prev,
+      { symbol, amount, avgPrice: price, entryPrice: price, currentPrice: price, type: 'sell', leverage, margin: marginForTrade }
+    ]);
+  }
+};
 
-      const pnl =
-        pos.type === 'buy'
-          ? ((pos.currentPrice ?? pos.avgPrice) - pos.entryPrice) * pos.amount * (pos.leverage ?? 1)
-          : (pos.entryPrice - (pos.currentPrice ?? pos.avgPrice)) * pos.amount * (pos.leverage ?? 1);
+      
 
-      const margin = (pos.avgPrice * pos.amount) / (pos.leverage ?? 1);
 
-      setBalance(prev => prev + pnl + margin);
+  // 🔹 Alle offenen Positionen zurückgeben
+const openPositions = () => positions.filter(p => p.amount > 0);
 
-      return prev.filter(p => !(p.symbol === symbol && p.type === type));
-    });
-  };
+// 🔹 Position schließen
+const closePosition = (symbol: string) => {
+  const pos = positions.find(p => p.symbol === symbol);
+  if (!pos) return;
+
+  const pnl =
+    pos.type === 'buy'
+      ? (pos.currentPrice! - pos.entryPrice) * pos.amount
+      : (pos.entryPrice - pos.currentPrice!) * pos.amount;
+
+  setBalance(prev => prev + pos.margin + pnl);
+
+  setPositions(prev => prev.filter(p => p.symbol !== symbol));
+};
+
+
 
   return (
     <PortfolioContext.Provider
-      value={{ balance, positions, setBalance, buy, sell, updatePositionPrice, openPositions, closePosition }}
-    >
-      {children}
-    </PortfolioContext.Provider>
+  value={{ balance, positions, setBalance, buy, sell, updatePositionPrice, openPositions, closePosition }}
+>
+  {children}
+</PortfolioContext.Provider>
+
   );
 };
 
