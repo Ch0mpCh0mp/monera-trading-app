@@ -27,9 +27,10 @@ export default function SymbolPage({ params }: { params: { symbol: string } }) {
   ? {
       amount: assetPosition.amount,
       entryPrice: assetPosition.avgPrice,
-      pnl: (buyPrice - assetPosition.avgPrice) * assetPosition.amount,
+      pnl: ((buyPrice - assetPosition.entryPrice!) * assetPosition.amount * (assetPosition.leverage ?? 1)),
     }
   : undefined;
+
 
 
   // --- Demo Chart-Daten ---
