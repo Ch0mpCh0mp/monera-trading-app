@@ -94,41 +94,40 @@ const positions = openPositions(); // aktuelle offene Positionen
       </section>
 
 {/* OFFENE POSITIONEN */}
-      {positions.length > 0 && (
-        <section className="space-y-3">
-          <h2 className="text-white/70 text-sm">Offene Positionen</h2>
-          {positions.map((pos) => (
-            <div
-  key={pos.symbol}
-  onClick={() => router.push(`/search/GOLD`)}
-  className="bg-white/5 border border-white/10 p-3 rounded-xl flex justify-between items-center cursor-pointer hover:bg-white/10 transition"
->
+  {positions.length > 0 && (
+  <section className="space-y-3">
+    <h2 className="text-white/70 text-sm">Offene Positionen</h2>
+   {positions.map((pos, index) => (
+  <div
+    key={`${pos.symbol}-${pos.type}-${pos.entryPrice}-${index}`}
+    onClick={() => router.push(`/search/${pos.symbol}?type=${pos.type}`)}
+    className="bg-white/5 border border-white/10 p-3 rounded-xl flex justify-between items-center cursor-pointer hover:bg-white/10 transition"
+  >
+    <div>
+      <p className="text-white font-semibold">
+        {pos.symbol} ({pos.type.toUpperCase()})
+      </p>
+      <p className="text-white/70 text-sm">
+        Menge: {pos.amount} • Einstieg: {pos.entryPrice.toFixed(2)}€
+      </p>
+    </div>
+    <div className="text-right">
+      <p className={`font-semibold ${pos.currentPrice! >= pos.avgPrice ? 'text-green-400' : 'text-red-400'}`}>
+        {pos.currentPrice?.toFixed(2)}€
+      </p>
+      <p className="text-white/70 text-sm">
+        PnL: {pos.pnl?.toFixed(2) ?? 0}€
+      </p>
+    </div>
+  </div>
+))}
 
-              <div>
-                <p className="text-white font-semibold">
-                  {pos.symbol} ({pos.type?.toUpperCase()})
-                </p>
-                <p className="text-white/70 text-sm">
-                  Menge: {pos.amount} • Einstieg: {pos.entryPrice?.toFixed(2)}€
-                </p>
-              </div>
-              <div className="text-right">
-                <p
-                  className={`font-semibold ${
-                    pos.currentPrice! >= pos.avgPrice ? 'text-green-400' : 'text-red-400'
-                  }`}
-                >
-                  {pos.currentPrice?.toFixed(2)}€
-                </p>
-                <p className="text-white/70 text-sm">
-                  PnL: {((pos.currentPrice! - pos.avgPrice) * pos.amount).toFixed(2)}€
-                </p>
-              </div>
-            </div>
-          ))}
-        </section>
-      )}
+  </section>
+)}
 
+
+           
+           
       {/* PROMO CARDS */}
       <section className="space-y-4">
         <PromoCard

@@ -18,7 +18,7 @@ export default function SymbolPage() {
   const rawSymbol = params?.symbol;
   const symbol = Array.isArray(rawSymbol) ? rawSymbol[0] : rawSymbol;
 
-  const { buy, sell, positions, updatePositionPrice } = usePortfolio();
+  const { buy, sell, positions, updatePositionPrice, closePosition } = usePortfolio();
 
   const [tradeType, setTradeType] = useState<'buy' | 'sell' | null>(null);
   const [hidePosition, setHidePosition] = useState(false);
@@ -109,12 +109,16 @@ export default function SymbolPage() {
 
       <BuySellCard
         buyPrice={buyPrice}
-        sellPrice={sellPrice}
-        assetIcon={<Gem className="w-6 h-6 text-yellow-400" />}
-        onBuy={() => setTradeType('buy')}
-        onSell={() => setTradeType('sell')}
-        position={positionPreview}
-        onClosePosition={() => setHidePosition(true)}
+  sellPrice={sellPrice}
+  assetIcon={<Gem className="w-6 h-6 text-yellow-400" />}
+  onBuy={() => setTradeType('buy')}
+  onSell={() => setTradeType('sell')}
+  position={positionPreview}
+  onClosePosition={() => {
+    if (assetPosition) {
+      closePosition(assetPosition.symbol, assetPosition.type);
+    }
+  }}
       />
 
       <PerformanceRow
