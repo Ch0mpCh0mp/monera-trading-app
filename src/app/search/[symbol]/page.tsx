@@ -76,8 +76,7 @@ export default function SymbolPage({ params }: { params: { symbol: string } }) {
   position={positionPreview}
   onClosePosition={() => setHidePosition(true)} // <-- NEU
 />
-
-      {/* Performance Row */}
+{/* Performance Row */}
       <PerformanceRow value={242.14} percent={5.76} />
 
       {/* Chart */}
