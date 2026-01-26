@@ -12,7 +12,8 @@ import TradeModal from './TradeModal';
 
 export default function SymbolPage({ params }: { params: { symbol: string } }) {
   const { symbol } = params;
-  const { buy, sell, positions, balance } = usePortfolio();
+  const { buy, sell, positions, balance, updatePositionPrice } = usePortfolio();
+
   const [hidePosition, setHidePosition] = useState(false);
 
   const [tradeType, setTradeType] = useState<'buy' | 'sell' | null>(null);
@@ -24,15 +25,14 @@ export default function SymbolPage({ params }: { params: { symbol: string } }) {
   if (!assetPosition) return;
 
   const interval = setInterval(() => {
-    // Hier simulieren wir den Marktpreis (kann später vom API/Websocket kommen)
-    const marketPrice = assetPosition.currentPrice! + (Math.random() - 0.5) * 5; 
-    // z.B. +/- 2,5 € pro Sekunde zufällig
-    assetPosition.currentPrice = marketPrice;
-  }, 1000); // alle 1 Sekunde
+    const marketPrice = assetPosition.currentPrice! + (Math.random() - 0.5) * 5;
+    updatePositionPrice(symbol, marketPrice);
+  }, 1000);
 
   return () => clearInterval(interval);
 }, [assetPosition]);
 
+  
   const sellPrice = assetPosition ? assetPosition.avgPrice - 0.5 : 4442.64;
   const buyPrice = assetPosition ? assetPosition.avgPrice + 0.5 : 4443.65;
 
