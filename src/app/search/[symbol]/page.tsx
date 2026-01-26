@@ -71,8 +71,9 @@ export default function SymbolPage({ params }: { params: { symbol: string } }) {
         sellPrice={sellPrice}
   buyPrice={buyPrice}
   assetIcon={<Gem className="w-6 h-6 text-yellow-400" />}
-  onBuy={() => setTradeType('buy')}
-  onSell={() => setTradeType('sell')}
+  onBuy={() => setTradeType('buy')} // öffnet nur Modal, Amount aus Modal
+  onSell={() => setTradeType('sell')} // öffnet nur Modal, Amount aus Modal
+ 
   position={positionPreview}
   onClosePosition={() => setHidePosition(true)} // <-- NEU
 />
