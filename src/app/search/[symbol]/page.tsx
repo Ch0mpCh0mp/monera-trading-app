@@ -7,7 +7,7 @@ import { Gem } from 'lucide-react';
 import PerformanceRow from './PerformanceRow';
 import ChartCard, { type ChartPoint } from './ChartCard';
 import { usePortfolio } from '../../context/PortfolioContext';
-import { useState } from 'react';
+import { useState , useEffect} from 'react';
 import TradeModal from './TradeModal';
 
 export default function SymbolPage({ params }: { params: { symbol: string } }) {
@@ -19,6 +19,19 @@ export default function SymbolPage({ params }: { params: { symbol: string } }) {
 
   // --- Aktuelle Position aus Portfolio ---
   const assetPosition = positions.find(p => p.symbol === symbol);
+
+  useEffect(() => {
+  if (!assetPosition) return;
+
+  const interval = setInterval(() => {
+    // Hier simulieren wir den Marktpreis (kann später vom API/Websocket kommen)
+    const marketPrice = assetPosition.currentPrice! + (Math.random() - 0.5) * 5; 
+    // z.B. +/- 2,5 € pro Sekunde zufällig
+    assetPosition.currentPrice = marketPrice;
+  }, 1000); // alle 1 Sekunde
+
+  return () => clearInterval(interval);
+}, [assetPosition]);
 
   const sellPrice = assetPosition ? assetPosition.avgPrice - 0.5 : 4442.64;
   const buyPrice = assetPosition ? assetPosition.avgPrice + 0.5 : 4443.65;
