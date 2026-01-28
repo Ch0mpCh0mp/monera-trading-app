@@ -3,6 +3,7 @@ import { Inter, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from 'next-themes';
 import { PortfolioProvider } from './context/PortfolioContext';
+import { MarketsProvider } from './context/MarketsContext';
 
 
 // VON GEIST ZU INTER GEWECHSELT
@@ -33,9 +34,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          {/* PortfolioProvider hier einfügen */}
           <PortfolioProvider>
-            {children}
+            <MarketsProvider>
+              {children}
+            </MarketsProvider>
           </PortfolioProvider>
         </ThemeProvider>
       </body>

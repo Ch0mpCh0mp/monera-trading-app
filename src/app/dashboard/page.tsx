@@ -3,13 +3,14 @@
 import Link from 'next/link';
 import StatusCard from '../components/StatusCard';
 import AssetRow from '../components/AssetRow';
-import { useState , useEffect} from 'react';
+import { useState, useContext } from 'react';
 import AccountValueCard from '../components/AccountValueCard';
 import WatchlistHeader from '../components/WatchlistHeader';
 import TopBar from '../components/TopBar';
 import AppShell from '../components/layout/AppShell';
 import { usePortfolio } from '../context/PortfolioContext';
 import { useRouter } from 'next/navigation';
+import { MarketsContext } from '../context/MarketsContext';
 
 // =====================
 // Typ für Assets
@@ -21,25 +22,7 @@ interface Asset {
   changePct: number;
   trend: 'up' | 'down' | 'neutral';
   image?: string; // optionales Feld für das Logo
-  onClick?: () => void; 
-}
-
-interface StockRaw {
-  '01. symbol': string;
-  '05. price': string;
-  '10. change percent': string;
-}
-
-// Typ für Crypto-Rohdaten
-interface CryptoRaw {
-  name: string;
-  symbol: string;
-  current_price: number;
-  price_change_percentage_24h: number;
-  image: string;
-  sparkline_in_7d?: {
-    price: number[];
-  };
+  onClick?: () => void;
 }
 
 function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
@@ -51,12 +34,7 @@ function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
-      <svg
-        width={size}
-        height={size}
-        viewBox={`0 0 ${size} ${size}`}
-        className="-rotate-90"
-      >
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -89,114 +67,43 @@ export default function DashboardPage() {
   const tabs = ['New', 'Gold', 'Scalping'] as const;
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>(tabs[0]);
 
-  // --- FETCH MARKETS ---
-  const [assetsByTab, setAssetsByTab] = useState<{
-    New: Asset[];
-    Gold: Asset[];
-    Scalping: Asset[];
-  }>({
-    New: [],
-    Gold: [],
-    Scalping: [],
-  });
+  // ✅ Märkte aus Context holen
+  const { crypto, stocks, loading } = useContext(MarketsContext);
 
-  useEffect(() => {
-    async function fetchMarkets() {
-      try {
-        const res = await fetch('/api/markets');
-        const rawData = await res.json() as { crypto: any[]; stocks: StockRaw[] };
-        console.log('rawData:', rawData);
+  // --- Assets nach Tabs filtern ---
+  const assetsByTab: Record<string, Asset[]> = {
+    New: crypto.filter((c) => ['BTC', 'ETH', 'SOL', 'ADA'].includes(c.symbol.toUpperCase())),
+    Gold: [
+      {
+        name: 'Gold (XAU/USD)',
+        symbol: 'XAUUSD',
+        price: 4950.12,
+        changePct: 0.35,
+        trend: 0.35 > 0 ? 'up' : 0.35 < 0 ? 'down' : 'neutral',
+        image: '/gold.png',
+      },
+      ...stocks, // restliche Stocks
+    ],
+    Scalping: crypto.filter((c) => ['SOL', 'ADA'].includes(c.symbol.toUpperCase())),
+  };
 
-        // --- New Tab (Crypto) ---
-        const cryptoArray = Array.isArray(rawData.crypto) ? rawData.crypto : [];
-        const allowedNewCoins = ['BTC', 'ETH', 'SOL', 'ADA'];
-        const newAssets: Asset[] = cryptoArray
-          .filter((c: CryptoRaw) => allowedNewCoins.includes(c.symbol.toUpperCase()))
-          .map((c: CryptoRaw) => ({
-            name: c.name,
-            symbol: c.symbol.toUpperCase(),
-            price: c.current_price || 0,
-            changePct: c.price_change_percentage_24h || 0,
-            trend:
-              c.price_change_percentage_24h > 0
-                ? 'up'
-                : c.price_change_percentage_24h < 0
-                ? 'down'
-                : 'neutral',
-            image: c.image,
-            sparklineData:
-              c.sparkline_in_7d?.price && c.sparkline_in_7d.price.length > 0
-                ? c.sparkline_in_7d.price
-                : Array.from({ length: 10 }, (_, i) =>
-                    c.current_price + Math.sin(i / 2) * (c.current_price * 0.01)
-                  ),
-          }));
+  if (loading) {
+    return (
+      <AppShell>
+        <p className="text-white p-6">Loading markets...</p>
+      </AppShell>
+    );
+  }
 
-        // --- Gold Tab (Stocks) ---
-        const stockArray = Array.isArray(rawData.stocks) ? rawData.stocks : [];
-        const goldAssets: Asset[] = stockArray
-          .filter((s: StockRaw) => s && s['01. symbol'] !== 'XAUUSD')
-          .map((s: StockRaw) => {
-            const changePctNum = Number(s['10. change percent']?.replace('%', '')) || 0;
-            return {
-              name: s['01. symbol'] || 'Unknown',
-              symbol: s['01. symbol'] || 'UNK',
-              price: Number(s['05. price']) || 0,
-              changePct: changePctNum,
-              trend: changePctNum > 0 ? 'up' : changePctNum < 0 ? 'down' : 'neutral',
-            };
-          });
-
-        // XAUUSD nur einmal hinzufügen
-        if (!goldAssets.some(a => a.symbol === 'XAUUSD')) {
-          goldAssets.unshift({
-            name: 'Gold (XAU/USD)',
-            symbol: 'XAUUSD',
-            price: 4950.12,
-            changePct: 0.35,
-            trend: 0.35 > 0 ? 'up' : 0.35 < 0 ? 'down' : 'neutral',
-            image: '/gold.png',
-          });
-        }
-
-        // --- Scalping Tab ---
-        const scalpingAssets = newAssets.filter(
-          (c) => ['SOL', 'ADA'].includes(c.symbol.toUpperCase())
-        );
-
-        // --- State setzen ---
-        setAssetsByTab({
-          New: newAssets,
-          Gold: goldAssets,
-          Scalping: scalpingAssets,
-        });
-      } catch (err) {
-        console.error('Failed to fetch markets:', err);
-      }
-    }
-
-    fetchMarkets();
-  }, []); // <-- useEffect richtig schließen
-
-  // --- JSX RETURN außerhalb von useEffect ---
   return (
     <AppShell containerClassName="flex flex-col flex-1 min-h-0 gap-3">
       <TopBar />
 
-      <AccountValueCard
-        value={balance}
-        changeSumToday={0}
-        changePct={0}
-        currency="EUR"
-      />
+      <AccountValueCard value={balance} changeSumToday={0} changePct={0} currency="EUR" />
 
       <div className="grid grid-cols-2 gap-4 mt-6">
         <StatusCard label="Margin" value="0,00 €" />
-        <StatusCard
-          label="Level"
-          value={`${levelPercent}%`}
-          rightSide={<LevelRing percent={levelPercent} />}
-        />
+        <StatusCard label="Level" value={`${levelPercent}%`} rightSide={<LevelRing percent={levelPercent} />} />
       </div>
 
       <StatusCard

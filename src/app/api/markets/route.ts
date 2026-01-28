@@ -17,7 +17,7 @@ const allStocks = [...stocks, gold]
 
 console.log('API MARKETS LIVE:', { crypto, stocks: allStocks}) 
     // JSON zurückgeben
-    return NextResponse.json({ crypto, stocks: allStocks })
+    return NextResponse.json({ crypto: crypto, stocks: allStocks })
   } catch (err: any) {
     console.error('Markets API error:', err)
     return NextResponse.json(
