@@ -111,7 +111,8 @@ useEffect(() => {
       console.log('rawData:', rawData);
 
      // Crypto für New-Tab (Live-Daten) inkl. Sparkline
-const newAssets: Asset[] = (rawData.crypto || []).map((c) => ({
+const cryptoArray = Array.isArray(rawData.crypto) ? rawData.crypto : [];
+const newAssets: Asset[] = cryptoArray.map((c: CryptoRaw) => ({
   name: c.name,
   symbol: c.symbol.toUpperCase(),
   price: c.current_price || 0,
@@ -123,7 +124,6 @@ const newAssets: Asset[] = (rawData.crypto || []).map((c) => ({
       ? 'down'
       : 'neutral',
   image: c.image,
-  // Wenn echte Sparkline nicht existiert, generiere Testwerte (leicht variiert)
   sparklineData:
     c.sparkline_in_7d?.price && c.sparkline_in_7d.price.length > 0
       ? c.sparkline_in_7d.price
