@@ -47,3 +47,31 @@ export async function fetchStocks(): Promise<Stock[]> {
 
   return stocks
 }
+
+// Gold (XAUUSD) live von GoldAPI.io
+export async function fetchGoldAPI(): Promise<Stock> {
+  const apiKey = process.env.GOLDAPI_API_KEY || ''
+
+  try {
+    const res = await fetch(
+      `https://app.goldapi.net/price/XAU/USD?x-api-key=${apiKey}`
+    )
+    const data = await res.json()
+
+    return {
+      '01. symbol': 'XAUUSD',
+      '05. price': String(data.price ?? 0),
+      '10. change percent': data.chp !== undefined
+        ? `${data.chp.toFixed(2)}%`
+        : '0.00%',
+    }
+  } catch (err) {
+    console.error('Failed to fetch Gold from GoldAPI:', err)
+    return {
+      '01. symbol': 'XAUUSD',
+      '05. price': '0',
+      '10. change percent': '0.00%',
+    }
+  }
+}
+
