@@ -57,7 +57,6 @@ function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
         viewBox={`0 0 ${size} ${size}`}
         className="-rotate-90"
       >
-        {/* HINTERGRUND (inaktiv) */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -66,8 +65,6 @@ function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
           stroke="rgba(0, 166, 62, 0.4)"
           strokeWidth={stroke}
         />
-
-        {/* FORTSCHRITT (aktiv) */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -86,115 +83,113 @@ function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
 
 export default function DashboardPage() {
   const levelPercent = 100;
-  const { balance , setBalance} = usePortfolio();
+  const { balance } = usePortfolio();
   const router = useRouter();
 
   const tabs = ['New', 'Gold', 'Scalping'] as const;
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>(tabs[0]);
 
-// --- FETCH MARKETS ANSTATT MOCKDATEN ---
-const [assetsByTab, setAssetsByTab] = useState<{
-  New: Asset[];
-  Gold: Asset[];
-  Scalping: Asset[];
-}>({
-  New: [],
-  Gold: [],
-  Scalping: [],
-});
-
-useEffect(() => {
-  async function fetchMarkets() {
-    try {
-      const res = await fetch('/api/markets');
-      const rawData = await res.json() as { crypto: any[]; stocks: StockRaw[] };
-      console.log('rawData:', rawData);
-
-     // Crypto für New-Tab (Live-Daten) inkl. Sparkline
-const cryptoArray = Array.isArray(rawData.crypto) ? rawData.crypto : [];
-const newAssets: Asset[] = cryptoArray.map((c: CryptoRaw) => ({
-  name: c.name,
-  symbol: c.symbol.toUpperCase(),
-  price: c.current_price || 0,
-  changePct: c.price_change_percentage_24h || 0,
-  trend:
-    c.price_change_percentage_24h > 0
-      ? 'up'
-      : c.price_change_percentage_24h < 0
-      ? 'down'
-      : 'neutral',
-  image: c.image,
-  sparklineData:
-    c.sparkline_in_7d?.price && c.sparkline_in_7d.price.length > 0
-      ? c.sparkline_in_7d.price
-      : Array.from({ length: 10 }, (_, i) =>
-          c.current_price + Math.sin(i / 2) * (c.current_price * 0.01)
-        ),
-}));
-
-
-    
-// Stocks für Gold-Tab
-const goldAssets: Asset[] = (rawData.stocks || [])
-  .filter((s): s is StockRaw => s !== null && s !== undefined)
-  .map((s) => {
-    const changePctNum = Number(s['10. change percent']?.replace('%', '')) || 0;
-    return {
-      name: s['01. symbol'] || 'Unknown',
-      symbol: s['01. symbol'] || 'UNK',
-      price: Number(s['05. price']) || 0,
-      changePct: changePctNum,
-      trend:
-        changePctNum > 0 ? 'up' : changePctNum < 0 ? 'down' : 'neutral',
-    };
+  // --- FETCH MARKETS ---
+  const [assetsByTab, setAssetsByTab] = useState<{
+    New: Asset[];
+    Gold: Asset[];
+    Scalping: Asset[];
+  }>({
+    New: [],
+    Gold: [],
+    Scalping: [],
   });
 
-  //  HIER XAU/USD HINZUFÜGEN 
-goldAssets.unshift({
-  name: 'Gold (XAU/USD)',
-  symbol: 'XAUUSD',
-  price: 4950.12,          // Hier kannst du einen aktuellen Goldpreis einsetzen
-  changePct: 0.35,         // Beispielwert für die Veränderung
-  trend: 0.35 > 0 ? 'up' : 0.35 < 0 ?'down' : 'neutral',
-  image: '/gold.png', // optional, wenn du ein Icon hast, sonst weglassen
-});
+  useEffect(() => {
+    async function fetchMarkets() {
+      try {
+        const res = await fetch('/api/markets');
+        const rawData = await res.json() as { crypto: any[]; stocks: StockRaw[] };
+        console.log('rawData:', rawData);
 
-      // Scalping aus Crypto filtern
-      const scalpingAssets = newAssets.filter(
-        (c) => c.symbol === 'SOL' || c.symbol === 'ADA'
-      );
+        // --- New Tab (Crypto) ---
+        const cryptoArray = Array.isArray(rawData.crypto) ? rawData.crypto : [];
+        const allowedNewCoins = ['BTC', 'ETH', 'SOL', 'ADA'];
+        const newAssets: Asset[] = cryptoArray
+          .filter((c: CryptoRaw) => allowedNewCoins.includes(c.symbol.toUpperCase()))
+          .map((c: CryptoRaw) => ({
+            name: c.name,
+            symbol: c.symbol.toUpperCase(),
+            price: c.current_price || 0,
+            changePct: c.price_change_percentage_24h || 0,
+            trend:
+              c.price_change_percentage_24h > 0
+                ? 'up'
+                : c.price_change_percentage_24h < 0
+                ? 'down'
+                : 'neutral',
+            image: c.image,
+            sparklineData:
+              c.sparkline_in_7d?.price && c.sparkline_in_7d.price.length > 0
+                ? c.sparkline_in_7d.price
+                : Array.from({ length: 10 }, (_, i) =>
+                    c.current_price + Math.sin(i / 2) * (c.current_price * 0.01)
+                  ),
+          }));
 
-      setAssetsByTab({
-        New: newAssets,
-        Gold: goldAssets,
-        Scalping: scalpingAssets,
-      });
-    } catch (err) {
-      console.error('Failed to fetch markets:', err);
+        // --- Gold Tab (Stocks) ---
+        const stockArray = Array.isArray(rawData.stocks) ? rawData.stocks : [];
+        const goldAssets: Asset[] = stockArray
+          .filter((s: StockRaw) => s && s['01. symbol'] !== 'XAUUSD')
+          .map((s: StockRaw) => {
+            const changePctNum = Number(s['10. change percent']?.replace('%', '')) || 0;
+            return {
+              name: s['01. symbol'] || 'Unknown',
+              symbol: s['01. symbol'] || 'UNK',
+              price: Number(s['05. price']) || 0,
+              changePct: changePctNum,
+              trend: changePctNum > 0 ? 'up' : changePctNum < 0 ? 'down' : 'neutral',
+            };
+          });
+
+        // XAUUSD nur einmal hinzufügen
+        if (!goldAssets.some(a => a.symbol === 'XAUUSD')) {
+          goldAssets.unshift({
+            name: 'Gold (XAU/USD)',
+            symbol: 'XAUUSD',
+            price: 4950.12,
+            changePct: 0.35,
+            trend: 0.35 > 0 ? 'up' : 0.35 < 0 ? 'down' : 'neutral',
+            image: '/gold.png',
+          });
+        }
+
+        // --- Scalping Tab ---
+        const scalpingAssets = newAssets.filter(
+          (c) => ['SOL', 'ADA'].includes(c.symbol.toUpperCase())
+        );
+
+        // --- State setzen ---
+        setAssetsByTab({
+          New: newAssets,
+          Gold: goldAssets,
+          Scalping: scalpingAssets,
+        });
+      } catch (err) {
+        console.error('Failed to fetch markets:', err);
+      }
     }
-  }
 
-  fetchMarkets();
-}, []);
+    fetchMarkets();
+  }, []); // <-- useEffect richtig schließen
 
-
-  
-  // --- ENDE FETCH ---
-
+  // --- JSX RETURN außerhalb von useEffect ---
   return (
     <AppShell containerClassName="flex flex-col flex-1 min-h-0 gap-3">
-      {/* LOGO MIT GLOCKE */}
       <TopBar />
 
-      {/* ACCOUNT VALUE */}
       <AccountValueCard
-  value={balance}          // vorher 12543.21
-  changeSumToday={0}       // optional: wir starten mit 0 Veränderung
-  changePct={0}            // optional: 0%
-  currency="EUR"
-/>
+        value={balance}
+        changeSumToday={0}
+        changePct={0}
+        currency="EUR"
+      />
 
-      {/* MARGIN & LEVEL */}
       <div className="grid grid-cols-2 gap-4 mt-6">
         <StatusCard label="Margin" value="0,00 €" />
         <StatusCard
@@ -204,23 +199,20 @@ goldAssets.unshift({
         />
       </div>
 
-     
-      {/* CASH UND DEPOSIT BUTTON */}
-<StatusCard
-  label="Cash"
-  value={`${balance.toFixed(2)} €`}
-  rightSide={
-   <button
-  type="button"
-  className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full"
-  onClick={() => router.push('/deposit')}
->
-  Deposit
-</button>
-  }
-/>
+      <StatusCard
+        label="Cash"
+        value={`${balance.toFixed(2)} €`}
+        rightSide={
+          <button
+            type="button"
+            className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full"
+            onClick={() => router.push('/deposit')}
+          >
+            Deposit
+          </button>
+        }
+      />
 
-    {/* GROSSER AKTIENBLOCK */}
       <section className="border border-white/5 text-white/50 bg-white/5 rounded-2xl flex flex-col flex-1 min-h-0">
         <div className="px-4 py-4 flex flex-col flex-1 min-h-0">
           <WatchlistHeader
@@ -240,11 +232,9 @@ goldAssets.unshift({
                 price={asset.price}
                 changePct={asset.changePct}
                 trend={asset.trend}
-               image={asset.image}
-                onClick={() => {
-         router.push(`/search/${asset.symbol.toLowerCase()}`);
-             }}
-            />
+                image={asset.image}
+                onClick={() => router.push(`/search/${asset.symbol.toLowerCase()}`)}
+              />
             ))}
           </div>
         </div>
