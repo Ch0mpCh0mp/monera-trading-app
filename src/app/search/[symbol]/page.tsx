@@ -11,76 +11,109 @@ import { useState, useEffect } from 'react';
 import TradeModal from './TradeModal';
 import { useParams } from 'next/navigation';
 
-export default function SymbolPage() {
-  // ✅ Hooks IMMER ganz oben
-  const params = useParams();
+// Typ für Asset
+interface Asset {
+  name: string;
+  symbol: string;
+  price: number;
+  changePct: number;
+  trend: 'up' | 'down' | 'neutral';
+  image?: string;
+}
 
+export default function SymbolPage() {
+  const params = useParams();
   const rawSymbol = params?.symbol;
   const symbol = Array.isArray(rawSymbol) ? rawSymbol[0] : rawSymbol;
 
   const { buy, sell, positions, updatePositionPrice, closePosition } = usePortfolio();
 
   const [tradeType, setTradeType] = useState<'buy' | 'sell' | null>(null);
-  const [hidePosition, setHidePosition] = useState(false);
+  const [asset, setAsset] = useState<Asset | null>(null);
 
-  // ✅ aktuelle Position
+  // ✅ Aktuelle Position
   const assetPosition = positions.find(p => p.symbol === symbol);
 
-  // ✅ LIVE PREIS (Simulation)
-  useEffect(() => {
+  // --- LIVE PREIS FETCH ---
+ useEffect(() => {
   if (!symbol) return;
 
-  const interval = setInterval(() => {
-    const pos = positions.find(p => p.symbol === symbol);
-    if (!pos) return;
+  const fetchPrice = async () => {
+    try {
+      const res = await fetch('/api/markets');
+      const rawData = await res.json() as { crypto: any[]; stocks: any[] };
 
-    const base = pos.currentPrice ?? pos.avgPrice;
-    const move = (Math.random() - 0.5) * 6;
-    const newPrice = Number((base + move).toFixed(2));
+      const allAssets: Asset[] = [
+        ...(Array.isArray(rawData.crypto) ? rawData.crypto : []).map(c => ({
+          name: c.name,
+          symbol: c.symbol.toUpperCase(),
+          price: c.current_price,
+          changePct: c.price_change_percentage_24h ?? 0,
+          trend:
+            c.price_change_percentage_24h > 0
+              ? 'up'
+              : c.price_change_percentage_24h < 0
+              ? 'down'
+              : 'neutral',
+          image: c.image,
+        } as Asset)), // <-- Cast auf Asset
+        ...(Array.isArray(rawData.stocks) ? rawData.stocks : []).map(s => ({
+          name: s['01. symbol'],
+          symbol: s['01. symbol'],
+          price: Number(s['05. price']),
+          changePct: Number(s['10. change percent']?.replace('%', '')) || 0,
+          trend:
+            Number(s['10. change percent']?.replace('%', '')) > 0
+              ? 'up'
+              : Number(s['10. change percent']?.replace('%', '')) < 0
+              ? 'down'
+              : 'neutral',
+        } as Asset)), // <-- Cast auf Asset
+      ];
 
-    updatePositionPrice(symbol, newPrice);
-  }, 1000);
+      const current = allAssets.find(a => a.symbol === symbol.toUpperCase());
+      if (current) setAsset(current);
+    } catch (err) {
+      console.error('Failed to fetch asset:', err);
+    }
+  };
+
+  fetchPrice();
+  const interval = setInterval(fetchPrice, 5000); // <-- const statt let
 
   return () => clearInterval(interval);
-}, [symbol, positions, updatePositionPrice]);
+}, [symbol]);
 
 
-  if (!symbol) {
-    return <p className="text-white p-6">Kein Symbol angegeben</p>;
-  }
-
-  const currentPrice =
-    assetPosition?.currentPrice ?? 4443.65;
+  const currentPrice = asset?.price ?? 0;
 
   const buyPrice = currentPrice;
   const sellPrice = currentPrice - 0.5;
 
-  // ✅ korrektes PnL (Buy + Sell)
+  // ✅ PnL
   const positionPreview =
-  assetPosition &&
-  assetPosition.entryPrice !== undefined &&
-  !hidePosition
-    ? {
-        amount: assetPosition.amount,
-        entryPrice: assetPosition.entryPrice,
-        pnl:
-          assetPosition.type === 'buy'
-            ? (currentPrice - assetPosition.entryPrice) *
-              assetPosition.amount
-            : (assetPosition.entryPrice - currentPrice) *
-              assetPosition.amount,
-      }
-    : undefined;
-
+    assetPosition &&
+    assetPosition.entryPrice !== undefined
+      ? {
+          amount: assetPosition.amount,
+          entryPrice: assetPosition.entryPrice,
+          pnl:
+            assetPosition.type === 'buy'
+              ? (currentPrice - assetPosition.entryPrice) * assetPosition.amount
+              : (assetPosition.entryPrice - currentPrice) * assetPosition.amount,
+        }
+      : undefined;
 
   // Demo Chart
   const demoPoints: ChartPoint[] = [
-    { t: '1', p: 4400 },
-    { t: '2', p: 4415 },
-    { t: '3', p: 4425 },
-    { t: '4', p: 4435 },
+    { t: '1', p: currentPrice - 20 },
+    { t: '2', p: currentPrice - 10 },
+    { t: '3', p: currentPrice - 5 },
+    { t: '4', p: currentPrice - 2 },
     { t: '5', p: currentPrice },
   ];
+
+  if (!symbol) return <p className="text-white p-6">Kein Symbol angegeben</p>;
 
   return (
     <AppShell>
@@ -109,29 +142,20 @@ export default function SymbolPage() {
 
       <BuySellCard
         buyPrice={buyPrice}
-  sellPrice={sellPrice}
-  assetIcon={<Gem className="w-6 h-6 text-yellow-400" />}
-  onBuy={() => setTradeType('buy')}
-  onSell={() => setTradeType('sell')}
-  position={positionPreview}
-  onClosePosition={() => {
-    if (assetPosition) {
-      closePosition(assetPosition.symbol, assetPosition.type);
-    }
-  }}
+        sellPrice={sellPrice}
+        assetIcon={<Gem className="w-6 h-6 text-yellow-400" />}
+        onBuy={() => setTradeType('buy')}
+        onSell={() => setTradeType('sell')}
+        position={positionPreview}
+        onClosePosition={() => {
+        if (assetPosition) closePosition(assetPosition.symbol);
+
+        }}
       />
 
-      <PerformanceRow
-        value={positionPreview?.pnl ?? 0}
-        percent={0}
-      />
+      <PerformanceRow value={positionPreview?.pnl ?? 0} percent={0} />
 
-      <ChartCard
-        points={demoPoints}
-        currentPrice={currentPrice}
-        currencySuffix="€"
-        defaultRange="1M"
-      />
+      <ChartCard points={demoPoints} currentPrice={currentPrice} currencySuffix="€" defaultRange="1M" />
     </AppShell>
   );
 }
