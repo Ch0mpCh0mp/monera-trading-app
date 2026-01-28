@@ -242,12 +242,9 @@ goldAssets.unshift({
                 trend={asset.trend}
                image={asset.image}
                 onClick={() => {
-                 if (asset.symbol === 'XAUUSD'){
-                  router.push(`/search/${asset.symbol.toLowerCase()}`);
-                }
-               }}
-          
-              />
+         router.push(`/search/${asset.symbol.toLowerCase()}`);
+             }}
+            />
             ))}
           </div>
         </div>
