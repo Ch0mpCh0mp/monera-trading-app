@@ -3,9 +3,8 @@ import { requireAuth } from '@/app/middleware/auth';
 import pool from '@/app/db/client'; //  DB-Client
 
 export async function GET(req: NextRequest) {
-  const res = NextResponse.next();
-
-  return requireAuth(req, res, async (user) => {
+  // requireAuth korrekt aufrufen
+  return requireAuth(req, async (user) => {
     // 1️⃣ User-Daten aus DB
     const userResult = await pool.query(
       'SELECT id, username, email, balance FROM users WHERE id = $1',
