@@ -1,10 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  reactStrictMode: true,
   reactCompiler: true,
 
   images: {
-    domains: ['coin-images.coingecko.com'],
+    domains: [
+      'assets.coingecko.com', // Crypto-Bilder
+      'coin-images.coingecko.com', // falls du auch andere Coin-Images nutzt
+    ],
   },
 
   webpack(config) {
@@ -20,14 +24,11 @@ const nextConfig: NextConfig = {
 
     // 2) Re-apply that rule for everything *except* svg
     //    and add SVGR for svg
-    config.module.rules.push(
-      // SVG -> React component
-      {
-        test: /\.svg$/i,
-        issuer: /\.[jt]sx?$/,
-        use: ["@svgr/webpack"],
-      }
-    );
+    config.module.rules.push({
+      test: /\.svg$/i,
+      issuer: /\.[jt]sx?$/,
+      use: ["@svgr/webpack"],
+    });
 
     if (fileLoaderRule) {
       fileLoaderRule.exclude = /\.svg$/i;

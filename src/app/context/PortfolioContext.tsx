@@ -1,5 +1,7 @@
 'use client';
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { MarketsContext } from './MarketsContext';
+
 
 export type Position = {
   symbol: string;
@@ -27,6 +29,7 @@ export type PortfolioContextType = {
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
 
 export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
+  const { stocks, crypto} = useContext(MarketsContext) || {stocks: [], crypto: []};
   const [balance, setBalance] = useState<number>(10000);
   const [positions, setPositions] = useState<Position[]>(() => {
     if (typeof window !== 'undefined') {
@@ -41,6 +44,35 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem('positions', JSON.stringify(positions));
     }
   }, [positions]);
+
+  // 🔹 aktuelle Marktpreise in den Positionen updaten
+useEffect(() => {
+if (positions.length === 0) return;
+
+
+  const timeout = setTimeout(() => {
+    setPositions(prev =>
+      prev.map(p => {
+        const marketAsset =
+          crypto.find(a => a.symbol === p.symbol) ||
+          stocks.find(a => a.symbol === p.symbol);
+
+        if (!marketAsset) return p;
+
+        const pnl =
+          p.type === 'buy'
+            ? (marketAsset.price - p.entryPrice) * p.amount
+            : (p.entryPrice - marketAsset.price) * p.amount;
+
+        return { ...p, currentPrice: marketAsset.price, pnl };
+      })
+    );
+  }, 0);
+
+  return () => clearTimeout(timeout);
+}, [stocks, crypto]);
+
+
 
   // 🔹 Preis einer Position updaten + PnL berechnen
   const updatePositionPrice = (symbol: string, newPrice: number) => {
