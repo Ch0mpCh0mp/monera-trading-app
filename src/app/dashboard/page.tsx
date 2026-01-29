@@ -22,6 +22,8 @@ interface Asset {
   changePct: number;
   trend: 'up' | 'down' | 'neutral';
   image?: string; // optionales Feld für das Logo
+// ANDREA, HAB DAS HIER NOCH EINGEFÜGT FÜR SPARKLINE
+  sparklineData?: number[]; // optionales Feld für Sparkline-Daten
 }
 
 interface StockRaw {
