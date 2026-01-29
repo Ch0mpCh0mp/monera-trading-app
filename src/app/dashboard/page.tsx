@@ -11,6 +11,7 @@ import AppShell from '../components/layout/AppShell';
 import { usePortfolio } from '../context/PortfolioContext';
 import { useRouter } from 'next/navigation';
 
+
 // =====================
 // Typ für Assets
 // =====================
