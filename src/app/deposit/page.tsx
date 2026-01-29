@@ -22,7 +22,7 @@ export default function DepositPage() {
     'h-full w-full bg-transparent outline-none text-sm text-white/90 placeholder:text-white/40 pr-3';
 
   return (
-    <div className="min-h-screen text-white bg-black flex items-center justify-center px-4 sm:px-6 py-10">
+    <div className="min-h-dvh text-white bg-black px-4 sm:px-6 py-10 flex justify-center items-start sm:items-center overflow-y-auto">
       {/* CARD HINTERGRUND */}
       <div className="w-full max-w-md relative rounded-xl border border-white/10 bg-white/5 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)] backdrop-blur">
         {/* HEADER BEREICH */}
@@ -67,7 +67,6 @@ export default function DepositPage() {
           </p>
         </div>
 
-        {/* PAYPAL */}
         <div className="mt-6">
           <PayPalScriptProvider
             options={{
@@ -76,28 +75,36 @@ export default function DepositPage() {
               intent: 'capture',
             }}
           >
-            <div className="rounded-xl border border-white/10 bg-white/5 p-2 sm:p-3 max-h-[320px] overflow-auto sm:max-h-none sm:overflow-visible">
-              <PayPalButtons
-                style={{ layout: 'vertical' }}
-                createOrder={(data, actions) =>
-                  actions.order.create({
-                    intent: 'CAPTURE',
-                    purchase_units: [
-                      {
-                        amount: {
-                          value: amount.toString(),
-                          currency_code: 'EUR',
+            {/* White PayPal container */}
+            <div className="rounded-3xl bg-white shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
+              {/* REAL space, no scaling */}
+              <div className="px-2 pt-2 pb-8">
+                <PayPalButtons
+                  style={{
+                    layout: 'vertical',
+                    shape: 'pill',
+                    height: 36, // kleiner → weniger Platzverbrauch
+                  }}
+                  createOrder={(data, actions) =>
+                    actions.order.create({
+                      intent: 'CAPTURE',
+                      purchase_units: [
+                        {
+                          amount: {
+                            value: amount.toString(),
+                            currency_code: 'EUR',
+                          },
                         },
-                      },
-                    ],
-                  })
-                }
-                onApprove={async (data, actions) => {
-                  await actions.order?.capture();
-                  setBalance(balance + amount);
-                  router.push('/dashboard');
-                }}
-              />
+                      ],
+                    })
+                  }
+                  onApprove={async (data, actions) => {
+                    await actions.order?.capture();
+                    setBalance(balance + amount);
+                    router.push('/dashboard');
+                  }}
+                />
+              </div>
             </div>
           </PayPalScriptProvider>
         </div>
@@ -111,9 +118,9 @@ export default function DepositPage() {
           Back
         </button>
 
-        <p className="mt-6 text-center text-xs text-white/40">
+        {/* <p className="mt-6 text-center text-xs text-white/40">
           Payments are processed by PayPal
-        </p>
+        </p> */}
       </div>
     </div>
   );
