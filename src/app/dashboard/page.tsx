@@ -73,17 +73,8 @@ export default function DashboardPage() {
   // --- Assets nach Tabs filtern ---
   const assetsByTab: Record<string, Asset[]> = {
     New: crypto.filter((c) => ['BTC', 'ETH', 'SOL', 'ADA'].includes(c.symbol.toUpperCase())),
-    Gold: [
-      {
-        name: 'Gold (XAU/USD)',
-        symbol: 'XAUUSD',
-        price: 4950.12,
-        changePct: 0.35,
-        trend: 0.35 > 0 ? 'up' : 0.35 < 0 ? 'down' : 'neutral',
-        image: '/gold.png',
-      },
-      ...stocks, // restliche Stocks
-    ],
+    Gold: stocks,
+
     Scalping: crypto.filter((c) => ['SOL', 'ADA'].includes(c.symbol.toUpperCase())),
   };
 

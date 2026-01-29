@@ -89,7 +89,8 @@ export function MarketsProvider({ children }: { children: ReactNode }) {
         trend: 'up',
         image: '/gold.png',
       };
-      setStocks([goldAsset]);
+    setStocks([goldAsset]);
+
     };
 
     // 🔹 beide Daten initial laden
