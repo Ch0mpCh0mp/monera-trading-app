@@ -8,7 +8,11 @@ type Props = {
   onCreate?: (name: string) => void;
 };
 
-export default function CreateWatchlistSheet({ open, onClose, onCreate }: Props) {
+export default function CreateWatchlistSheet({
+  open,
+  onClose,
+  onCreate,
+}: Props) {
   const [name, setName] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -29,7 +33,7 @@ export default function CreateWatchlistSheet({ open, onClose, onCreate }: Props)
     };
   }, [open, onClose]);
 
-  // Wenn geschlossen: reset
+// WENN GESCHLOSSEN, NAME ZURÜCKSETZEN
   useEffect(() => {
     if (!open) setName('');
   }, [open]);
@@ -47,16 +51,16 @@ export default function CreateWatchlistSheet({ open, onClose, onCreate }: Props)
 
   return (
     <div className="fixed inset-0 z-50">
-      {/* Backdrop (dim + blur) */}
+      {/* Backdrop */}
       <button
         type="button"
         aria-label="Close create watchlist"
         onClick={onClose}
-        className="absolute inset-0 bg-black/55 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"
       />
 
       {/* Bottom sheet */}
-      <div className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-md rounded-t-[28px] bg-[#0b0f14]/95 border border-white/10 shadow-2xl px-6 pt-3 pb-6">
+      <div className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-md rounded-t-[28px] bg-[#0a0a0a]/95 border border-white/10 shadow-2xl px-6 pt-3 pb-6">
         {/* Handle */}
         <div className="mx-auto h-1 w-10 rounded-full bg-white/20 mb-4" />
 
@@ -72,8 +76,11 @@ export default function CreateWatchlistSheet({ open, onClose, onCreate }: Props)
           ref={inputRef}
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder=""
-          className="w-full bg-transparent text-white/90 outline-none pb-2 border-b-2 border-cyan-500/70 focus:border-cyan-400"
+          className="
+            w-full bg-transparent text-white/90 outline-none pb-2
+            border-b-2 border-[rgba(0,166,62,0.55)]
+            focus:border-[rgba(0,166,62,1)]
+          "
         />
 
         <button
@@ -82,9 +89,9 @@ export default function CreateWatchlistSheet({ open, onClose, onCreate }: Props)
           disabled={!canCreate}
           className="
             mt-6 w-full rounded-full py-4 text-base font-medium
-            bg-cyan-700/80 hover:bg-cyan-700
-            disabled:opacity-40 disabled:hover:bg-cyan-700/80
-            text-white/90
+            bg-[rgba(0,166,62,0.85)] hover:bg-[rgba(0,166,62,1)]
+            disabled:opacity-40 disabled:hover:bg-[rgba(0,166,62,0.85)]
+            text-white
           "
         >
           Create
