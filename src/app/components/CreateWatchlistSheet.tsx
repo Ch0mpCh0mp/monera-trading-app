@@ -61,7 +61,7 @@ export default function CreateWatchlistSheet({ open, onClose, onCreate }: Props)
         <div className="mx-auto h-1 w-10 rounded-full bg-white/20 mb-4" />
 
         <h2 className="text-center text-white/90 text-lg font-medium mb-6">
-          Watchlist erstellen
+          Create Watchlist
         </h2>
 
         <label className="block text-[11px] tracking-widest text-white/40 mb-2">
@@ -87,7 +87,7 @@ export default function CreateWatchlistSheet({ open, onClose, onCreate }: Props)
             text-white/90
           "
         >
-          Erstellen
+          Create
         </button>
       </div>
     </div>
