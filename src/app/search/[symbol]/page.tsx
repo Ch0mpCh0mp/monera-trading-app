@@ -28,8 +28,8 @@ export default async function SymbolPage({
         {symbol}
       </h1>
       <BuySellCard
-        sellPrice="4.442,64 €"
-        buyPrice="4.443,65 €"
+        sellPrice="4.442,64 $"
+        buyPrice="4.443,65 $"
         assetIcon={<Gem className="w-6 h-6 text-yellow-400" />}
       />
       <PerformanceRow value={242.14} percent={5.76} />

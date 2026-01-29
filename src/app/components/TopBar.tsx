@@ -7,7 +7,7 @@ export default function TopBar() {
       <div className="flex items-center gap-2">
         <Logo size={30} />
         <button aria-haspopup='menu' aria-expanded={false} className="flex items-center gap-1 text-white text-xl font-semibold tracking-wide">
-          CFD <ChevronDown size={18} className="text-white" />
+          CFD <ChevronDown size={1} className="text-white" />
         </button>
       </div>
 
