@@ -46,16 +46,15 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
   }, [positions]);
 
   // 🔹 aktuelle Marktpreise in den Positionen updaten
+
+// 🔹 Live-PnL alle 1s updaten
 useEffect(() => {
-if (positions.length === 0) return;
-
-
-  const timeout = setTimeout(() => {
+  const updatePositions = () => {
     setPositions(prev =>
       prev.map(p => {
+        // finde Asset nach Symbol
         const marketAsset =
-          crypto.find(a => a.symbol === p.symbol) ||
-          stocks.find(a => a.symbol === p.symbol);
+          [...crypto, ...stocks].find(a => a.symbol === p.symbol);
 
         if (!marketAsset) return p;
 
@@ -67,10 +66,16 @@ if (positions.length === 0) return;
         return { ...p, currentPrice: marketAsset.price, pnl };
       })
     );
-  }, 0);
+  };
 
-  return () => clearTimeout(timeout);
-}, [stocks, crypto]);
+  // direkt beim Mount
+  updatePositions();
+
+  // alle 1 Sekunde
+  const interval = setInterval(updatePositions, 1000);
+
+  return () => clearInterval(interval);
+}, [crypto, stocks]); // trigger nur, wenn neue Market-Daten hereinkommen
 
 
 

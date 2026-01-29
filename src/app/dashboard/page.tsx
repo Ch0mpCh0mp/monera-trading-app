@@ -68,14 +68,14 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>(tabs[0]);
 
   // ✅ Märkte aus Context holen
-  const { crypto, stocks, loading } = useContext(MarketsContext);
+  const { crypto, stocks, gold, loading } = useContext(MarketsContext);
 
   // --- Assets nach Tabs filtern ---
   const assetsByTab: Record<string, Asset[]> = {
-    New: crypto.filter((c) => ['BTC', 'ETH', 'SOL', 'ADA'].includes(c.symbol.toUpperCase())),
-    Gold: stocks,
+    New: crypto.filter((c: Asset) => ['BTC', 'ETH', 'SOL', 'ADA'].includes(c.symbol.toUpperCase())),
+    Gold: gold.filter((c:Asset) => c.symbol === 'XAUUSD'),
 
-    Scalping: crypto.filter((c) => ['SOL', 'ADA'].includes(c.symbol.toUpperCase())),
+    Scalping: crypto.filter((c:Asset) => ['SOL', 'ADA'].includes(c.symbol.toUpperCase())),
   };
 
   if (loading) {
