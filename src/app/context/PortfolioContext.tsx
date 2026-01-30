@@ -29,7 +29,7 @@ export type PortfolioContextType = {
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
 
 export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
-  const { stocks, crypto} = useContext(MarketsContext) || {stocks: [], crypto: []};
+  const { stocks, crypto, gold} = useContext(MarketsContext) || {stocks: [], crypto: [], gold: []};
   const [balance, setBalance] = useState<number>(10000);
   const [positions, setPositions] = useState<Position[]>(() => {
     if (typeof window !== 'undefined') {
@@ -54,7 +54,7 @@ useEffect(() => {
       prev.map(p => {
         // finde Asset nach Symbol
         const marketAsset =
-          [...crypto, ...stocks].find(a => a.symbol === p.symbol);
+          [...crypto, ...stocks, ...gold].find(a => a.symbol === p.symbol);
 
         if (!marketAsset) return p;
 
@@ -137,7 +137,17 @@ useEffect(() => {
 
     setPositions(prev => [
       ...prev,
-      { symbol, amount, avgPrice: price, entryPrice: price, currentPrice: price, type: 'buy', leverage, margin: marginForTrade }
+    { 
+  symbol: symbol.toUpperCase(),
+  amount,
+  avgPrice: price,
+  entryPrice: price,
+  currentPrice: price,
+  type: 'buy',
+  leverage,
+  margin: marginForTrade
+}
+
     ]);
   }
 };
@@ -190,7 +200,17 @@ const sell = (symbol: string, price: number, amount: number, leverage = 1) => {
 
     setPositions(prev => [
       ...prev,
-      { symbol, amount, avgPrice: price, entryPrice: price, currentPrice: price, type: 'sell', leverage, margin: marginForTrade }
+     {
+  symbol: symbol.toUpperCase(),
+  amount,
+  avgPrice: price,
+  entryPrice: price,
+  currentPrice: price,
+  type: 'sell',
+  leverage,
+  margin: marginForTrade
+}
+
     ]);
   }
 };
