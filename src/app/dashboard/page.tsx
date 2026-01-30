@@ -22,8 +22,9 @@ interface Asset {
   changePct: number;
   trend: 'up' | 'down' | 'neutral';
   image?: string; // optionales Feld für das Logo
-// ANDREA, HAB DAS HIER NOCH EINGEFÜGT FÜR SPARKLINE
-  sparklineData?: number[]; // optionales Feld für Sparkline-Daten
+  
+  // ANDREA, HAB DAS HIER NOCH EINGEFÜGT FÜR SPARKLINE
+  sparklineData?: number[];
 }
 
 interface StockRaw {
@@ -91,21 +92,35 @@ export default function DashboardPage() {
   const { balance, setBalance } = usePortfolio();
   const router = useRouter();
 
-  const tabs = ['New', 'Gold', 'Scalping'] as const;
-  const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>(tabs[0]);
+  // RAUSNEHMEN NICHT VERGESSEN
+  // const tabs = ['New', 'Gold', 'Scalping'] as const;
+  // const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>(tabs[0]);
+
+  const [watchlists, setWatchlists] = useState<string[]>([
+    'New',
+    'Gold',
+    'Scalping',
+  ]);
+  const [activeTab, setActiveTab] = useState<string>('New');
 
   const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
 
   // --- FETCH MARKETS ANSTATT MOCKDATEN ---
-  const [assetsByTab, setAssetsByTab] = useState<{
-    New: Asset[];
-    Gold: Asset[];
-    Scalping: Asset[];
-  }>({
-    New: [],
-    Gold: [],
-    Scalping: [],
-  });
+  // const [assetsByTab, setAssetsByTab] = useState<{
+  //   New: Asset[];
+  //   Gold: Asset[];
+  //   Scalping: Asset[];
+  // }>({
+  //   New: [],
+  //   Gold: [],
+  //   Scalping: [],
+  // });
+
+  const [assetsByTab, setAssetsByTab] = useState<Record<string, Asset[]>>({
+  New: [],
+  Gold: [],
+  Scalping: [],
+});
 
   useEffect(() => {
     async function fetchMarkets() {
@@ -229,7 +244,7 @@ export default function DashboardPage() {
       <section className="border border-white/5 text-white/50 bg-white/5 rounded-2xl flex flex-col flex-1 min-h-0">
         <div className="px-4 py-4 flex flex-col flex-1 min-h-0">
           <WatchlistHeader
-            tabs={tabs}
+            tabs={watchlists}
             activeTab={activeTab}
             onTabChange={setActiveTab}
             onAddClick={() => setIsCreateSheetOpen(true)}
