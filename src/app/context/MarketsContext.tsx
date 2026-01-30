@@ -108,8 +108,6 @@ export function MarketsProvider({ children }: { children: ReactNode }) {
 
         const stockList = await Promise.all(stockPromises);
         if (!isMounted) return;
-
-        // **Nur aktualisieren, wenn stockList Daten enthält**
         if (stockList.length > 0) setStocks(stockList);
       } catch (err) {
         console.error('Stocks fetch failed', err);
@@ -118,11 +116,16 @@ export function MarketsProvider({ children }: { children: ReactNode }) {
 
     const fetchAll = async () => {
       await Promise.all([fetchCrypto(), fetchGold(), fetchStocks()]);
-      if (isMounted) setLoading(false);
+      
+      // 🔹 KRITISCHER FIX: setLoading MUSS hier stehen
+      if (isMounted) {
+        setLoading(false);
+        window.dispatchEvent(new Event('markets-updated'));
+      }
     };
 
     fetchAll();
-    const interval = setInterval(fetchAll, 10000); // alle 10 Sekunden
+    const interval = setInterval(fetchAll, 10000);
 
     return () => {
       isMounted = false;

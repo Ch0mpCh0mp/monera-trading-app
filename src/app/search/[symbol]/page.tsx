@@ -5,7 +5,7 @@ import SymbolHeader from './SymbolHeader';
 import BuySellCard from './BuySellCard';
 import { Gem } from 'lucide-react';
 import PerformanceRow from './PerformanceRow';
-import ChartCard, { type ChartPoint } from './ChartCard';
+import ChartCard from './ChartCard';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { useState, useContext } from 'react';
 import TradeModal from './TradeModal';
@@ -29,38 +29,32 @@ export default function SymbolPage() {
   const { buy, sell, positions, closePosition } = usePortfolio();
   const [tradeType, setTradeType] = useState<'buy' | 'sell' | null>(null);
 
-  const assetPosition = positions.find(p => p.symbol === symbol);
+  // 🔹 Hole die Position FÜR DIESES SYMBOL
+  const assetPosition = positions.find(p => p.symbol === symbol?.toUpperCase());
 
-  // ✅ MARKETS (EINZIGE PREISQUELLE)
+  // 🔹 MARKETS (EINZIGE PREISQUELLE)
   const { crypto, stocks, gold } = useContext(MarketsContext);
-
   const allAssets: Asset[] = [...crypto, ...stocks, ...gold];
-
-  const asset = allAssets.find(
-    a => a.symbol === symbol?.toUpperCase()
-  );
-
+  const asset = allAssets.find(a => a.symbol === symbol?.toUpperCase());
   const currentPrice = asset?.price ?? 0;
 
-
-console.log("DEBUG SYMBOL:", symbol);
-console.log("DEBUG ASSET:", asset);
-console.log("DEBUG PRICE:", currentPrice);
+  console.log("DEBUG SYMBOL:", symbol);
+  console.log("DEBUG ASSET:", asset);
+  console.log("DEBUG PRICE:", currentPrice);
+  console.log("DEBUG POSITION:", assetPosition);
 
   const buyPrice = currentPrice;
-  const sellPrice = currentPrice - 0.5;
+  const sellPrice = currentPrice;
 
-  const positionPreview =
-    assetPosition && assetPosition.entryPrice !== undefined
-      ? {
-          amount: assetPosition.amount,
-          entryPrice: assetPosition.entryPrice,
-          pnl:
-            assetPosition.type === 'buy'
-              ? (currentPrice - assetPosition.entryPrice) * assetPosition.amount
-              : (assetPosition.entryPrice - currentPrice) * assetPosition.amount,
-        }
-      : undefined;
+  // 🔹 KRITISCHER FIX: Nutze PnL direkt aus Position
+  const positionPreview = assetPosition
+    ? {
+        amount: assetPosition.amount,
+        entryPrice: assetPosition.entryPrice,
+        pnl: assetPosition.pnl, // ✅ Nutze den bereits berechneten PnL
+        currentPrice: assetPosition.currentPrice,
+      }
+    : undefined;
 
   const demoPoints = [
     { t: '1', p: currentPrice - 20 },
@@ -79,16 +73,13 @@ console.log("DEBUG PRICE:", currentPrice);
           type={tradeType}
           price={currentPrice}
           onClose={() => setTradeType(null)}
-         onConfirm={(amount, leverage) => {
-  if (tradeType === 'buy') {
-    buy(symbol, currentPrice, amount, leverage);
-  } else {
-    sell(symbol, currentPrice, amount);
-  }
-
-  setTradeType(null);
-
-
+          onConfirm={(amount, leverage) => {
+            if (tradeType === 'buy') {
+              buy(symbol.toUpperCase(), currentPrice, amount, leverage);
+            } else {
+              sell(symbol.toUpperCase(), currentPrice, amount, leverage);
+            }
+            setTradeType(null);
           }}
         />
       )}
@@ -107,7 +98,11 @@ console.log("DEBUG PRICE:", currentPrice);
         onSell={() => setTradeType('sell')}
         position={positionPreview}
         onClosePosition={() => {
-          if (assetPosition) closePosition(assetPosition.symbol);
+          if (assetPosition) {
+            if (confirm(`Position ${symbol} schließen?`)) {
+              closePosition(assetPosition.symbol);
+            }
+          }
         }}
       />
 
@@ -120,6 +115,5 @@ console.log("DEBUG PRICE:", currentPrice);
         defaultRange="1M"
       />
     </AppShell>
-
   );
 }

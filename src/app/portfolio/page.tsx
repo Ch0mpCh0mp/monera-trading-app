@@ -9,9 +9,9 @@ import {
   Droplets,
   DollarSign,
   ChevronDown,
+  X,
 } from 'lucide-react';
 import TopBar from '../components/TopBar';
-import { useAccountSummary } from '@/hooks/useAccountSummary';
 import { formatCurrency } from '@/lib/formatCurrency';
 import { usePortfolio } from '../context/PortfolioContext';
 import { useRouter } from 'next/navigation';
@@ -31,17 +31,14 @@ function PromoCard({
     <div className="rounded-2xl bg-white/5 border border-white/10 p-4 flex items-center justify-between">
       <div className="pr-3">
         <p className="text-white text-sm leading-snug">{title}</p>
-
         <button
           type="button"
           onClick={onClick}
-          className="
-            mt-3 inline-flex items-center rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white text-xs  px-4 py-2"
+          className="mt-3 inline-flex items-center rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white text-xs px-4 py-2"
         >
           {cta}
         </button>
       </div>
-
       <div className="shrink-0 w-16 h-16 rounded-full bg-white/10 flex items-center justify-center text-white/80">
         {icon}
       </div>
@@ -50,84 +47,109 @@ function PromoCard({
 }
 
 export default function PortfolioPage() {
-const { balance , openPositions } = usePortfolio();
-const positions = openPositions(); // aktuelle offene Positionen
-
-
+  const { balance, equity, openPositions, closePosition } = usePortfolio();
+  const positions = openPositions();
   const router = useRouter();
 
+  // 🔹 Berechne Total PnL
+  const totalPnL = positions.reduce((sum, pos) => sum + (pos.pnl || 0), 0);
 
   return (
     <AppShell containerClassName="space-y-6">
-      {/* TOPBAR */}
       <TopBar />
 
       {/* VALUE + PLUS BUTTON */}
-     <section>
-  <div className="flex items-start justify-between">
-    <div>
-      <p className="text-white/70 text-lg">Wert</p>
-      <p className="text-white text-4xl font-light mt-1">
-        {formatCurrency(balance, 'EUR')}
-      </p>
-    </div>
-    <button
-      type="button"
-      aria-label="Add"
-      onClick={() => router.push('/deposit')}
-      className="mt-2 w-12 h-12 rounded-full bg-[rgba(0,166,62,1)] hover:bg-[rgba(0,166,62,0.85)] flex items-center justify-center text-white"
-    >
-      <Plus size={22} />
-    </button>
-  </div>
-
-
+      <section>
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-white/70 text-lg">Wert</p>
+            {/* 🔹 KRITISCHER FIX: Zeige EQUITY statt BALANCE */}
+            <p className="text-white text-4xl font-light mt-1">
+              {formatCurrency(equity, 'EUR')}
+            </p>
+            {/* 🔹 NEU: Zeige Balance & PnL separat */}
+            <div className="mt-2 space-y-1">
+              <p className="text-white/50 text-sm">
+                Cash: {formatCurrency(balance, 'EUR')}
+              </p>
+              <p className={`text-sm font-semibold ${totalPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                PnL: {totalPnL >= 0 ? '+' : ''}{formatCurrency(totalPnL, 'EUR')}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            aria-label="Add"
+            onClick={() => router.push('/deposit')}
+            className="mt-2 w-12 h-12 rounded-full bg-[rgba(0,166,62,1)] hover:bg-[rgba(0,166,62,0.85)] flex items-center justify-center text-white"
+          >
+            <Plus size={22} />
+          </button>
+        </div>
 
         {/* MARGIN LEVEL PILL */}
         <button
           type="button"
           className="mt-5 w-full rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white py-3 flex items-center justify-center gap-2 text-sm"
-          >
+        >
           Margin-Level • 0 %
           <ChevronDown size={16} className="text-white/90" />
         </button>
       </section>
 
-{/* OFFENE POSITIONEN */}
-  {positions.length > 0 && (
-  <section className="space-y-3">
-    <h2 className="text-white/70 text-sm">Offene Positionen</h2>
-   {positions.map((pos, index) => (
-  <div
-    key={`${pos.symbol}-${pos.type}-${pos.entryPrice}-${index}`}
-    onClick={() => router.push(`/search/${pos.symbol}?type=${pos.type}`)}
-    className="bg-white/5 border border-white/10 p-3 rounded-xl flex justify-between items-center cursor-pointer hover:bg-white/10 transition"
-  >
-    <div>
-      <p className="text-white font-semibold">
-        {pos.symbol} ({pos.type.toUpperCase()})
-      </p>
-      <p className="text-white/70 text-sm">
-        Menge: {pos.amount} • Einstieg: {pos.entryPrice.toFixed(2)}€
-      </p>
-    </div>
-    <div className="text-right">
-      <p className={`font-semibold ${pos.currentPrice! >= pos.avgPrice ? 'text-green-400' : 'text-red-400'}`}>
-        {pos.currentPrice?.toFixed(2)}€
-      </p>
-      <p className="text-white/70 text-sm">
-        PnL: {pos.pnl?.toFixed(2) ?? 0}€
-      </p>
-    </div>
-  </div>
-))}
+      {/* OFFENE POSITIONEN */}
+      {positions.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-white/70 text-sm">Offene Positionen</h2>
+          {positions.map((pos, index) => (
+            <div
+              key={`${pos.symbol}-${pos.type}-${pos.entryPrice}-${index}`}
+              className="bg-white/5 border border-white/10 p-4 rounded-xl relative group"
+            >
+              {/* 🔹 SCHLIESSEN-BUTTON */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (confirm(`Position ${pos.symbol} schließen?`)) {
+                    closePosition(pos.symbol);
+                  }
+                }}
+                className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-500/20 hover:bg-red-500/40 flex items-center justify-center text-red-400 opacity-0 group-hover:opacity-100 transition"
+              >
+                <X size={16} />
+              </button>
 
-  </section>
-)}
+              <div
+                onClick={() => router.push(`/search/${pos.symbol}?type=${pos.type}`)}
+                className="cursor-pointer"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-white font-semibold">
+                      {pos.symbol} ({pos.type.toUpperCase()})
+                    </p>
+                    <p className="text-white/70 text-sm mt-1">
+                      Menge: {pos.amount} • Entry: €{pos.entryPrice.toFixed(2)}
+                    </p>
+                    <p className="text-white/50 text-xs mt-1">
+                      Margin: €{pos.margin.toFixed(2)} • Hebel: {pos.leverage}x
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className={`font-semibold ${pos.currentPrice >= pos.entryPrice ? 'text-green-400' : 'text-red-400'}`}>
+                      €{pos.currentPrice.toFixed(2)}
+                    </p>
+                    <p className={`text-sm font-semibold mt-1 ${(pos.pnl || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {(pos.pnl || 0) >= 0 ? '+' : ''}€{(pos.pnl || 0).toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
 
-
-           
-           
       {/* PROMO CARDS */}
       <section className="space-y-4">
         <PromoCard
@@ -158,11 +180,3 @@ const positions = openPositions(); // aktuelle offene Positionen
     </AppShell>
   );
 }
-
-
-
-
-
-
-
-      

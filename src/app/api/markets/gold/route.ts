@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   const apiKey = process.env.GOLD_API_KEY;
+  console.log("GoldAPI Key:", process.env.GOLD_API_KEY);
+
 
   if (!apiKey) {
     return NextResponse.json(
