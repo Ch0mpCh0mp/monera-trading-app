@@ -11,6 +11,8 @@ import AppShell from '../components/layout/AppShell';
 import { usePortfolio } from '../context/PortfolioContext';
 import { useRouter } from 'next/navigation';
 import CreateWatchlistSheet from '../components/CreateWatchlistSheet';
+import AddInstrumentSheet from '../components/AddInstrumentSheet';
+import WatchlistSettingsSheet from '../components/WatchlistSettingsSheet';
 
 // =====================
 // Typ für Assets
@@ -122,6 +124,18 @@ export default function DashboardPage() {
     Scalping: [],
   });
 
+  const [isAddInstrumentOpen, setIsAddInstrumentOpen] = useState(false);
+  const [isWatchlistSettingsOpen, setIsWatchlistSettingsOpen] = useState(false);
+
+  const instrumentUniverse = [
+    ...(assetsByTab.New ?? []),
+    ...(assetsByTab.Gold ?? []),
+  ].reduce((acc, item) => {
+    // unique by symbol
+    if (!acc.some((x) => x.symbol === item.symbol)) acc.push(item);
+    return acc;
+  }, [] as Asset[]);
+
   useEffect(() => {
     async function fetchMarkets() {
       try {
@@ -187,11 +201,18 @@ export default function DashboardPage() {
           (c) => c.symbol === 'SOL' || c.symbol === 'ADA'
         );
 
-        setAssetsByTab({
+        setAssetsByTab((prev) => ({
+          ...prev,
           New: newAssets,
           Gold: goldAssets,
           Scalping: scalpingAssets,
-        });
+        }));
+
+        // setAssetsByTab({
+        //   New: newAssets,
+        //   Gold: goldAssets,
+        //   Scalping: scalpingAssets,
+        // });
       } catch (err) {
         console.error('Failed to fetch markets:', err);
       }
@@ -248,7 +269,7 @@ export default function DashboardPage() {
             activeTab={activeTab}
             onTabChange={setActiveTab}
             onAddClick={() => setIsCreateSheetOpen(true)}
-            onEditClick={() => console.log('edit watchlists')}
+            onEditClick={() => setIsWatchlistSettingsOpen(true)}
           />
 
           <div className="mt-4 overflow-y-auto overflow-x-hidden pr-2 flex-1 min-h-0">
@@ -259,15 +280,15 @@ export default function DashboardPage() {
                 </p>
 
                 <p className="text-white/40 text-xs mt-2 max-w-sm mx-auto">
-                  Add the instruments that interest you to easily track their performance 
-                  and price changes in one place. 
+                  Add the instruments that interest you to easily track their
+                  performance and price changes in one place.
                 </p>
 
                 <div className="mt-6 flex items-center justify-center gap-3">
                   <button
                     type="button"
                     className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 text-white px-5 py-3 rounded-full"
-                    onClick={() => console.log('TODO: add instrument')}
+                    onClick={() => setIsAddInstrumentOpen(true)}
                   >
                     <span className="text-lg leading-none">+</span>
                     Add Instruments
@@ -277,7 +298,7 @@ export default function DashboardPage() {
                     type="button"
                     aria-label="settings"
                     className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/15 text-white/80"
-                    onClick={() => console.log('TODO: watchlist settings')}
+                    onClick={() => setIsWatchlistSettingsOpen(true)}
                   >
                     ⚙️
                   </button>
@@ -348,6 +369,71 @@ export default function DashboardPage() {
         // onCreate={(name) => {
         //   console.log('Create watchlist:', name);
         // }}
+      />
+
+      <AddInstrumentSheet
+        open={isAddInstrumentOpen}
+        onClose={() => setIsAddInstrumentOpen(false)}
+        instruments={instrumentUniverse}
+        title={`Add to "${activeTab}"`}
+        onAdd={(instrument) => {
+          setAssetsByTab((prev) => {
+            const list = prev[activeTab] ?? [];
+            const exists = list.some((a) => a.symbol === instrument.symbol);
+            if (exists) return prev;
+
+            return {
+              ...prev,
+              [activeTab]: [...list, instrument],
+            };
+          });
+
+          setIsAddInstrumentOpen(false);
+        }}
+      />
+
+      <WatchlistSettingsSheet
+        open={isWatchlistSettingsOpen}
+        onClose={() => setIsWatchlistSettingsOpen(false)}
+        watchlistName={activeTab}
+        onRename={(nextName) => {
+          const from = activeTab;
+          const to = nextName.trim();
+          if (!to || to === from) return;
+
+          const dupe = watchlists.some(
+            (w) => w.toLowerCase() === to.toLowerCase()
+          );
+          if (dupe) return;
+
+          setWatchlists((prev) => prev.map((w) => (w === from ? to : w)));
+
+          setAssetsByTab((prev) => {
+            const next = { ...prev };
+            next[to] = next[from] ?? [];
+            delete next[from];
+            return next;
+          });
+
+          setActiveTab(to);
+          setIsWatchlistSettingsOpen(false);
+        }}
+        onDelete={() => {
+          const toDelete = activeTab;
+
+          setWatchlists((prev) => prev.filter((w) => w !== toDelete));
+
+          setAssetsByTab((prev) => {
+            const next = { ...prev };
+            delete next[toDelete];
+            return next;
+          });
+
+          const remaining = watchlists.filter((w) => w !== toDelete);
+          setActiveTab(remaining[0] ?? 'New');
+
+          setIsWatchlistSettingsOpen(false);
+        }}
       />
     </AppShell>
   );
