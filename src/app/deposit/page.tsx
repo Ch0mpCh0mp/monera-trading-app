@@ -16,15 +16,15 @@ export default function DepositPage() {
   // HAB ICH HINZUGEFÜGT
   const labelCls = 'text-sm font-medium text-white/80 block';
   const shellCls =
-    'w-full grid grid-cols-[44px_1fr] items-center h-11 rounded-xl bg-black/30 border border-white/10 focus-within:ring-4 focus-within:ring-white/10';
+    'w-full grid grid-cols-[44px_1fr] items-center h-11 rounded-lg bg-black/30 border border-white/10 focus-within:ring-4 focus-within:ring-white/10';
   const iconWrapCls = 'h-full w-full grid place-items-center text-white/60';
   const inputCls =
     'h-full w-full bg-transparent outline-none text-sm text-white/90 placeholder:text-white/40 pr-3';
 
   return (
-    <div className="min-h-screen text-white bg-black flex items-center justify-center px-4 sm:px-6 py-10">
+    <div className="min-h-dvh text-white bg-black px-4 sm:px-6 py-10 flex justify-center items-start sm:items-center overflow-y-auto">
       {/* CARD HINTERGRUND */}
-      <div className="w-full max-w-md relative rounded-xl border border-white/10 bg-white/5 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)] backdrop-blur">
+      <div className="w-full max-w-md relative rounded-lg border border-white/10 bg-white/5 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)] backdrop-blur">
         {/* HEADER BEREICH */}
         <div className="flex flex-col items-center text-center pt-2">
           <div className="mb-4">
@@ -42,7 +42,7 @@ export default function DepositPage() {
         {/* FORM BEREICH */}
         <div className="mt-6 space-y-2">
           <label className={labelCls} htmlFor="amount">
-            Amount (€)
+            Amount ($)
           </label>
 
           <div className={shellCls}>
@@ -63,41 +63,49 @@ export default function DepositPage() {
 
           <p className="text-xs text-white/45">
             Your current balance:{' '}
-            <span className="text-white/40">€{balance}</span>
+            <span className="text-white/40">${balance}</span>
           </p>
         </div>
 
-        {/* PAYPAL */}
         <div className="mt-6">
           <PayPalScriptProvider
             options={{
               clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || '',
               currency: 'EUR',
+              locale: 'en_US',
               intent: 'capture',
             }}
           >
-            <div className="rounded-xl border border-white/10 bg-white/5 p-2 sm:p-3 max-h-[320px] overflow-auto sm:max-h-none sm:overflow-visible">
-              <PayPalButtons
-                style={{ layout: 'vertical' }}
-                createOrder={(data, actions) =>
-                  actions.order.create({
-                    intent: 'CAPTURE',
-                    purchase_units: [
-                      {
-                        amount: {
-                          value: amount.toString(),
-                          currency_code: 'EUR',
+            {/* White PayPal container */}
+            <div className="rounded-lg bg-white shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
+              {/* REAL space, no scaling */}
+              <div className="px-2 pt-2 pb-8">
+                <PayPalButtons
+                  style={{
+                    layout: 'vertical',
+                    shape: 'rect',  // oder pill wenn lieber runder sein soll?
+                    height: 36, // kleiner → weniger Platzverbrauch
+                  }}
+                  createOrder={(data, actions) =>
+                    actions.order.create({
+                      intent: 'CAPTURE',
+                      purchase_units: [
+                        {
+                          amount: {
+                            value: amount.toString(),
+                            currency_code: 'EUR',
+                          },
                         },
-                      },
-                    ],
-                  })
-                }
-                onApprove={async (data, actions) => {
-                  await actions.order?.capture();
-                  setBalance(balance + amount);
-                  router.push('/dashboard');
-                }}
-              />
+                      ],
+                    })
+                  }
+                  onApprove={async (data, actions) => {
+                    await actions.order?.capture();
+                    setBalance(balance + amount);
+                    router.push('/dashboard');
+                  }}
+                />
+              </div>
             </div>
           </PayPalScriptProvider>
         </div>
@@ -111,9 +119,9 @@ export default function DepositPage() {
           Back
         </button>
 
-        <p className="mt-6 text-center text-xs text-white/40">
+        {/* <p className="mt-6 text-center text-xs text-white/40">
           Payments are processed by PayPal
-        </p>
+        </p> */}
       </div>
     </div>
   );
