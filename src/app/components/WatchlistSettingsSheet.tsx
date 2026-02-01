@@ -18,7 +18,7 @@ export default function WatchlistSettingsSheet({
   onRename,
   onDelete,
 }: Props) {
-  const [name, setName] = useState(watchlistName);
+  const [name, setName] = useState<string>(watchlistName);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {

@@ -46,19 +46,6 @@ export default function WatchlistHeader<T extends string>({
         </div>
       </div>
 
-      {/* <div className="flex flex-1 items-center gap-2">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            type="button"
-            onClick={() => onTabChange(tab)}
-            className={`shrink-0 px-3 py-1.5 rounded-lg text-sm text-center transition ${activeTab === tab ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white/80'}`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div> */}
-
       {/* BUTTONS RECHTS */}
       <div className="flex items-center gap-2 shrink-0">
         {/* PLUS BUTTON */}
