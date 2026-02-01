@@ -22,7 +22,7 @@ interface Asset {
   changePct: number;
   trend: 'up' | 'down' | 'neutral';
   image?: string; // optionales Feld für das Logo
-  
+
   // ANDREA, HAB DAS HIER NOCH EINGEFÜGT FÜR SPARKLINE
   sparklineData?: number[];
 }
@@ -117,10 +117,10 @@ export default function DashboardPage() {
   // });
 
   const [assetsByTab, setAssetsByTab] = useState<Record<string, Asset[]>>({
-  New: [],
-  Gold: [],
-  Scalping: [],
-});
+    New: [],
+    Gold: [],
+    Scalping: [],
+  });
 
   useEffect(() => {
     async function fetchMarkets() {
@@ -252,6 +252,53 @@ export default function DashboardPage() {
           />
 
           <div className="mt-4 overflow-y-auto overflow-x-hidden pr-2 flex-1 min-h-0">
+            {(assetsByTab[activeTab]?.length ?? 0) === 0 ? (
+              <div className="py-10 text-center">
+                <p className="text-white/80 text-sm font-medium">
+                  This Watchlist is empty
+                </p>
+
+                <p className="text-white/40 text-xs mt-2 max-w-sm mx-auto">
+                  Add the instruments that interest you to easily track their performance 
+                  and price changes in one place. 
+                </p>
+
+                <div className="mt-6 flex items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 text-white px-5 py-3 rounded-full"
+                    onClick={() => console.log('TODO: add instrument')}
+                  >
+                    <span className="text-lg leading-none">+</span>
+                    Add Instruments
+                  </button>
+
+                  <button
+                    type="button"
+                    aria-label="settings"
+                    className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/15 text-white/80"
+                    onClick={() => console.log('TODO: watchlist settings')}
+                  >
+                    ⚙️
+                  </button>
+                </div>
+              </div>
+            ) : (
+              assetsByTab[activeTab]!.map((asset) => (
+                <AssetRow
+                  key={asset.symbol}
+                  name={asset.name}
+                  symbol={asset.symbol}
+                  price={asset.price}
+                  changePct={asset.changePct}
+                  trend={asset.trend}
+                  image={asset.image}
+                />
+              ))
+            )}
+          </div>
+
+          {/* <div className="mt-4 overflow-y-auto overflow-x-hidden pr-2 flex-1 min-h-0">
             {assetsByTab[activeTab]?.map((asset) => (
               <AssetRow
                 key={asset.symbol}
@@ -263,7 +310,7 @@ export default function DashboardPage() {
                 image={asset.image}
               />
             ))}
-          </div>
+          </div> */}
         </div>
       </section>
 
@@ -272,8 +319,35 @@ export default function DashboardPage() {
         open={isCreateSheetOpen}
         onClose={() => setIsCreateSheetOpen(false)}
         onCreate={(name) => {
-          console.log('Create watchlist:', name);
+          // 1) Sheet schließen
+          setIsCreateSheetOpen(false);
+
+          // 2) Watchlist-Tab hinzufügen (falls noch nicht da)
+          setWatchlists((prev) => {
+            const trimmed = name.trim();
+            if (!trimmed) return prev;
+
+            const exists = prev.some(
+              (w) => w.toLowerCase() === trimmed.toLowerCase()
+            );
+            return exists ? prev : [...prev, trimmed];
+          });
+
+          // 3) Leere Liste für diese Watchlist anlegen (falls noch nicht da)
+          setAssetsByTab((prev) => {
+            const trimmed = name.trim();
+            if (!trimmed) return prev;
+
+            return prev[trimmed] ? prev : { ...prev, [trimmed]: [] };
+          });
+
+          // 4) Direkt auf den neuen Tab wechseln
+          setActiveTab(name.trim());
         }}
+
+        // onCreate={(name) => {
+        //   console.log('Create watchlist:', name);
+        // }}
       />
     </AppShell>
   );
