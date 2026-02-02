@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import StatusCard from '../components/StatusCard';
 import AssetRow from '../components/AssetRow';
 import { useState, useEffect } from 'react';
@@ -39,8 +38,8 @@ interface StockRaw {
 interface CryptoRaw {
   name: string;
   symbol: string;
-  current_price: number;
-  price_change_percentage_24h: number;
+  current_price?: number;
+  price_change_percentage_24h?: number;
   image: string;
   sparkline_in_7d?: {
     price: number[];
@@ -91,7 +90,9 @@ function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
 
 export default function DashboardPage() {
   const levelPercent = 100;
-  const { balance, setBalance } = usePortfolio();
+  // SETBALANCE WIRD NICHT BENUTZT, SOLL DAS WEG? SONST EINFACH SO:
+  const { balance } = usePortfolio();
+  // const { balance, setBalance } = usePortfolio();
   const router = useRouter();
 
   // RAUSNEHMEN NICHT VERGESSEN
@@ -140,35 +141,65 @@ export default function DashboardPage() {
     async function fetchMarkets() {
       try {
         const res = await fetch('/api/markets');
+        if (!res.ok) {
+          throw new Error(`Failed to fetch markets: ${res.status}`);
+        }
+
         const rawData = (await res.json()) as {
-          crypto: any[];
+          // FALLS ES SPÄTER PROBLEME GIBT; HAB AUS ANY CRYPTORAW GEMACHT
+          crypto: CryptoRaw[];
           stocks: StockRaw[];
         };
-        console.log('rawData:', rawData);
+        // HAB DAS ALTE CONSOLE.LOG AUSKOMMENTIERT UND NEUES EINGEFÜGT
+        if (process.env.NODE_ENV === 'development') {
+          console.log('rawData:', rawData);
+        }
+        // console.log('rawData:', rawData);
 
         // Crypto für New-Tab (Live-Daten) inkl. Sparkline
-        const newAssets: Asset[] = (rawData.crypto || []).map((c) => ({
-          name: c.name,
-          symbol: c.symbol.toUpperCase(),
-          price: c.current_price || 0,
-          changePct: c.price_change_percentage_24h || 0,
-          trend:
-            c.price_change_percentage_24h > 0
-              ? 'up'
-              : c.price_change_percentage_24h < 0
-                ? 'down'
-                : 'neutral',
-          image: c.image,
-          // Wenn echte Sparkline nicht existiert, generiere Testwerte (leicht variiert)
-          sparklineData:
-            c.sparkline_in_7d?.price && c.sparkline_in_7d.price.length > 0
+        const newAssets: Asset[] = (rawData.crypto || []).map((c) => {
+          const basePrice = c.current_price ?? 0;
+          const baseChangePct = c.price_change_percentage_24h ?? 0;
+
+          return {
+            name: c.name,
+            symbol: c.symbol.toUpperCase(),
+            price: basePrice,
+            changePct: baseChangePct,
+            trend:
+              baseChangePct > 0 ? 'up' : baseChangePct < 0 ? 'down' : 'neutral',
+            image: c.image,
+            sparklineData: c.sparkline_in_7d?.price?.length
               ? c.sparkline_in_7d.price
               : Array.from(
                   { length: 10 },
-                  (_, i) =>
-                    c.current_price + Math.sin(i / 2) * (c.current_price * 0.01)
+                  (_, i) => basePrice + Math.sin(i / 2) * (basePrice * 0.01)
                 ),
-        }));
+          };
+        });
+
+        // const newAssets: Asset[] = (rawData.crypto || []).map((c) => ({
+        //   name: c.name,
+        //   symbol: c.symbol.toUpperCase(),
+        //   price: c.current_price ?? 0,
+        //   changePct: c.price_change_percentage_24h ?? 0,
+        //   trend:
+        //     c.price_change_percentage_24h > 0
+        //       ? 'up'
+        //       : c.price_change_percentage_24h < 0
+        //         ? 'down'
+        //         : 'neutral',
+        //   image: c.image,
+        //   // Wenn echte Sparkline nicht existiert, generiere Testwerte (leicht variiert)
+        //   sparklineData:
+        //     c.sparkline_in_7d?.price && c.sparkline_in_7d.price.length > 0
+        //       ? c.sparkline_in_7d.price
+        //       : Array.from(
+        //           { length: 10 },
+        //           (_, i) =>
+        //             c.current_price + Math.sin(i / 2) * (c.current_price * 0.01)
+        //         ),
+        // }));
 
         // Stocks für Gold-Tab
         const goldAssets: Asset[] = (rawData.stocks || [])
