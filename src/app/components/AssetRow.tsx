@@ -2,6 +2,8 @@
 
 import Image from 'next/image';
 import { Sparklines, SparklinesLine } from 'react-sparklines';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 type Trend = 'up' | 'down' | 'neutral';
 
@@ -12,7 +14,8 @@ type AssetRowProps = {
   changePct: number;
   trend: Trend;
   image?: string;
-  sparklineData?: number[]; // kleine Linie
+  sparklineData?: number[];
+  onClick?: () => void;
 };
 
 export default function AssetRow({
@@ -23,7 +26,10 @@ export default function AssetRow({
   trend,
   image,
   sparklineData,
+  onClick,
 }: AssetRowProps) {
+  const router = useRouter();
+
   const isPositive = changePct > 0;
   const isNegative = changePct < 0;
   const changeColorClass = isPositive
@@ -54,9 +60,17 @@ export default function AssetRow({
 
   // const sparklineColor =
   //   data[data.length - 1] >= data[0] ? '#34D399' : '#F87171';
+  // --- Nur die Funktion hier ---
+  const handleClick = () => {
+    if (onClick) onClick(); // optionaler Callback
+    router.push(`/search/${symbol.toLowerCase()}`);
+  };
 
   return (
-    <div className="grid grid-cols-[1fr_80px_96px] items-center gap-3 py-4 min-h-[56px] border-b border-white/5">
+    <div
+      className="grid grid-cols-[1fr_80px_96px] items-center gap-3 py-4 min-h-[56px] border-b border-white/5 hover:bg-white/10 cursor-pointer"
+      onClick={handleClick} // Layout unverändert, nur Klick hinzugefügt
+    >
       {/* Name + Symbol */}
       <div className="flex items-center gap-2 min-w-0">
         <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10">

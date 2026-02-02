@@ -1,43 +1,117 @@
+'use client';
+
 import AppShell from '@/app/components/layout/AppShell';
 import SymbolHeader from './SymbolHeader';
 import BuySellCard from './BuySellCard';
 import { Gem } from 'lucide-react';
 import PerformanceRow from './PerformanceRow';
-import ChartCard, { type ChartPoint } from './ChartCard';
+import ChartCard from './ChartCard';
+import { usePortfolio } from '../../context/PortfolioContext';
+import { useState, useContext } from 'react';
+import TradeModal from './TradeModal';
+import { useParams } from 'next/navigation';
+import { MarketsContext } from '../../context/MarketsContext';
 
-export default async function SymbolPage({
-  params,
-}: {
-  params: Promise<{ symbol: string }>;
-}) {
-  const { symbol } = await params;
+interface Asset {
+  name: string;
+  symbol: string;
+  price: number;
+  changePct: number;
+  trend: 'up' | 'down' | 'neutral';
+  image?: string;
+}
 
-  const demoPoints: ChartPoint[] = [
-    { t: '2026-01-01', p: 4200 },
-    { t: '2026-01-05', p: 4250 },
-    { t: '2026-01-10', p: 4305 },
-    { t: '2026-01-15', p: 4520 },
-    { t: '2026-01-18', p: 4380 },
-    { t: '2026-01-22', p: 4442.64 },
+export default function SymbolPage() {
+  const params = useParams();
+  const rawSymbol = params?.symbol;
+  const symbol = Array.isArray(rawSymbol) ? rawSymbol[0] : rawSymbol;
+
+  const { buy, sell, positions, closePosition } = usePortfolio();
+  const [tradeType, setTradeType] = useState<'buy' | 'sell' | null>(null);
+
+  // 🔹 Hole die Position FÜR DIESES SYMBOL
+  const assetPosition = positions.find(p => p.symbol === symbol?.toUpperCase());
+
+  // 🔹 MARKETS (EINZIGE PREISQUELLE)
+  const { crypto, stocks, gold } = useContext(MarketsContext);
+  const allAssets: Asset[] = [...crypto, ...stocks, ...gold];
+  const asset = allAssets.find(a => a.symbol === symbol?.toUpperCase());
+  const currentPrice = asset?.price ?? 0;
+
+  console.log("DEBUG SYMBOL:", symbol);
+  console.log("DEBUG ASSET:", asset);
+  console.log("DEBUG PRICE:", currentPrice);
+  console.log("DEBUG POSITION:", assetPosition);
+
+  const buyPrice = currentPrice;
+  const sellPrice = currentPrice;
+
+  // 🔹 KRITISCHER FIX: Nutze PnL direkt aus Position
+  const positionPreview = assetPosition
+    ? {
+        amount: assetPosition.amount,
+        entryPrice: assetPosition.entryPrice,
+        pnl: assetPosition.pnl, // ✅ Nutze den bereits berechneten PnL
+        currentPrice: assetPosition.currentPrice,
+      }
+    : undefined;
+
+  const demoPoints = [
+    { t: '1', p: currentPrice - 20 },
+    { t: '2', p: currentPrice - 10 },
+    { t: '3', p: currentPrice - 5 },
+    { t: '4', p: currentPrice - 2 },
+    { t: '5', p: currentPrice },
   ];
+
+  if (!symbol) return <p className="text-white p-6">Kein Symbol angegeben</p>;
 
   return (
     <AppShell>
+      {tradeType && (
+        <TradeModal
+          type={tradeType}
+          price={currentPrice}
+          onClose={() => setTradeType(null)}
+          onConfirm={(amount, leverage) => {
+            if (tradeType === 'buy') {
+              buy(symbol.toUpperCase(), currentPrice, amount, leverage);
+            } else {
+              sell(symbol.toUpperCase(), currentPrice, amount, leverage);
+            }
+            setTradeType(null);
+          }}
+        />
+      )}
+
       <SymbolHeader />
-      <h1 className="text-white/90 text-2xl font-semibold text-center mt-2">
+
+      <h1 className="text-white text-2xl font-semibold text-center mt-2">
         {symbol}
       </h1>
+
       <BuySellCard
-        sellPrice="4.442,64 €"
-        buyPrice="4.443,65 €"
+        buyPrice={buyPrice}
+        sellPrice={sellPrice}
         assetIcon={<Gem className="w-6 h-6 text-yellow-400" />}
+        onBuy={() => setTradeType('buy')}
+        onSell={() => setTradeType('sell')}
+        position={positionPreview}
+        onClosePosition={() => {
+          if (assetPosition) {
+            if (confirm(`Position ${symbol} schließen?`)) {
+              closePosition(assetPosition.symbol);
+            }
+          }
+        }}
       />
-      <PerformanceRow value={242.14} percent={5.76} />
+
+      <PerformanceRow value={positionPreview?.pnl ?? 0} percent={0} />
 
       <ChartCard
         points={demoPoints}
-        currentPrice={4442.64}
-        currencySuffix="$"
+        currentPrice={currentPrice}
+        currencySuffix="€"
         defaultRange="1M"
       />
     </AppShell>
