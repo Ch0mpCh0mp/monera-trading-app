@@ -33,9 +33,14 @@ export default function AddInstrumentSheet({
 
   useEffect(() => {
     if (!open) return;
-    setQuery('');
+
+    const id = window.setTimeout(() => {
+      inputRef.current?.focus();
+    }, 50);
+
+    return () => window.clearTimeout(id);
     // Fokus fürs Mobile-Keyboard (auf echten Geräten)
-    setTimeout(() => inputRef.current?.focus(), 50);
+    // setTimeout(() => inputRef.current?.focus(), 50);
   }, [open]);
 
   const filtered = useMemo(() => {
