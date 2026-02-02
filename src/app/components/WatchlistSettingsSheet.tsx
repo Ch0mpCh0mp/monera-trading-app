@@ -23,9 +23,9 @@ export default function WatchlistSettingsSheet({
 
   useEffect(() => {
     if (!open) return;
-    setName(watchlistName);
-    setTimeout(() => inputRef.current?.focus(), 50);
-  }, [open, watchlistName]);
+    const t = window.setTimeout(() => inputRef.current?.focus(), 50);
+    return () => window.clearTimeout(t);
+  }, [open]);
 
   if (!open) return null;
 

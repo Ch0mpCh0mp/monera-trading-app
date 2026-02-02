@@ -424,6 +424,7 @@ export default function DashboardPage() {
       />
 
       <WatchlistSettingsSheet
+        key={activeTab}
         open={isWatchlistSettingsOpen}
         onClose={() => setIsWatchlistSettingsOpen(false)}
         watchlistName={activeTab}
