@@ -1,20 +1,30 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
 
   images: {
-    domains: ['coin-images.coingecko.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'coin-images.coingecko.com',
+      },
+    ],
   },
+
+  // If you prefer the older way of specifying allowed image domains, you can uncomment below
+  // images: {
+  //   domains: ['coin-images.coingecko.com'],
+  // },
 
   webpack(config) {
     // 1) Find the rule that handles images (and likely svg too)
     const fileLoaderRule = config.module.rules.find((rule: any) => {
       return (
         rule &&
-        typeof rule === "object" &&
+        typeof rule === 'object' &&
         rule.test instanceof RegExp &&
-        rule.test.test(".svg")
+        rule.test.test('.svg')
       );
     });
 
@@ -25,7 +35,7 @@ const nextConfig: NextConfig = {
       {
         test: /\.svg$/i,
         issuer: /\.[jt]sx?$/,
-        use: ["@svgr/webpack"],
+        use: ['@svgr/webpack'],
       }
     );
 

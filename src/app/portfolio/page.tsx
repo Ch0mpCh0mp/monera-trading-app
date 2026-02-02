@@ -13,7 +13,7 @@ import {
 import TopBar from '../components/TopBar';
 import { useAccountSummary } from '@/hooks/useAccountSummary';
 import { formatCurrency } from '@/lib/formatCurrency';
-import { usePortfolio } from '../context/PortfolioContext';
+// import { usePortfolio } from '../context/PortfolioContext';
 import { useRouter } from 'next/navigation';
 
 function PromoCard({
@@ -50,7 +50,8 @@ function PromoCard({
 }
 
 export default function PortfolioPage() {
-const { balance: accountValue, levelPct, currency } = usePortfolio(); // aus PortfolioContext
+  const { accountValue, levelPct, currency } = useAccountSummary();
+// const { balance: accountValue, levelPct, currency } = usePortfolio(); // aus PortfolioContext
 const router = useRouter();
 
 
