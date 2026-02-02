@@ -29,19 +29,31 @@ export default function AssetRow({
   const changeColorClass = isPositive
     ? 'text-green-400'
     : isNegative
-    ? 'text-red-400'
-    : 'text-white/70';
+      ? 'text-red-400'
+      : 'text-white/70';
 
   // Wenn sparklineData leer ist, generiere Testwerte ±5% um Preis
   const data =
     sparklineData && sparklineData.length > 1
       ? sparklineData
-      : Array.from({ length: 10 }, (_, i) =>
-          price + (Math.random() - 0.5) * price * 0.1
-        );
+      : Array.from({ length: 10 }, (_, i) => {
+          // deterministische "Welle" statt Random (pure render)
+          const amp = price * 0.03; // ~±3%
+          const seed =
+            (symbol.charCodeAt(0) + symbol.charCodeAt(symbol.length - 1)) % 10;
+          return price + Math.sin((i + seed) / 2) * amp;
+        });
+
+  // : Array.from({ length: 10 }, (_, i) =>
+  //     price + (Math.random() - 0.5) * price * 0.1
+  //   );
 
   // Farbe grün oder rot je nach Trend
-  const sparklineColor = data[data.length - 1] >= data[0] ? '#34D399' : '#F87171';
+  const sparklineColor =
+    trend === 'up' ? '#34D399' : trend === 'down' ? '#F87171' : '#9CA3AF';
+
+  // const sparklineColor =
+  //   data[data.length - 1] >= data[0] ? '#34D399' : '#F87171';
 
   return (
     <div className="grid grid-cols-[1fr_80px_96px] items-center gap-3 py-4 min-h-[56px] border-b border-white/5">
@@ -78,7 +90,9 @@ export default function AssetRow({
 
       {/* Preis + Veränderung */}
       <div className="text-right">
-        <p className="text-white text-sm font-medium tabular-nums">{price.toFixed(2)}</p>
+        <p className="text-white text-sm font-medium tabular-nums">
+          {price.toFixed(2)}
+        </p>
         <p className={`text-[11px] tabular-nums ${changeColorClass}`}>
           {isPositive ? '+' : ''}
           {Number.isFinite(changePct) ? changePct.toFixed(2) : '0.00'}%
