@@ -102,54 +102,36 @@ function ScrollRow({
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(false);
 
-  useEffect(() => {
+  const updateChevron = () => {
     const el = scrollerRef.current;
     if (!el) return;
 
-    const updateChevron = () => {
-      const canScroll = el.scrollWidth > el.clientWidth;
+    const canScroll = el.scrollWidth > el.clientWidth;
 
-      const atStart = el.scrollLeft <= 1;
-      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
+    const atStart = el.scrollLeft <= 1;
+    const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
 
-      setShowLeft(canScroll && !atStart);
-      setShowRight(canScroll && !atEnd);
-    };
+    setShowLeft(canScroll && !atStart);
+    setShowRight(canScroll && !atEnd);
+  };
 
-    // ✅ initial update (aber async, damit ESLint happy ist)
-    const raf = requestAnimationFrame(updateChevron);
+  useEffect(() => {
+    updateChevron();
 
-    // Scroll listener
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    // REAGIERE AUFS SCROLLEN
     el.addEventListener('scroll', updateChevron, { passive: true });
 
-    // Resize listener (stabile Referenz für cleanup)
-    const onResize = () => updateChevron();
-    window.addEventListener('resize', onResize);
+    // REAGIERE WENN BREITE SICH VERÄNDERT
+    window.addEventListener('resize', updateChevron);
 
     return () => {
-      cancelAnimationFrame(raf);
       el.removeEventListener('scroll', updateChevron);
-      window.removeEventListener('resize', onResize);
+      window.removeEventListener('resize', updateChevron);
     };
   }, []);
-
-  // useEffect(() => {
-  //   updateChevron();
-
-  //   const el = scrollerRef.current;
-  //   if (!el) return;
-
-  //   // REAGIERE AUFS SCROLLEN
-  //   el.addEventListener('scroll', updateChevron, { passive: true });
-
-  //   // REAGIERE WENN BREITE SICH VERÄNDERT
-  //   window.addEventListener('resize', updateChevron);
-
-  //   return () => {
-  //     el.removeEventListener('scroll', updateChevron);
-  //     window.removeEventListener('resize', updateChevron);
-  //   };
-  // }, []);
 
   const scrollPrev = () => {
     const el = scrollerRef.current;
