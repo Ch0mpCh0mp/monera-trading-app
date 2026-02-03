@@ -10,8 +10,8 @@ export default function SocialHeader() {
         <UserCircle2 size={30} />
       </button>
 
-      <h1 className="justify-self-center text-white font-md tracking-wide text-xl">
-        Social
+      <h1 className="justify-self-center text-white/80 font-md tracking-wide text-xl">
+        Socials
       </h1>
 
       <button

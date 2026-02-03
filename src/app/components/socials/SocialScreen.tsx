@@ -53,7 +53,7 @@ export default function SocialScreen() {
         <SocialHeader />
       </div>
 
-      <div className="mt-4">
+      <div className="mt-5">
         <SocialTabs value={tab} onChange={setTab} />
       </div>
 
