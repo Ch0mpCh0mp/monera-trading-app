@@ -1,12 +1,5 @@
-"use client";
-
-import BottomNav from '../components/BottomNav';
+import SocialScreen from '../components/socials/SocialScreen';
 
 export default function SocialPage() {
-    return (
-        <main>
-            <h1>Social</h1>
-            <BottomNav />
-        </main>
-    );
+  return <SocialScreen />;
 }
