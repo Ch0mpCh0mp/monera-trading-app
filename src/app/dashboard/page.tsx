@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import StatusCard from '../components/StatusCard';
 import AssetRow from '../components/AssetRow';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import AccountValueCard from '../components/AccountValueCard';
 import WatchlistHeader from '../components/WatchlistHeader';
 import TopBar from '../components/TopBar';
@@ -13,7 +13,6 @@ import { useRouter } from 'next/navigation';
 import CreateWatchlistSheet from '../components/CreateWatchlistSheet';
 import AddInstrumentSheet from '../components/AddInstrumentSheet';
 import WatchlistSettingsSheet from '../components/WatchlistSettingsSheet';
-import { MarketsContext } from '../context/MarketsContext';
 
 // =====================
 // Typ für Assets
@@ -28,8 +27,6 @@ interface Asset {
 
   // ANDREA, HAB DAS HIER NOCH EINGEFÜGT FÜR SPARKLINE
   sparklineData?: number[];
-  onClick?: () => void;
-
 }
 
 interface StockRaw {
@@ -59,7 +56,13 @@ function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        className="-rotate-90"
+      >
+        {/* HINTERGRUND (inaktiv) */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -68,6 +71,8 @@ function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
           stroke="rgba(0, 166, 62, 0.4)"
           strokeWidth={stroke}
         />
+
+        {/* FORTSCHRITT (aktiv) */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -86,7 +91,9 @@ function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
 
 export default function DashboardPage() {
   const levelPercent = 100;
+  // SETBALANCE WIRD NICHT BENUTZT, SOLL DAS WEG? SONST EINFACH SO:
   const { balance } = usePortfolio();
+  // const { balance, setBalance } = usePortfolio();
   const router = useRouter();
 
   const tabs = ['New', 'Gold', 'Scalping'] as const;
@@ -109,6 +116,17 @@ useEffect(() => {
       const res = await fetch('/api/markets');
       const rawData = await res.json() as { crypto: any[]; stocks: StockRaw[] };
       console.log('rawData:', rawData);
+
+  // --- FETCH MARKETS ANSTATT MOCKDATEN ---
+  // const [assetsByTab, setAssetsByTab] = useState<{
+  //   New: Asset[];
+  //   Gold: Asset[];
+  //   Scalping: Asset[];
+  // }>({
+  //   New: [],
+  //   Gold: [],
+  //   Scalping: [],
+  // });
 
   const [assetsByTab, setAssetsByTab] = useState<Record<string, Asset[]>>({
     New: [],
@@ -143,6 +161,7 @@ goldAssets.unshift({
         if (process.env.NODE_ENV === 'development') {
           console.log('rawData:', rawData);
         }
+        // console.log('rawData:', rawData);
 
         // Crypto für New-Tab (Live-Daten) inkl. Sparkline
         const newAssets: Asset[] = (rawData.crypto || []).map((c) => ({
@@ -168,6 +187,29 @@ goldAssets.unshift({
                 ),
           };
         });
+
+        // const newAssets: Asset[] = (rawData.crypto || []).map((c) => ({
+        //   name: c.name,
+        //   symbol: c.symbol.toUpperCase(),
+        //   price: c.current_price ?? 0,
+        //   changePct: c.price_change_percentage_24h ?? 0,
+        //   trend:
+        //     c.price_change_percentage_24h > 0
+        //       ? 'up'
+        //       : c.price_change_percentage_24h < 0
+        //         ? 'down'
+        //         : 'neutral',
+        //   image: c.image,
+        //   // Wenn echte Sparkline nicht existiert, generiere Testwerte (leicht variiert)
+        //   sparklineData:
+        //     c.sparkline_in_7d?.price && c.sparkline_in_7d.price.length > 0
+        //       ? c.sparkline_in_7d.price
+        //       : Array.from(
+        //           { length: 10 },
+        //           (_, i) =>
+        //             c.current_price + Math.sin(i / 2) * (c.current_price * 0.01)
+        //         ),
+        // }));
 
         // Stocks für Gold-Tab
         const goldAssets: Asset[] = (rawData.stocks || [])
@@ -207,6 +249,11 @@ goldAssets.unshift({
           Scalping: scalpingAssets,
         }));
 
+        // setAssetsByTab({
+        //   New: newAssets,
+        //   Gold: goldAssets,
+        //   Scalping: scalpingAssets,
+        // });
       } catch (err) {
         console.error('Failed to fetch markets:', err);
       }
@@ -220,36 +267,30 @@ goldAssets.unshift({
 
   // --- ENDE FETCH ---
 
-  // ✅ Märkte aus Context holen
-  const { crypto, stocks, gold, loading } = useContext(MarketsContext);
-
-  // --- Assets nach Tabs filtern ---
-  // const assetsByTab: Record<string, Asset[]> = {
-  //   New: crypto.filter((c: Asset) => ['BTC', 'ETH', 'SOL', 'ADA'].includes(c.symbol.toUpperCase())),
-  //   Gold: gold.filter((c:Asset) => c.symbol === 'XAUUSD'),
-
-  //   Scalping: crypto.filter((c:Asset) => ['SOL', 'ADA'].includes(c.symbol.toUpperCase())),
-  // };
-
-  if (loading) {
-    return (
-      <AppShell>
-        <p className="text-white p-6">Loading markets...</p>
-      </AppShell>
-    );
-  }
-
   return (
     <AppShell containerClassName="flex flex-col flex-1 min-h-0 gap-3">
+      {/* LOGO MIT GLOCKE */}
       <TopBar />
 
-      <AccountValueCard value={balance} changeSumToday={0} changePct={0} currency="EUR" />
+      {/* ACCOUNT VALUE */}
+      <AccountValueCard
+        value={balance} // vorher 12543.21
+        changeSumToday={0} // optional: wir starten mit 0 Veränderung
+        changePct={0} // optional: 0%
+        currency="EUR"
+      />
 
+      {/* MARGIN & LEVEL */}
       <div className="grid grid-cols-2 gap-4 mt-6">
         <StatusCard label="Margin" value="0,00 €" />
-        <StatusCard label="Level" value={`${levelPercent}%`} rightSide={<LevelRing percent={levelPercent} />} />
+        <StatusCard
+          label="Level"
+          value={`${levelPercent}%`}
+          rightSide={<LevelRing percent={levelPercent} />}
+        />
       </div>
 
+      {/* CASH UND DEPOSIT BUTTON */}
       <StatusCard
         label="Cash"
         value={`${balance.toFixed(2)} €`}
@@ -264,6 +305,7 @@ goldAssets.unshift({
         }
       />
 
+      {/* GROSSER AKTIENBLOCK */}
       <section className="border border-white/5 text-white/50 bg-white/5 rounded-2xl flex flex-col flex-1 min-h-0">
         <div className="px-4 py-4 flex flex-col flex-1 min-h-0">
           <WatchlistHeader
@@ -284,7 +326,6 @@ goldAssets.unshift({
                 changePct={asset.changePct}
                 trend={asset.trend}
                 image={asset.image}
-                onClick={() => router.push(`/search/${asset.symbol.toLowerCase()}`)}
               />
             ))}
           </div>

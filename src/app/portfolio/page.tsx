@@ -9,13 +9,12 @@ import {
   Droplets,
   DollarSign,
   ChevronDown,
-  X,
 } from 'lucide-react';
 import TopBar from '../components/TopBar';
+import { useAccountSummary } from '@/hooks/useAccountSummary';
 import { formatCurrency } from '@/lib/formatCurrency';
 import { usePortfolio } from '../context/PortfolioContext';
 import { useRouter } from 'next/navigation';
-import { useAccountSummary } from '@/hooks/useAccountSummary';
 
 function PromoCard({
   title,
@@ -32,14 +31,17 @@ function PromoCard({
     <div className="rounded-2xl bg-white/5 border border-white/10 p-4 flex items-center justify-between">
       <div className="pr-3">
         <p className="text-white text-sm leading-snug">{title}</p>
+
         <button
           type="button"
           onClick={onClick}
-          className="mt-3 inline-flex items-center rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white text-xs px-4 py-2"
+          className="
+            mt-3 inline-flex items-center rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white text-xs  px-4 py-2"
         >
           {cta}
         </button>
       </div>
+
       <div className="shrink-0 w-16 h-16 rounded-full bg-white/10 flex items-center justify-center text-white/80">
         {icon}
       </div>
@@ -49,15 +51,12 @@ function PromoCard({
 
 export default function PortfolioPage() {
   const { accountValue, levelPct, currency } = useAccountSummary();
-  const { balance, equity, openPositions, closePosition } = usePortfolio();
-  const positions = openPositions();
+  // const { balance: accountValue, levelPct, currency } = usePortfolio(); // aus PortfolioContext
   const router = useRouter();
-
-  // 🔹 Berechne Total PnL
-  const totalPnL = positions.reduce((sum, pos) => sum + (pos.pnl || 0), 0);
 
   return (
     <AppShell containerClassName="space-y-6">
+      {/* TOPBAR */}
       <TopBar />
 
       {/* VALUE + PLUS BUTTON */}
@@ -82,6 +81,7 @@ export default function PortfolioPage() {
               </p>
             </div>
           </div>
+
           <button
             type="button"
             aria-label="Add"
@@ -97,7 +97,7 @@ export default function PortfolioPage() {
           type="button"
           className="mt-5 w-full rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white py-3 flex items-center justify-center gap-2 text-sm"
         >
-          Margin-Level • 0 %
+          Margin-Level • {levelPct} %
           <ChevronDown size={16} className="text-white/90" />
         </button>
       </section>

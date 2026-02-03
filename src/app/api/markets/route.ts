@@ -1,23 +1,13 @@
 import { NextResponse } from 'next/server'
 import { getMarkets } from './_lib/marketsCache'
-import { fetchCrypto, fetchStocks, fetchGoldAPI } from './_lib/markets'
 
 export async function GET() {
   try {
     // Markets aus dem Cache holen (Crypto + Stocks)
-    const [ crypto, stocks, gold ] = await Promise.all([
-      fetchCrypto(),
-      fetchStocks(),
-      fetchGoldAPI(),
-    ])
-
-//Gold zu Stocks hinufügen
-const allStocks = [...stocks, gold]
-
-
-console.log('API MARKETS LIVE:', { crypto, stocks: allStocks}) 
+    const { crypto, stocks } = await getMarkets()
+console.log('API MARKETS:', { crypto, stocks }) 
     // JSON zurückgeben
-    return NextResponse.json({ crypto: crypto, stocks: allStocks })
+    return NextResponse.json({ crypto, stocks })
   } catch (err: any) {
     console.error('Markets API error:', err)
     return NextResponse.json(
