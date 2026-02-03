@@ -5,18 +5,8 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
 
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'coin-images.coingecko.com',
-      },
-    ],
+    domains: ['coin-images.coingecko.com'],
   },
-
-  // If you prefer the older way of specifying allowed image domains, you can uncomment below
-  // images: {
-  //   domains: ['coin-images.coingecko.com'],
-  // },
 
   webpack(config) {
     // 1) Find the rule that handles images (and likely svg too)
@@ -34,7 +24,7 @@ const nextConfig: NextConfig = {
     config.module.rules.push({
       test: /\.svg$/i,
       issuer: /\.[jt]sx?$/,
-      use: ["@svgr/webpack"],
+      use: ['@svgr/webpack'],
     });
 
     if (fileLoaderRule) {
