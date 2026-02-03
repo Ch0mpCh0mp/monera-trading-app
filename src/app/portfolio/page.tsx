@@ -9,9 +9,9 @@ import {
   Droplets,
   DollarSign,
   ChevronDown,
+  X,
 } from 'lucide-react';
 import TopBar from '../components/TopBar';
-import { useAccountSummary } from '@/hooks/useAccountSummary';
 import { formatCurrency } from '@/lib/formatCurrency';
 import { usePortfolio } from '../context/PortfolioContext';
 import { useRouter } from 'next/navigation';
@@ -31,17 +31,14 @@ function PromoCard({
     <div className="rounded-2xl bg-white/5 border border-white/10 p-4 flex items-center justify-between">
       <div className="pr-3">
         <p className="text-white text-sm leading-snug">{title}</p>
-
         <button
           type="button"
           onClick={onClick}
-          className="
-            mt-3 inline-flex items-center rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white text-xs  px-4 py-2"
+          className="mt-3 inline-flex items-center rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white text-xs px-4 py-2"
         >
           {cta}
         </button>
       </div>
-
       <div className="shrink-0 w-16 h-16 rounded-full bg-white/10 flex items-center justify-center text-white/80">
         {icon}
       </div>
@@ -50,13 +47,15 @@ function PromoCard({
 }
 
 export default function PortfolioPage() {
-  const { accountValue, levelPct, currency } = useAccountSummary();
-  // const { balance: accountValue, levelPct, currency } = usePortfolio(); // aus PortfolioContext
+  const { balance, equity, openPositions, closePosition } = usePortfolio();
+  const positions = openPositions();
   const router = useRouter();
+
+  // 🔹 Berechne Total PnL
+  const totalPnL = positions.reduce((sum, pos) => sum + (pos.pnl || 0), 0);
 
   return (
     <AppShell containerClassName="space-y-6">
-      {/* TOPBAR */}
       <TopBar />
 
       {/* VALUE + PLUS BUTTON */}
@@ -73,15 +72,11 @@ export default function PortfolioPage() {
               <p className="text-white/50 text-sm">
                 Cash: {formatCurrency(balance, 'EUR')}
               </p>
-              <p
-                className={`text-sm font-semibold ${totalPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}
-              >
-                PnL: {totalPnL >= 0 ? '+' : ''}
-                {formatCurrency(totalPnL, 'EUR')}
+              <p className={`text-sm font-semibold ${totalPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                PnL: {totalPnL >= 0 ? '+' : ''}{formatCurrency(totalPnL, 'EUR')}
               </p>
             </div>
           </div>
-
           <button
             type="button"
             aria-label="Add"
@@ -97,7 +92,7 @@ export default function PortfolioPage() {
           type="button"
           className="mt-5 w-full rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white py-3 flex items-center justify-center gap-2 text-sm"
         >
-          Margin-Level • {levelPct} %
+          Margin-Level • 0 %
           <ChevronDown size={16} className="text-white/90" />
         </button>
       </section>
@@ -125,9 +120,7 @@ export default function PortfolioPage() {
               </button>
 
               <div
-                onClick={() =>
-                  router.push(`/search/${pos.symbol}?type=${pos.type}`)
-                }
+                onClick={() => router.push(`/search/${pos.symbol}?type=${pos.type}`)}
                 className="cursor-pointer"
               >
                 <div className="flex justify-between items-start">
@@ -143,16 +136,11 @@ export default function PortfolioPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p
-                      className={`font-semibold ${pos.currentPrice >= pos.entryPrice ? 'text-green-400' : 'text-red-400'}`}
-                    >
+                    <p className={`font-semibold ${pos.currentPrice >= pos.entryPrice ? 'text-green-400' : 'text-red-400'}`}>
                       €{pos.currentPrice.toFixed(2)}
                     </p>
-                    <p
-                      className={`text-sm font-semibold mt-1 ${(pos.pnl || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}
-                    >
-                      {(pos.pnl || 0) >= 0 ? '+' : ''}€
-                      {(pos.pnl || 0).toFixed(2)}
+                    <p className={`text-sm font-semibold mt-1 ${(pos.pnl || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {(pos.pnl || 0) >= 0 ? '+' : ''}€{(pos.pnl || 0).toFixed(2)}
                     </p>
                   </div>
                 </div>
