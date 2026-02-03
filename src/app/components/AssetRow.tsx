@@ -35,13 +35,14 @@ export default function AssetRow({
   const changeColorClass = isPositive
     ? 'text-green-400'
     : isNegative
-      ? 'text-red-400'
-      : 'text-white/70';
+    ? 'text-red-400'
+    : 'text-white/70';
 
   // Wenn sparklineData leer ist, generiere Testwerte ±5% um Preis
   const data =
     sparklineData && sparklineData.length > 1
       ? sparklineData
+<<<<<<< HEAD
       : Array.from(
           { length: 10 },
           (_, i) => price + (Math.random() - 0.5) * price * 0.1
@@ -58,6 +59,14 @@ export default function AssetRow({
     if (onClick) onClick(); // optionaler Callback
     router.push(`/search/${symbol.toLowerCase()}`);
   };
+=======
+      : Array.from({ length: 10 }, (_, i) =>
+          price + (Math.random() - 0.5) * price * 0.1
+        );
+
+  // Farbe grün oder rot je nach Trend
+  const sparklineColor = data[data.length - 1] >= data[0] ? '#34D399' : '#F87171';
+>>>>>>> parent of ca1cdce (Merge pull request #12 from Ch0mpCh0mp/plus-dashboard)
 
   return (
     <div
@@ -97,9 +106,7 @@ export default function AssetRow({
 
       {/* Preis + Veränderung */}
       <div className="text-right">
-        <p className="text-white text-sm font-medium tabular-nums">
-          {price.toFixed(2)}
-        </p>
+        <p className="text-white text-sm font-medium tabular-nums">{price.toFixed(2)}</p>
         <p className={`text-[11px] tabular-nums ${changeColorClass}`}>
           {isPositive ? '+' : ''}
           {Number.isFinite(changePct) ? changePct.toFixed(2) : '0.00'}%

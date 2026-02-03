@@ -89,18 +89,26 @@ export default function DashboardPage() {
   const { balance } = usePortfolio();
   const router = useRouter();
 
-  // RAUSNEHMEN NICHT VERGESSEN
-  // const tabs = ['New', 'Gold', 'Scalping'] as const;
-  // const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>(tabs[0]);
+  const tabs = ['New', 'Gold', 'Scalping'] as const;
+  const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>(tabs[0]);
 
-  const [watchlists, setWatchlists] = useState<string[]>([
-    'New',
-    'Gold',
-    'Scalping',
-  ]);
-  const [activeTab, setActiveTab] = useState<string>('New');
+// --- FETCH MARKETS ANSTATT MOCKDATEN ---
+const [assetsByTab, setAssetsByTab] = useState<{
+  New: Asset[];
+  Gold: Asset[];
+  Scalping: Asset[];
+}>({
+  New: [],
+  Gold: [],
+  Scalping: [],
+});
 
-  const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
+useEffect(() => {
+  async function fetchMarkets() {
+    try {
+      const res = await fetch('/api/markets');
+      const rawData = await res.json() as { crypto: any[]; stocks: StockRaw[] };
+      console.log('rawData:', rawData);
 
   const [assetsByTab, setAssetsByTab] = useState<Record<string, Asset[]>>({
     New: [],
@@ -108,17 +116,20 @@ export default function DashboardPage() {
     Scalping: [],
   });
 
-  const [isAddInstrumentOpen, setIsAddInstrumentOpen] = useState(false);
-  const [isWatchlistSettingsOpen, setIsWatchlistSettingsOpen] = useState(false);
+  //  HIER XAU/USD HINZUFÜGEN
+goldAssets.unshift({
+  name: 'Gold (XAU/USD)',
+  symbol: 'XAUUSD',
+  price: 4950.12,          // Hier kannst du einen aktuellen Goldpreis einsetzen
+  changePct: 0.35,         // Beispielwert für die Veränderung
+  trend: 0.35 > 0 ? 'up' : 0.35 < 0 ?'down' : 'neutral',
+  image: '/gold.png', // optional, wenn du ein Icon hast, sonst weglassen
+});
 
-  const instrumentUniverse = [
-    ...(assetsByTab.New ?? []),
-    ...(assetsByTab.Gold ?? []),
-  ].reduce((acc, item) => {
-    // unique by symbol
-    if (!acc.some((x) => x.symbol === item.symbol)) acc.push(item);
-    return acc;
-  }, [] as Asset[]);
+      // Scalping aus Crypto filtern
+      const scalpingAssets = newAssets.filter(
+        (c) => c.symbol === 'SOL' || c.symbol === 'ADA'
+      );
 
   useEffect(() => {
     async function fetchMarkets() {
@@ -200,9 +211,12 @@ export default function DashboardPage() {
         console.error('Failed to fetch markets:', err);
       }
     }
+  }
 
-    fetchMarkets();
-  }, []);
+  fetchMarkets();
+}, []);
+
+
 
   // --- ENDE FETCH ---
 
@@ -253,61 +267,14 @@ export default function DashboardPage() {
       <section className="border border-white/5 text-white/50 bg-white/5 rounded-2xl flex flex-col flex-1 min-h-0">
         <div className="px-4 py-4 flex flex-col flex-1 min-h-0">
           <WatchlistHeader
-            tabs={watchlists}
+            tabs={tabs}
             activeTab={activeTab}
             onTabChange={setActiveTab}
-            onAddClick={() => setIsCreateSheetOpen(true)}
-            onEditClick={() => setIsWatchlistSettingsOpen(true)}
+            onAddClick={() => console.log('add watchlist')}
+            onEditClick={() => console.log('edit watchlists')}
           />
 
           <div className="mt-4 overflow-y-auto overflow-x-hidden pr-2 flex-1 min-h-0">
-            {(assetsByTab[activeTab]?.length ?? 0) === 0 ? (
-              <div className="py-10 text-center">
-                <p className="text-white/80 text-sm font-medium">
-                  This Watchlist is empty
-                </p>
-
-                <p className="text-white/40 text-xs mt-2 max-w-sm mx-auto">
-                  Add the instruments that interest you to easily track their
-                  performance and price changes in one place.
-                </p>
-
-                <div className="mt-6 flex items-center justify-center gap-3">
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 text-white px-5 py-3 rounded-full"
-                    onClick={() => setIsAddInstrumentOpen(true)}
-                  >
-                    <span className="text-lg leading-none">+</span>
-                    Add Instruments
-                  </button>
-
-                  <button
-                    type="button"
-                    aria-label="settings"
-                    className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/15 text-white/80"
-                    onClick={() => setIsWatchlistSettingsOpen(true)}
-                  >
-                    ⚙️
-                  </button>
-                </div>
-              </div>
-            ) : (
-              assetsByTab[activeTab]!.map((asset) => (
-                <AssetRow
-                  key={asset.symbol}
-                  name={asset.name}
-                  symbol={asset.symbol}
-                  price={asset.price}
-                  changePct={asset.changePct}
-                  trend={asset.trend}
-                  image={asset.image}
-                />
-              ))
-            )}
-          </div>
-
-          {/* <div className="mt-4 overflow-y-auto overflow-x-hidden pr-2 flex-1 min-h-0">
             {assetsByTab[activeTab]?.map((asset) => (
               <AssetRow
                 key={asset.symbol}
@@ -320,7 +287,7 @@ export default function DashboardPage() {
                 onClick={() => router.push(`/search/${asset.symbol.toLowerCase()}`)}
               />
             ))}
-          </div> */}
+          </div>
         </div>
       </section>
 
