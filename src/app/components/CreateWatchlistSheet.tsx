@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type Props = {
   open: boolean;
@@ -16,11 +16,6 @@ export default function CreateWatchlistSheet({
   const [name, setName] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleClose = useCallback(() => {
-    setName('');
-    onClose();
-  }, [onClose]);
-
   // Fokus + ESC schließen
   useEffect(() => {
     if (!open) return;
@@ -28,7 +23,7 @@ export default function CreateWatchlistSheet({
     const t = window.setTimeout(() => inputRef.current?.focus(), 80);
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleClose();
+      if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', onKeyDown);
 
@@ -36,7 +31,12 @@ export default function CreateWatchlistSheet({
       window.clearTimeout(t);
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [open, handleClose]);
+  }, [open, onClose]);
+
+// WENN GESCHLOSSEN, NAME ZURÜCKSETZEN
+  useEffect(() => {
+    if (!open) setName('');
+  }, [open]);
 
   if (!open) return null;
 
@@ -46,7 +46,7 @@ export default function CreateWatchlistSheet({
   const handleCreate = () => {
     if (!canCreate) return;
     onCreate?.(trimmed);
-    handleClose();
+    onClose();
   };
 
   return (
@@ -55,7 +55,7 @@ export default function CreateWatchlistSheet({
       <button
         type="button"
         aria-label="Close create watchlist"
-        onClick={handleClose}
+        onClick={onClose}
         className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"
       />
 
