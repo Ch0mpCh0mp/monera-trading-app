@@ -2,10 +2,10 @@
 
 import BottomNav from '../components/BottomNav';
 
-export default function ProfilePage() {
+export default function SocialPage() {
     return (
         <main>
-            <h1>Profile</h1>
+            <h1>Social</h1>
             <BottomNav />
         </main>
     );

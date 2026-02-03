@@ -11,7 +11,7 @@ export default function BottomNav() {
     { href: '/dashboard', icon: House, label: 'Dashboard' },
     { href: '/portfolio', icon: ChartPie, label: 'Portfolio' },
     { href: '/search', icon: Search, label: 'Search' },
-    { href: '/profile', icon: User, label: 'Profile' },
+    { href: '/social', icon: User, label: 'Social' },
     { href: '/menu', icon: Menu, label: 'Menu' },
   ];
 
