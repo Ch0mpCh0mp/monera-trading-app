@@ -32,103 +32,74 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
   const marketsCtx = useContext(MarketsContext);
   const { crypto = [], stocks = [], gold = [], loading = true } = marketsCtx || {};
 
-  // 🔹 KRITISCHER FIX: Starte mit Defaults, DANN lade aus LocalStorage
-  const [balance, setBalance] = useState<number>(10000);
-  const [equity, setEquity] = useState<number>(10000);
-  const [positions, setPositions] = useState<Position[]>([]);
-  const [initialized, setInitialized] = useState(false);
+  const [balance, setBalance] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('balance');
+      if (saved) return parseFloat(saved);
+    }
+    return 10000;
+  });
 
-  // 🔹 NUR einmal beim Mount aus LocalStorage laden
-  useEffect(() => {
-    if (initialized || typeof window === 'undefined') return;
-    
-    const savedBalance = localStorage.getItem('balance');
-    const savedPositions = localStorage.getItem('positions');
-    
-    if (savedBalance) {
-      const bal = parseFloat(savedBalance);
-      if (!isNaN(bal)) {
-        setBalance(bal);
-        setEquity(bal);
+  const [positions, setPositions] = useState<Position[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('positions');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {}
       }
     }
-    
-    if (savedPositions) {
-      try {
-        const pos = JSON.parse(savedPositions);
-        if (Array.isArray(pos)) {
-          setPositions(pos);
-        }
-      } catch (e) {
-        console.error('Failed to parse positions:', e);
-        localStorage.removeItem('positions');
-      }
-    }
-    
-    setInitialized(true);
-  }, [initialized]);
+    return [];
+  });
 
-  // 🔹 Hilfsfunktion: Aktuellen Preis holen
-  const getCurrentPrice = (symbol: string, fallback: number): number => {
+  const [equity, setEquity] = useState<number>(balance);
+
+  const getCurrentPrice = (symbol: string, fallback: number) => {
     const asset = [...crypto, ...stocks, ...gold].find((a) => a.symbol === symbol);
     return asset?.price ?? fallback;
   };
 
-  // 🔹 PnL berechnen
-  const calculatePnL = (pos: Position, currentPrice: number): number => {
-    if (pos.type === 'buy') {
-      return (currentPrice - pos.entryPrice) * pos.amount;
-    } else {
-      return (pos.entryPrice - currentPrice) * pos.amount;
-    }
+  const calculatePnL = (pos: Position, currentPrice: number) => {
+    return pos.type === 'buy'
+      ? (currentPrice - pos.entryPrice) * pos.amount
+      : (pos.entryPrice - currentPrice) * pos.amount;
   };
 
-  // 🔹 Positionen mit Live-Preisen updaten
+  // 🔹 Live-PnL & Equity Update
   useEffect(() => {
-    if (loading || !initialized || positions.length === 0) return;
+    if (loading) return;
 
-    const updatePrices = () => {
-      let totalPnL = 0;
+    const interval = setInterval(() => {
+      setPositions((prevPositions) => {
+        let totalPnL = 0;
 
-      const updated = positions.map((p) => {
-        const currentPrice = getCurrentPrice(p.symbol, p.currentPrice);
-        const pnl = calculatePnL(p, currentPrice);
-        totalPnL += pnl;
+        const updated = prevPositions.map((p) => {
+          const currentPrice = getCurrentPrice(p.symbol, p.currentPrice);
+          const pnl = calculatePnL(p, currentPrice);
+          totalPnL += pnl;
+          return { ...p, currentPrice, pnl };
+        });
 
-        return { ...p, currentPrice, pnl };
+        setEquity(balance + totalPnL);
+        return updated;
       });
+    }, 1000);
 
-      setPositions(updated);
-      
-      setEquity(balance + totalPnL);
-    };
+    return () => clearInterval(interval);
+  }, [crypto, stocks, gold, balance, loading]);
 
-    updatePrices();
-
-    const handler = () => updatePrices();
-    window.addEventListener('markets-updated', handler);
-    const interval = setInterval(updatePrices, 1000);
-
-    return () => {
-      window.removeEventListener('markets-updated', handler);
-      clearInterval(interval);
-    };
-  }, [crypto, stocks, gold, loading, balance, initialized, positions.length]);
-
-  // 🔹 Balance & Positions speichern
+  // 🔹 LocalStorage Sync
   useEffect(() => {
-    if (!initialized || typeof window === 'undefined') return;
-    
+    if (typeof window === 'undefined') return;
     localStorage.setItem('balance', balance.toString());
     localStorage.setItem('positions', JSON.stringify(positions));
-  }, [balance, positions, initialized]);
+  }, [balance, positions]);
 
   const updatePositionPrice = (symbol: string, newPrice: number) => {
     setPositions((prev) =>
       prev.map((p) => {
         if (p.symbol !== symbol) return p;
-        const pnl = calculatePnL(p, newPrice);
-        return { ...p, currentPrice: newPrice, pnl };
+        return { ...p, currentPrice: newPrice, pnl: calculatePnL(p, newPrice) };
       })
     );
   };
@@ -247,26 +218,11 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
 
   const closePosition = (symbol: string) => {
     const pos = positions.find((p) => p.symbol === symbol);
-    if (!pos) {
-      console.warn("Position nicht gefunden:", symbol);
-      return;
-    }
+    if (!pos) return;
 
     const currentPrice = getCurrentPrice(pos.symbol, pos.currentPrice);
     const finalPnL = calculatePnL(pos, currentPrice);
 
-    console.log("🔹 CLOSING POSITION:", {
-      symbol: pos.symbol,
-      entryPrice: pos.entryPrice,
-      currentPrice,
-      amount: pos.amount,
-      margin: pos.margin,
-      pnl: finalPnL,
-      balanceVorher: balance,
-      balanceNachher: balance + pos.margin + finalPnL,
-    });
-
-    // Balance + Margin + PnL zurückgeben
     setBalance((prev) => prev + pos.margin + finalPnL);
     setPositions((prev) => prev.filter((p) => p.symbol !== symbol));
   };

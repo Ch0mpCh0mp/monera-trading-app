@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import { useState, useEffect } from 'react'; 
+
 import AppShell from '../components/layout/AppShell';
 import {
   Plus,
@@ -51,6 +53,20 @@ export default function PortfolioPage() {
   const positions = openPositions();
   const router = useRouter();
 
+  // 🔹 Markiere, dass die Komponente auf dem Client gemountet ist
+
+const [mounted, setMounted] = useState(false);
+
+useEffect(() => {
+  // 🔹 Delay den State-Update, damit kein synchroner Render passiert
+  const id = requestAnimationFrame(() => {
+    setMounted(true);
+  });
+
+  return () => cancelAnimationFrame(id);
+}, []);
+
+
   // 🔹 Berechne Total PnL
   const totalPnL = positions.reduce((sum, pos) => sum + (pos.pnl || 0), 0);
 
@@ -65,7 +81,7 @@ export default function PortfolioPage() {
             <p className="text-white/70 text-lg">Wert</p>
             {/* 🔹 KRITISCHER FIX: Zeige EQUITY statt BALANCE */}
             <p className="text-white text-4xl font-light mt-1">
-              {formatCurrency(equity, 'EUR')}
+              {formatCurrency(typeof equity === 'number' ? equity: 0, 'EUR')}
             </p>
             {/* 🔹 NEU: Zeige Balance & PnL separat */}
             <div className="mt-2 space-y-1">
@@ -73,8 +89,9 @@ export default function PortfolioPage() {
                 Cash: {formatCurrency(balance, 'EUR')}
               </p>
               <p className={`text-sm font-semibold ${totalPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                PnL: {totalPnL >= 0 ? '+' : ''}{formatCurrency(totalPnL, 'EUR')}
-              </p>
+  PnL: {totalPnL >= 0 ? '+' : ''}{formatCurrency(totalPnL ?? 0, 'EUR')}
+</p>
+
             </div>
           </div>
           <button
