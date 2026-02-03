@@ -42,17 +42,10 @@ export default function AssetRow({
   const data =
     sparklineData && sparklineData.length > 1
       ? sparklineData
-      : Array.from({ length: 10 }, (_, i) => {
-          // deterministische "Welle" statt Random (pure render)
-          const amp = price * 0.03; // ~±3%
-          const seed =
-            (symbol.charCodeAt(0) + symbol.charCodeAt(symbol.length - 1)) % 10;
-          return price + Math.sin((i + seed) / 2) * amp;
-        });
-
-  // : Array.from({ length: 10 }, (_, i) =>
-  //     price + (Math.random() - 0.5) * price * 0.1
-  //   );
+      : Array.from(
+          { length: 10 },
+          (_, i) => price + (Math.random() - 0.5) * price * 0.1
+        );
 
   // Farbe grün oder rot je nach Trend
   const sparklineColor =
