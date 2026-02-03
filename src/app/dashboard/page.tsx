@@ -10,9 +10,6 @@ import TopBar from '../components/TopBar';
 import AppShell from '../components/layout/AppShell';
 import { usePortfolio } from '../context/PortfolioContext';
 import { useRouter } from 'next/navigation';
-import CreateWatchlistSheet from '../components/CreateWatchlistSheet';
-import AddInstrumentSheet from '../components/AddInstrumentSheet';
-import WatchlistSettingsSheet from '../components/WatchlistSettingsSheet';
 
 // =====================
 // Typ für Assets
@@ -24,9 +21,7 @@ interface Asset {
   changePct: number;
   trend: 'up' | 'down' | 'neutral';
   image?: string; // optionales Feld für das Logo
-
-  // ANDREA, HAB DAS HIER NOCH EINGEFÜGT FÜR SPARKLINE
-  sparklineData?: number[];
+  onClick?: () => void;
 }
 
 interface StockRaw {
@@ -56,13 +51,15 @@ function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
+            
       <svg
         width={size}
         height={size}
         viewBox={`0 0 ${size} ${size}`}
         className="-rotate-90"
       >
-        {/* HINTERGRUND (inaktiv) */}
+                {/* HINTERGRUND (inaktiv) */}
+                
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -71,8 +68,8 @@ function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
           stroke="rgba(0, 166, 62, 0.4)"
           strokeWidth={stroke}
         />
-
-        {/* FORTSCHRITT (aktiv) */}
+                {/* FORTSCHRITT (aktiv) */}
+                
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -84,70 +81,31 @@ function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
           strokeDashoffset={offset}
           strokeLinecap="round"
         />
+              
       </svg>
+          
     </div>
   );
 }
 
 export default function DashboardPage() {
   const levelPercent = 100;
-  // SETBALANCE WIRD NICHT BENUTZT, SOLL DAS WEG? SONST EINFACH SO:
-  const { balance } = usePortfolio();
-  // const { balance, setBalance } = usePortfolio();
+  const { balance, setBalance } = usePortfolio();
   const router = useRouter();
 
   const tabs = ['New', 'Gold', 'Scalping'] as const;
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>(tabs[0]);
 
-// --- FETCH MARKETS ANSTATT MOCKDATEN ---
-const [assetsByTab, setAssetsByTab] = useState<{
-  New: Asset[];
-  Gold: Asset[];
-  Scalping: Asset[];
-}>({
-  New: [],
-  Gold: [],
-  Scalping: [],
-});
-
-useEffect(() => {
-  async function fetchMarkets() {
-    try {
-      const res = await fetch('/api/markets');
-      const rawData = await res.json() as { crypto: any[]; stocks: StockRaw[] };
-      console.log('rawData:', rawData);
-
   // --- FETCH MARKETS ANSTATT MOCKDATEN ---
-  // const [assetsByTab, setAssetsByTab] = useState<{
-  //   New: Asset[];
-  //   Gold: Asset[];
-  //   Scalping: Asset[];
-  // }>({
-  //   New: [],
-  //   Gold: [],
-  //   Scalping: [],
-  // });
-
-  const [assetsByTab, setAssetsByTab] = useState<Record<string, Asset[]>>({
+  const [assetsByTab, setAssetsByTab] = useState<{
+    New: Asset[];
+    Gold: Asset[];
+    Scalping: Asset[];
+  }>({
     New: [],
     Gold: [],
     Scalping: [],
   });
-
-  //  HIER XAU/USD HINZUFÜGEN
-goldAssets.unshift({
-  name: 'Gold (XAU/USD)',
-  symbol: 'XAUUSD',
-  price: 4950.12,          // Hier kannst du einen aktuellen Goldpreis einsetzen
-  changePct: 0.35,         // Beispielwert für die Veränderung
-  trend: 0.35 > 0 ? 'up' : 0.35 < 0 ?'down' : 'neutral',
-  image: '/gold.png', // optional, wenn du ein Icon hast, sonst weglassen
-});
-
-      // Scalping aus Crypto filtern
-      const scalpingAssets = newAssets.filter(
-        (c) => c.symbol === 'SOL' || c.symbol === 'ADA'
-      );
 
   useEffect(() => {
     async function fetchMarkets() {
@@ -157,13 +115,8 @@ goldAssets.unshift({
           crypto: any[];
           stocks: StockRaw[];
         };
-        // HAB DAS ALTE CONSOLE.LOG AUSKOMMENTIERT UND NEUES EINGEFÜGT
-        if (process.env.NODE_ENV === 'development') {
-          console.log('rawData:', rawData);
-        }
-        // console.log('rawData:', rawData);
+        console.log('rawData:', rawData); // Crypto für New-Tab (Live-Daten) inkl. Sparkline
 
-        // Crypto für New-Tab (Live-Daten) inkl. Sparkline
         const newAssets: Asset[] = (rawData.crypto || []).map((c) => ({
           name: c.name,
           symbol: c.symbol.toUpperCase(),
@@ -175,8 +128,7 @@ goldAssets.unshift({
               : c.price_change_percentage_24h < 0
                 ? 'down'
                 : 'neutral',
-          image: c.image,
-          // Wenn echte Sparkline nicht existiert, generiere Testwerte (leicht variiert)
+          image: c.image, // Wenn echte Sparkline nicht existiert, generiere Testwerte (leicht variiert)
           sparklineData:
             c.sparkline_in_7d?.price && c.sparkline_in_7d.price.length > 0
               ? c.sparkline_in_7d.price
@@ -185,31 +137,7 @@ goldAssets.unshift({
                   (_, i) =>
                     c.current_price + Math.sin(i / 2) * (c.current_price * 0.01)
                 ),
-          };
-        });
-
-        // const newAssets: Asset[] = (rawData.crypto || []).map((c) => ({
-        //   name: c.name,
-        //   symbol: c.symbol.toUpperCase(),
-        //   price: c.current_price ?? 0,
-        //   changePct: c.price_change_percentage_24h ?? 0,
-        //   trend:
-        //     c.price_change_percentage_24h > 0
-        //       ? 'up'
-        //       : c.price_change_percentage_24h < 0
-        //         ? 'down'
-        //         : 'neutral',
-        //   image: c.image,
-        //   // Wenn echte Sparkline nicht existiert, generiere Testwerte (leicht variiert)
-        //   sparklineData:
-        //     c.sparkline_in_7d?.price && c.sparkline_in_7d.price.length > 0
-        //       ? c.sparkline_in_7d.price
-        //       : Array.from(
-        //           { length: 10 },
-        //           (_, i) =>
-        //             c.current_price + Math.sin(i / 2) * (c.current_price * 0.01)
-        //         ),
-        // }));
+        }));
 
         // Stocks für Gold-Tab
         const goldAssets: Asset[] = (rawData.stocks || [])
@@ -225,9 +153,8 @@ goldAssets.unshift({
               trend:
                 changePctNum > 0 ? 'up' : changePctNum < 0 ? 'down' : 'neutral',
             };
-          });
+          }); //  HIER XAU/USD HINZUFÜGEN
 
-        //  HIER XAU/USD HINZUFÜGEN
         goldAssets.unshift({
           name: 'Gold (XAU/USD)',
           symbol: 'XAUUSD',
@@ -235,62 +162,52 @@ goldAssets.unshift({
           changePct: 0.35, // Beispielwert für die Veränderung
           trend: 0.35 > 0 ? 'up' : 0.35 < 0 ? 'down' : 'neutral',
           image: '/gold.png', // optional, wenn du ein Icon hast, sonst weglassen
-        });
+        }); // Scalping aus Crypto filtern
 
-        // Scalping aus Crypto filtern
         const scalpingAssets = newAssets.filter(
           (c) => c.symbol === 'SOL' || c.symbol === 'ADA'
         );
 
-        setAssetsByTab((prev) => ({
-          ...prev,
+        setAssetsByTab({
           New: newAssets,
           Gold: goldAssets,
           Scalping: scalpingAssets,
-        }));
-
-        // setAssetsByTab({
-        //   New: newAssets,
-        //   Gold: goldAssets,
-        //   Scalping: scalpingAssets,
-        // });
+        });
       } catch (err) {
         console.error('Failed to fetch markets:', err);
       }
     }
-  }
 
-  fetchMarkets();
-}, []);
-
-
-
-  // --- ENDE FETCH ---
+    fetchMarkets();
+  }, []); // --- ENDE FETCH ---
 
   return (
     <AppShell containerClassName="flex flex-col flex-1 min-h-0 gap-3">
-      {/* LOGO MIT GLOCKE */}
+            {/* LOGO MIT GLOCKE */}
+            
       <TopBar />
-
-      {/* ACCOUNT VALUE */}
+            {/* ACCOUNT VALUE */}
+            
       <AccountValueCard
         value={balance} // vorher 12543.21
         changeSumToday={0} // optional: wir starten mit 0 Veränderung
         changePct={0} // optional: 0%
         currency="EUR"
       />
-
-      {/* MARGIN & LEVEL */}
+            {/* MARGIN & LEVEL */}
+            
       <div className="grid grid-cols-2 gap-4 mt-6">
+                
         <StatusCard label="Margin" value="0,00 €" />
+                
         <StatusCard
           label="Level"
           value={`${levelPercent}%`}
           rightSide={<LevelRing percent={levelPercent} />}
         />
+              
       </div>
-
-      {/* CASH UND DEPOSIT BUTTON */}
+            {/* CASH UND DEPOSIT BUTTON */}
       <StatusCard
         label="Cash"
         value={`${balance.toFixed(2)} €`}
@@ -300,14 +217,16 @@ goldAssets.unshift({
             className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full"
             onClick={() => router.push('/deposit')}
           >
-            Deposit
+              Deposit
           </button>
         }
       />
-
-      {/* GROSSER AKTIENBLOCK */}
+          {/* GROSSER AKTIENBLOCK */}
+            
       <section className="border border-white/5 text-white/50 bg-white/5 rounded-2xl flex flex-col flex-1 min-h-0">
+                
         <div className="px-4 py-4 flex flex-col flex-1 min-h-0">
+                    
           <WatchlistHeader
             tabs={tabs}
             activeTab={activeTab}
@@ -315,8 +234,9 @@ goldAssets.unshift({
             onAddClick={() => console.log('add watchlist')}
             onEditClick={() => console.log('edit watchlists')}
           />
-
+                    
           <div className="mt-4 overflow-y-auto overflow-x-hidden pr-2 flex-1 min-h-0">
+                        
             {assetsByTab[activeTab]?.map((asset) => (
               <AssetRow
                 key={asset.symbol}
@@ -326,112 +246,20 @@ goldAssets.unshift({
                 changePct={asset.changePct}
                 trend={asset.trend}
                 image={asset.image}
+                onClick={() => {
+                  if (asset.symbol === 'XAUUSD') {
+                    router.push(`/search/${asset.symbol.toLowerCase()}`);
+                  }
+                }}
               />
             ))}
+                      
           </div>
+                  
         </div>
+              
       </section>
-
-      {/* PLUSZEICHEN */}
-      <CreateWatchlistSheet
-        open={isCreateSheetOpen}
-        onClose={() => setIsCreateSheetOpen(false)}
-        onCreate={(name) => {
-          // 1) Sheet schließen
-          setIsCreateSheetOpen(false);
-
-          // 2) Watchlist-Tab hinzufügen (falls noch nicht da)
-          setWatchlists((prev) => {
-            const trimmed = name.trim();
-            if (!trimmed) return prev;
-
-            const exists = prev.some(
-              (w) => w.toLowerCase() === trimmed.toLowerCase()
-            );
-            return exists ? prev : [...prev, trimmed];
-          });
-
-          // 3) Leere Liste für diese Watchlist anlegen (falls noch nicht da)
-          setAssetsByTab((prev) => {
-            const trimmed = name.trim();
-            if (!trimmed) return prev;
-
-            return prev[trimmed] ? prev : { ...prev, [trimmed]: [] };
-          });
-
-          // 4) Direkt auf den neuen Tab wechseln
-          setActiveTab(name.trim());
-        }}
-
-        // onCreate={(name) => {
-        //   console.log('Create watchlist:', name);
-        // }}
-      />
-
-      <AddInstrumentSheet
-        open={isAddInstrumentOpen}
-        onClose={() => setIsAddInstrumentOpen(false)}
-        instruments={instrumentUniverse}
-        title={`Add to "${activeTab}"`}
-        onAdd={(instrument) => {
-          setAssetsByTab((prev) => {
-            const list = prev[activeTab] ?? [];
-            const exists = list.some((a) => a.symbol === instrument.symbol);
-            if (exists) return prev;
-
-            return {
-              ...prev,
-              [activeTab]: [...list, instrument],
-            };
-          });
-
-          setIsAddInstrumentOpen(false);
-        }}
-      />
-
-      <WatchlistSettingsSheet
-        open={isWatchlistSettingsOpen}
-        onClose={() => setIsWatchlistSettingsOpen(false)}
-        watchlistName={activeTab}
-        onRename={(nextName) => {
-          const from = activeTab;
-          const to = nextName.trim();
-          if (!to || to === from) return;
-
-          const dupe = watchlists.some(
-            (w) => w.toLowerCase() === to.toLowerCase()
-          );
-          if (dupe) return;
-
-          setWatchlists((prev) => prev.map((w) => (w === from ? to : w)));
-
-          setAssetsByTab((prev) => {
-            const next = { ...prev };
-            next[to] = next[from] ?? [];
-            delete next[from];
-            return next;
-          });
-
-          setActiveTab(to);
-          setIsWatchlistSettingsOpen(false);
-        }}
-        onDelete={() => {
-          const toDelete = activeTab;
-
-          setWatchlists((prev) => prev.filter((w) => w !== toDelete));
-
-          setAssetsByTab((prev) => {
-            const next = { ...prev };
-            delete next[toDelete];
-            return next;
-          });
-
-          const remaining = watchlists.filter((w) => w !== toDelete);
-          setActiveTab(remaining[0] ?? 'New');
-
-          setIsWatchlistSettingsOpen(false);
-        }}
-      />
+          
     </AppShell>
   );
 }
