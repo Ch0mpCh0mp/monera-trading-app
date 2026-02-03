@@ -40,7 +40,6 @@ export default function SocialTabs({ value, onChange }: Props) {
 
     update();
 
-    // optional: falls Fonts später laden, nochmal nachziehen
     const t = window.setTimeout(update, 50);
 
     window.addEventListener('resize', update);
