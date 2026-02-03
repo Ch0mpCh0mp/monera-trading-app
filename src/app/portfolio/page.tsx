@@ -13,10 +13,9 @@ import {
 } from 'lucide-react';
 import TopBar from '../components/TopBar';
 import { formatCurrency } from '@/lib/formatCurrency';
-// import { usePortfolio } from '../context/PortfolioContext';
+import { usePortfolio } from '../context/PortfolioContext';
 import { useRouter } from 'next/navigation';
 import { useAccountSummary } from '@/hooks/useAccountSummary';
-import { usePortfolio } from '../context/PortfolioContext';
 
 function PromoCard({
   title,
@@ -75,8 +74,11 @@ export default function PortfolioPage() {
               <p className="text-white/50 text-sm">
                 Cash: {formatCurrency(balance, 'EUR')}
               </p>
-              <p className={`text-sm font-semibold ${totalPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                PnL: {totalPnL >= 0 ? '+' : ''}{formatCurrency(totalPnL, 'EUR')}
+              <p
+                className={`text-sm font-semibold ${totalPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}
+              >
+                PnL: {totalPnL >= 0 ? '+' : ''}
+                {formatCurrency(totalPnL, 'EUR')}
               </p>
             </div>
           </div>
@@ -123,7 +125,9 @@ export default function PortfolioPage() {
               </button>
 
               <div
-                onClick={() => router.push(`/search/${pos.symbol}?type=${pos.type}`)}
+                onClick={() =>
+                  router.push(`/search/${pos.symbol}?type=${pos.type}`)
+                }
                 className="cursor-pointer"
               >
                 <div className="flex justify-between items-start">
@@ -139,11 +143,16 @@ export default function PortfolioPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className={`font-semibold ${pos.currentPrice >= pos.entryPrice ? 'text-green-400' : 'text-red-400'}`}>
+                    <p
+                      className={`font-semibold ${pos.currentPrice >= pos.entryPrice ? 'text-green-400' : 'text-red-400'}`}
+                    >
                       €{pos.currentPrice.toFixed(2)}
                     </p>
-                    <p className={`text-sm font-semibold mt-1 ${(pos.pnl || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {(pos.pnl || 0) >= 0 ? '+' : ''}€{(pos.pnl || 0).toFixed(2)}
+                    <p
+                      className={`text-sm font-semibold mt-1 ${(pos.pnl || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}
+                    >
+                      {(pos.pnl || 0) >= 0 ? '+' : ''}€
+                      {(pos.pnl || 0).toFixed(2)}
                     </p>
                   </div>
                 </div>
