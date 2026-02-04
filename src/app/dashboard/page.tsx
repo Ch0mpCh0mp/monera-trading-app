@@ -15,7 +15,7 @@ import AddInstrumentSheet from '../components/AddInstrumentSheet';
 import WatchlistSettingsSheet from '../components/WatchlistSettingsSheet';
 
 // =====================
-// Typ für Assets
+// Typen
 // =====================
 interface Asset {
   name: string;
@@ -27,6 +27,7 @@ interface Asset {
 
   // ANDREA, HAB DAS HIER NOCH EINGEFÜGT FÜR SPARKLINE
   sparklineData?: number[];
+  onClick?: () => void;
 }
 
 interface StockRaw {
@@ -35,7 +36,6 @@ interface StockRaw {
   '10. change percent': string;
 }
 
-// Typ für Crypto-Rohdaten
 interface CryptoRaw {
   name: string;
   symbol: string;
@@ -47,12 +47,14 @@ interface CryptoRaw {
   };
 }
 
+// =====================
+// Level Ring
+// =====================
 function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
   const stroke = 4;
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
-  const clampedPercent = Math.max(0, Math.min(100, percent));
-  const offset = circumference * (1 - clampedPercent / 100);
+  const offset = circumference * (1 - percent / 100);
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
@@ -62,7 +64,6 @@ function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
         viewBox={`0 0 ${size} ${size}`}
         className="-rotate-90"
       >
-        {/* HINTERGRUND (inaktiv) */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -71,8 +72,6 @@ function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
           stroke="rgba(0, 166, 62, 0.4)"
           strokeWidth={stroke}
         />
-
-        {/* FORTSCHRITT (aktiv) */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -89,36 +88,29 @@ function LevelRing({ percent, size = 42 }: { percent: number; size?: number }) {
   );
 }
 
+// =====================
+// PAGE
+// =====================
 export default function DashboardPage() {
   const levelPercent = 100;
-  const { balance, setBalance } = usePortfolio();
+  const { balance } = usePortfolio();
   const router = useRouter();
 
-  // RAUSNEHMEN NICHT VERGESSEN
-  // const tabs = ['New', 'Gold', 'Scalping'] as const;
-  // const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>(tabs[0]);
-
+  const tabs = ['New', 'Gold', 'Scalping'] as const;
   const [watchlists, setWatchlists] = useState<string[]>([
     'New',
     'Gold',
     'Scalping',
   ]);
+  // const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>('New');
   const [activeTab, setActiveTab] = useState<string>('New');
-
   const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
 
-  // --- FETCH MARKETS ANSTATT MOCKDATEN ---
-  // const [assetsByTab, setAssetsByTab] = useState<{
-  //   New: Asset[];
-  //   Gold: Asset[];
-  //   Scalping: Asset[];
-  // }>({
-  //   New: [],
-  //   Gold: [],
-  //   Scalping: [],
-  // });
-
-  const [assetsByTab, setAssetsByTab] = useState<Record<string, Asset[]>>({
+  const [assetsByTab, setAssetsByTab] = useState<{
+    New: Asset[];
+    Gold: Asset[];
+    Scalping: Asset[];
+  }>({
     New: [],
     Gold: [],
     Scalping: [],
@@ -135,23 +127,27 @@ export default function DashboardPage() {
     if (!acc.some((x) => x.symbol === item.symbol)) acc.push(item);
     return acc;
   }, [] as Asset[]);
-
+  // =====================
+  // FETCH MARKETS
+  // =====================
   useEffect(() => {
     async function fetchMarkets() {
       try {
         const res = await fetch('/api/markets');
-        const rawData = (await res.json()) as {
-          crypto: any[];
-          stocks: StockRaw[];
-        };
-        console.log('rawData:', rawData);
+        const rawData = await res.json();
 
-        // Crypto für New-Tab (Live-Daten) inkl. Sparkline
-        const newAssets: Asset[] = (rawData.crypto || []).map((c) => ({
+        // ---------- CRYPTO NORMALISIEREN (MERGE-SICHER) ----------
+        const cryptoArray: CryptoRaw[] = Array.isArray(rawData.crypto)
+          ? rawData.crypto
+          : Array.isArray(rawData.crypto?.data)
+            ? rawData.crypto.data
+            : [];
+
+        const newAssets: Asset[] = cryptoArray.map((c) => ({
           name: c.name,
           symbol: c.symbol.toUpperCase(),
-          price: c.current_price || 0,
-          changePct: c.price_change_percentage_24h || 0,
+          price: c.current_price ?? 0,
+          changePct: c.price_change_percentage_24h ?? 0,
           trend:
             c.price_change_percentage_24h > 0
               ? 'up'
@@ -159,26 +155,26 @@ export default function DashboardPage() {
                 ? 'down'
                 : 'neutral',
           image: c.image,
-          // Wenn echte Sparkline nicht existiert, generiere Testwerte (leicht variiert)
-          sparklineData:
-            c.sparkline_in_7d?.price && c.sparkline_in_7d.price.length > 0
-              ? c.sparkline_in_7d.price
-              : Array.from(
-                  { length: 10 },
-                  (_, i) =>
-                    c.current_price + Math.sin(i / 2) * (c.current_price * 0.01)
-                ),
+          sparklineData: c.sparkline_in_7d?.price?.length
+            ? c.sparkline_in_7d.price
+            : Array.from(
+                { length: 10 },
+                (_, i) =>
+                  (c.current_price ?? 0) +
+                  Math.sin(i / 2) * ((c.current_price ?? 0) * 0.01)
+              ),
         }));
 
-        // Stocks für Gold-Tab
-        const goldAssets: Asset[] = (rawData.stocks || [])
-          .filter((s): s is StockRaw => s !== null && s !== undefined)
-          .map((s) => {
+        // ---------- STOCKS ----------
+        const goldAssets: Asset[] = (rawData.stocks ?? [])
+          .filter(Boolean)
+          .map((s: StockRaw) => {
             const changePctNum =
               Number(s['10. change percent']?.replace('%', '')) || 0;
+
             return {
-              name: s['01. symbol'] || 'Unknown',
-              symbol: s['01. symbol'] || 'UNK',
+              name: s['01. symbol'],
+              symbol: s['01. symbol'],
               price: Number(s['05. price']) || 0,
               changePct: changePctNum,
               trend:
@@ -186,33 +182,26 @@ export default function DashboardPage() {
             };
           });
 
-        //  HIER XAU/USD HINZUFÜGEN
+        // ---------- XAU/USD MANUELL ----------
         goldAssets.unshift({
           name: 'Gold (XAU/USD)',
           symbol: 'XAUUSD',
-          price: 4950.12, // Hier kannst du einen aktuellen Goldpreis einsetzen
-          changePct: 0.35, // Beispielwert für die Veränderung
-          trend: 0.35 > 0 ? 'up' : 0.35 < 0 ? 'down' : 'neutral',
-          image: '/gold.png', // optional, wenn du ein Icon hast, sonst weglassen
+          price: 4950.12,
+          changePct: 0.35,
+          trend: 'up',
+          image: '/gold.png',
         });
 
-        // Scalping aus Crypto filtern
+        // ---------- SCALPING ----------
         const scalpingAssets = newAssets.filter(
-          (c) => c.symbol === 'SOL' || c.symbol === 'ADA'
+          (a) => a.symbol === 'SOL' || a.symbol === 'ADA'
         );
 
-        setAssetsByTab((prev) => ({
-          ...prev,
+        setAssetsByTab({
           New: newAssets,
           Gold: goldAssets,
           Scalping: scalpingAssets,
-        }));
-
-        // setAssetsByTab({
-        //   New: newAssets,
-        //   Gold: goldAssets,
-        //   Scalping: scalpingAssets,
-        // });
+        });
       } catch (err) {
         console.error('Failed to fetch markets:', err);
       }
@@ -223,20 +212,20 @@ export default function DashboardPage() {
 
   // --- ENDE FETCH ---
 
+  // =====================
+  // RENDER
+  // =====================
   return (
     <AppShell containerClassName="flex flex-col flex-1 min-h-0 gap-3">
-      {/* LOGO MIT GLOCKE */}
       <TopBar />
 
-      {/* ACCOUNT VALUE */}
       <AccountValueCard
-        value={balance} // vorher 12543.21
-        changeSumToday={0} // optional: wir starten mit 0 Veränderung
-        changePct={0} // optional: 0%
+        value={balance}
+        changeSumToday={0}
+        changePct={0}
         currency="EUR"
       />
 
-      {/* MARGIN & LEVEL */}
       <div className="grid grid-cols-2 gap-4 mt-6">
         <StatusCard label="Margin" value="0,00 €" />
         <StatusCard
@@ -246,7 +235,6 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* CASH UND DEPOSIT BUTTON */}
       <StatusCard
         label="Cash"
         value={`${balance.toFixed(2)} €`}
@@ -322,6 +310,13 @@ export default function DashboardPage() {
           {/* <div className="mt-4 overflow-y-auto overflow-x-hidden pr-2 flex-1 min-h-0">
             {assetsByTab[activeTab]?.map((asset) => (
               <AssetRow
+              {...asset}
+onClick={() => {
+  if (asset?.symbol === 'XAUUSD') {
+    router.push(`/search/${asset.symbol.toLowerCase()}`);
+  }
+}}
+
                 key={asset.symbol}
                 name={asset.name}
                 symbol={asset.symbol}
