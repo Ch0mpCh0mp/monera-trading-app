@@ -15,6 +15,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Logo from '../components/Logo';
 
 type MenuRowProps = {
   icon: React.ElementType;
@@ -62,16 +63,20 @@ function Pill({ label, active, onClick }: PillProps) {
       type="button"
       onClick={onClick}
       className={[
-        'rounded-2xl px-4 py-3 border text-sm w-full',
-        'flex items-center justify-center gap-2',
+        'w-full rounded-2xl px-3 py-3.5',
+        'flex flex-col items-center justify-center gap-1.5',
+        'border bg-white/5',
+        'shadow-[0_0_0_1px_rgba(255,255,255,0.03)]',
         active
-          ? 'border-green-500/70 bg-green-500/10 text-white'
-          : 'border-white/10 bg-white/5 text-white/85',
+          ? 'border-green-500/70 bg-green-500/12 text-white'
+          : 'border-white/12 text-white/85 hover:bg-white/7',
+        'active:scale-[0.99] transition',
       ].join(' ')}
     >
-      <span className="w-6 h-6 rounded-full bg-black/40 border border-white/10 flex items-center justify-center text-xs">
-        A
+      <span className="flex items-center justify-center">
+        <Logo size={20} />
       </span>
+
       <span className="font-medium">{label}</span>
     </button>
   );
