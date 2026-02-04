@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Logo from '../components/Logo';
+import { useState } from 'react';
 
 type MenuRowProps = {
   icon: React.ElementType;
@@ -37,7 +38,7 @@ function MenuRow({
       className="w-full flex items-center gap-3 py-4 text-left rounded-xl px-2 active:bg-white/5 hover:bg-white/5 transition"
     >
       <span className="shrink-0 w-9 h-9 rounded-lg border border-white/10 flex items-center justify-center">
-        <Icon size={24} strokeWidth={1.5}  className="opacity-90" />
+        <Icon size={24} strokeWidth={1.5} className="opacity-90" />
       </span>
 
       <span className="flex-1 text-md text-white/85">{label}</span>
@@ -85,16 +86,14 @@ function Pill({ label, active, onClick }: PillProps) {
 export default function MenuPage() {
   const router = useRouter();
 
+  const [mode, setMode] = useState<'Invest' | 'CFD' | 'Crypto'>('CFD');
+
   return (
     <AppShell>
       {/* Top row (account + refresh) */}
       <header className="flex items-center justify-between pt-2">
         <div className="flex items-center gap-3">
-          <UserCircle2
-            size={30}
-            strokeWidth={1.25}
-            className="text-white/90"
-          />
+          <UserCircle2 size={30} strokeWidth={1.25} className="text-white/90" />
           <div className="leading-tight">
             <p className="text-lg text-white/85">demo@user.com</p>
           </div>
@@ -111,9 +110,21 @@ export default function MenuPage() {
 
       {/* Pills */}
       <section className="mt-5 grid grid-cols-3 gap-3">
-        <Pill label="Invest" />
-        <Pill label="CFD" active />
-        <Pill label="Crypto" />
+        <Pill
+          label="Invest"
+          active={mode === 'Invest'}
+          onClick={() => setMode('Invest')}
+        />
+        <Pill
+          label="CFD"
+          active={mode === 'CFD'}
+          onClick={() => setMode('CFD')}
+        />
+        <Pill
+          label="Crypto"
+          active={mode === 'Crypto'}
+          onClick={() => setMode('Crypto')}
+        />
       </section>
 
       {/* Menu list */}
