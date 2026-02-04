@@ -35,10 +35,10 @@ function MenuRow({
     <button
       type="button"
       onClick={onClick}
-      className="w-full flex items-center gap-3 py-4 text-left rounded-xl px-2 active:bg-white/5 hover:bg-white/5 transition"
+      className="w-full flex items-center gap-3 py-4 text-left px-4 active:bg-white/5 hover:bg-white/5 transition"
     >
-      <span className="shrink-0 w-9 h-9 rounded-lg border border-white/10 flex items-center justify-center">
-        <Icon size={24} strokeWidth={1.5} className="opacity-90" />
+      <span className="shrink-0 w-9 h-9 rounded-lg bg-black/20 border border-white/10 flex items-center justify-center">
+        <Icon size={24} strokeWidth={1.5} className="opacity-75" />
       </span>
 
       <span className="flex-1 text-md text-white/85">{label}</span>
@@ -128,7 +128,7 @@ export default function MenuPage() {
       </section>
 
       {/* Menu list */}
-      <section className="mt-6 divide-y divide-white/10">
+      <section className="mt-6 rounded-2xl border border-white/10 bg-white/5 overflow-hidden divide-y divide-white/10">
         <MenuRow icon={BadgePercent} label="Interest on cash" />
         <MenuRow icon={Wallet} label="Manage funds" />
         <MenuRow icon={PlaySquare} label="Videos" />
