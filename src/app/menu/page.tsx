@@ -33,8 +33,7 @@ function MenuRow({
     <button
       type="button"
       onClick={onClick}
-      className="w-full flex items-center gap-3 py-4 text-left rounded-xl -mx-2 px-2
-           active:bg-white/5 hover:bg-white/5 transition"
+      className="w-full flex items-center gap-3 py-4 text-left rounded-xl px-2 active:bg-white/5 hover:bg-white/5 transition"
     >
       <span className="shrink-0 w-9 h-9 rounded-lg border border-white/10 flex items-center justify-center">
         <Icon size={18} className="opacity-90" />
@@ -63,7 +62,7 @@ function Pill({ label, active, onClick }: PillProps) {
       type="button"
       onClick={onClick}
       className={[
-        'flex-1 min-w-[92px] rounded-2xl px-4 py-3 border text-sm',
+        'rounded-2xl px-4 py-3 border text-sm w-full',
         'flex items-center justify-center gap-2',
         active
           ? 'border-green-500/70 bg-green-500/10 text-white'
@@ -102,7 +101,7 @@ export default function MenuPage() {
       </header>
 
       {/* Pills */}
-      <section className="mt-5 flex gap-3">
+      <section className="mt-5 grid grid-cols-3 gap-3">
         <Pill label="Invest" />
         <Pill label="CFD" active />
         <Pill label="Crypto" />
