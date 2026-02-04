@@ -35,8 +35,7 @@ function PromoCard({
         <button
           type="button"
           onClick={onClick}
-          className="
-            mt-3 inline-flex items-center rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white text-xs  px-4 py-2"
+          className="mt-3 inline-flex items-center rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white text-xs  px-4 py-2"
         >
           {cta}
         </button>
@@ -50,8 +49,16 @@ function PromoCard({
 }
 
 export default function PortfolioPage() {
-  const { accountValue, levelPct, currency } = useAccountSummary();
+  // HIER changesumToday eingebaut
+  const { accountValue, levelPct, currency, changeSumToday } =
+    useAccountSummary();
+  const equity = accountValue;
+  const balance = accountValue; // vorerst identisch
+  const totalPnL = changeSumToday ?? 0;
   // const { balance: accountValue, levelPct, currency } = usePortfolio(); // aus PortfolioContext
+
+  const positions: any[] = [];
+
   const router = useRouter();
 
   return (
