@@ -40,7 +40,7 @@ function MenuRow({
         <Icon size={24} className="opacity-90" />
       </span>
 
-      <span className="flex-1 text-sm text-white/90">{label}</span>
+      <span className="flex-1 text-md text-white/90">{label}</span>
 
       {trailing === 'external' ? (
         <ExternalLink size={18} className="opacity-70" />
