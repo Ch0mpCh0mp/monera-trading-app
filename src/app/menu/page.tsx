@@ -37,10 +37,10 @@ function MenuRow({
       className="w-full flex items-center gap-3 py-4 text-left rounded-xl px-2 active:bg-white/5 hover:bg-white/5 transition"
     >
       <span className="shrink-0 w-9 h-9 rounded-lg border border-white/10 flex items-center justify-center">
-        <Icon size={24} className="opacity-90" />
+        <Icon size={24} strokeWidth={1.5}  className="opacity-90" />
       </span>
 
-      <span className="flex-1 text-md text-white/90">{label}</span>
+      <span className="flex-1 text-md text-white/85">{label}</span>
 
       {trailing === 'external' ? (
         <ExternalLink size={18} className="opacity-70" />
