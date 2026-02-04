@@ -129,6 +129,45 @@ export default function MenuPage() {
 
       {/* Menu list */}
       <section className="mt-6 rounded-2xl border border-white/10 bg-white/5 overflow-hidden divide-y divide-white/10">
+        <MenuRow
+          icon={BadgePercent}
+          label="Interest on cash"
+          onClick={() => router.push('/cash-interest')}
+        />
+        <MenuRow
+          icon={Wallet}
+          label="Manage funds"
+          onClick={() => router.push('/funds')}
+        />
+        <MenuRow
+          icon={PlaySquare}
+          label="Videos"
+          onClick={() => router.push('/videos')}
+        />
+        <MenuRow
+          icon={GraduationCap}
+          label="Learn"
+          trailing="external"
+          onClick={() => router.push('/learn')}
+        />
+        <MenuRow
+          icon={CalendarDays}
+          label="Economic calendar"
+          onClick={() => router.push('/calendar')}
+        />
+        <MenuRow
+          icon={Bell}
+          label="Price alerts"
+          onClick={() => router.push('/alerts')}
+        />
+        <MenuRow
+          icon={Clock}
+          label="History"
+          onClick={() => router.push('/history')}
+        />
+      </section>
+
+      {/* <section className="mt-6 rounded-2xl border border-white/10 bg-white/5 overflow-hidden divide-y divide-white/10">
         <MenuRow icon={BadgePercent} label="Interest on cash" />
         <MenuRow icon={Wallet} label="Manage funds" />
         <MenuRow icon={PlaySquare} label="Videos" />
@@ -136,7 +175,7 @@ export default function MenuPage() {
         <MenuRow icon={CalendarDays} label="Economic calendar" />
         <MenuRow icon={Bell} label="Price alerts" />
         <MenuRow icon={Clock} label="History" />
-      </section>
+      </section> */}
 
       {/* Primary CTA */}
       <div className="mt-8 pb-2">
