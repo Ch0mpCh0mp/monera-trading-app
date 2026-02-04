@@ -74,7 +74,7 @@ function Pill({ label, active, onClick }: PillProps) {
       ].join(' ')}
     >
       <span className="flex items-center justify-center">
-        <Logo size={20} />
+        <Logo size={24} />
       </span>
 
       <span className="font-medium">{label}</span>
@@ -90,9 +90,13 @@ export default function MenuPage() {
       {/* Top row (account + refresh) */}
       <header className="flex items-center justify-between pt-2">
         <div className="flex items-center gap-3">
-          <UserCircle2 size={26} className="text-white/90" />
+          <UserCircle2
+            size={30}
+            strokeWidth={1.25}
+            className="text-white/90"
+          />
           <div className="leading-tight">
-            <p className="text-sm text-white/85">demo@user.com</p>
+            <p className="text-lg text-white/85">demo@user.com</p>
           </div>
         </div>
 
