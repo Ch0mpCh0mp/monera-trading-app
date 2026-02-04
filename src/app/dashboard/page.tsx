@@ -1,15 +1,14 @@
 'use client';
 
-import Link from 'next/link';
-import StatusCard from '../components/StatusCard';
-import AssetRow from '../components/AssetRow';
 import { useState, useEffect } from 'react';
-import AccountValueCard from '../components/AccountValueCard';
-import WatchlistHeader from '../components/WatchlistHeader';
-import TopBar from '../components/TopBar';
-import AppShell from '../components/layout/AppShell';
-import { usePortfolio } from '../context/PortfolioContext';
 import { useRouter } from 'next/navigation';
+import AppShell from '../components/layout/AppShell';
+import TopBar from '../components/TopBar';
+import AccountValueCard from '../components/AccountValueCard';
+import StatusCard from '../components/StatusCard';
+import WatchlistHeader from '../components/WatchlistHeader';
+import AssetRow from '../components/AssetRow';
+import { usePortfolio } from '../context/PortfolioContext';
 
 // =====================
 // Typen
@@ -37,9 +36,7 @@ interface CryptoRaw {
   current_price: number;
   price_change_percentage_24h: number;
   image: string;
-  sparkline_in_7d?: {
-    price: number[];
-  };
+  sparkline_in_7d?: { price: number[] };
 }
 
 // =====================
@@ -93,97 +90,92 @@ export default function DashboardPage() {
     New: Asset[];
     Gold: Asset[];
     Scalping: Asset[];
-  }>({
-    New: [],
-    Gold: [],
-    Scalping: [],
-  });
+  }>({ New: [], Gold: [], Scalping: [] });
 
   // =====================
   // FETCH MARKETS
   // =====================
-  useEffect(() => {
-    async function fetchMarkets() {
-      try {
-        const res = await fetch('/api/markets');
-        const rawData = await res.json();
+ // ...
+useEffect(() => {
+  async function fetchMarkets() {
+    try {
+      const res = await fetch('/api/markets');
+      const rawData = await res.json();
+      console.log('Markets fetched:', rawData);
 
-        // ---------- CRYPTO NORMALISIEREN (MERGE-SICHER) ----------
-        const cryptoArray: CryptoRaw[] = Array.isArray(rawData.crypto)
-          ? rawData.crypto
-          : Array.isArray(rawData.crypto?.data)
-          ? rawData.crypto.data
-          : [];
+      // ---------- CRYPTO ----------
+      const cryptoArray: CryptoRaw[] = Array.isArray(rawData.crypto)
+        ? rawData.crypto
+        : Array.isArray(rawData.crypto?.data)
+        ? rawData.crypto.data
+        : [];
 
-        const newAssets: Asset[] = cryptoArray.map((c) => ({
-          name: c.name,
-          symbol: c.symbol.toUpperCase(),
-          price: c.current_price ?? 0,
-          changePct: c.price_change_percentage_24h ?? 0,
-          trend:
-            c.price_change_percentage_24h > 0
-              ? 'up'
-              : c.price_change_percentage_24h < 0
-              ? 'down'
-              : 'neutral',
-          image: c.image,
-          sparklineData:
-            c.sparkline_in_7d?.price?.length
-              ? c.sparkline_in_7d.price
-              : Array.from({ length: 10 }, (_, i) =>
-                  (c.current_price ?? 0) +
-                  Math.sin(i / 2) * ((c.current_price ?? 0) * 0.01)
-                ),
-        }));
+      const newAssets: Asset[] = cryptoArray.map((c) => ({
+        name: c.name,
+        symbol: c.symbol.toUpperCase(),
+        price: c.current_price ?? 0,
+        changePct: c.price_change_percentage_24h ?? 0,
+        trend:
+          c.price_change_percentage_24h > 0
+            ? 'up'
+            : c.price_change_percentage_24h < 0
+            ? 'down'
+            : 'neutral',
+        image: c.image,
+        sparklineData:
+          c.sparkline_in_7d?.price?.length
+            ? c.sparkline_in_7d.price
+            : Array.from({ length: 10 }, (_, i) =>
+                (c.current_price ?? 0) + Math.sin(i / 2) * ((c.current_price ?? 0) * 0.01)
+              ),
+      }));
 
-        // ---------- STOCKS ----------
-        const goldAssets: Asset[] = (rawData.stocks ?? [])
-          .filter(Boolean)
-          .map((s: StockRaw) => {
-            const changePctNum =
-              Number(s['10. change percent']?.replace('%', '')) || 0;
+      // ---------- GOLD / XAU/USD ----------
+      // nur ein Asset, kein Duplikat
+      const goldAsset: Asset = {
+        name: 'Gold (XAU/USD)',
+        symbol: 'XAUUSD',
+        price: rawData.gold?.price ?? 4950,
+        changePct: rawData.gold?.changePct ?? 0,
+        trend: rawData.gold?.trend ?? 'up',
+        image: '/gold.png',
+      };
 
-            return {
-              name: s['01. symbol'],
-              symbol: s['01. symbol'],
-              price: Number(s['05. price']) || 0,
-              changePct: changePctNum,
-              trend:
-                changePctNum > 0
-                  ? 'up'
-                  : changePctNum < 0
-                  ? 'down'
-                  : 'neutral',
-            };
-          });
+      // ---------- SCALPING ----------
+      const scalpingAssets = newAssets.filter(
+        (a) => a.symbol === 'SOL' || a.symbol === 'ADA'
+      );
 
-        // ---------- XAU/USD MANUELL ----------
-        goldAssets.unshift({
-          name: 'Gold (XAU/USD)',
-          symbol: 'XAUUSD',
-          price: 4950.12,
-          changePct: 0.35,
-          trend: 'up',
-          image: '/gold.png',
-        });
+      // ---------- SET STATE ----------
+      setAssetsByTab({
+  New: newAssets.length ? newAssets : [], // immer Array
+  Gold: goldAsset ? [goldAsset] : [
+    { name: 'Gold (XAU/USD)', symbol: 'XAUUSD', price: 4950, changePct: 0, trend: 'neutral', image: '/gold.png' }
+  ],
+  Scalping: scalpingAssets.length ? scalpingAssets : [],
+});
 
-        // ---------- SCALPING ----------
-        const scalpingAssets = newAssets.filter(
-          (a) => a.symbol === 'SOL' || a.symbol === 'ADA'
-        );
-
-        setAssetsByTab({
-          New: newAssets,
-          Gold: goldAssets,
-          Scalping: scalpingAssets,
-        });
-      } catch (err) {
-        console.error('Failed to fetch markets:', err);
-      }
+    } catch (err) {
+      console.error('Failed to fetch markets:', err);
+      setAssetsByTab({
+        New: [],
+        Gold: [
+          {
+            name: 'Gold (XAU/USD)',
+            symbol: 'XAUUSD',
+            price: 4950,
+            changePct: 0,
+            trend: 'up',
+            image: '/gold.png',
+          },
+        ],
+        Scalping: [],
+      });
     }
+  }
 
-    fetchMarkets();
-  }, []);
+  fetchMarkets();
+}, []);
 
   // =====================
   // RENDER
@@ -232,19 +224,18 @@ export default function DashboardPage() {
           />
 
           <div className="mt-4 overflow-y-auto pr-2 flex-1 min-h-0">
-            {assetsByTab[activeTab].map((asset) => (
-              <AssetRow
-              {...asset}
-onClick={() => {
-  if (asset?.symbol === 'XAUUSD') {
-    router.push(`/search/${asset.symbol.toLowerCase()}`);
-  }
-}}
+            {assetsByTab[activeTab]?.map((asset) => (
+  <AssetRow
+    key={asset.symbol ?? asset.name} // Fallback Key
+    {...asset}
+    onClick={() => {
+      if (asset?.symbol === 'XAUUSD') {
+        router.push(`/search/${asset.symbol.toLowerCase()}`);
+      }
+    }}
+  />
+))}
 
-                key={asset.symbol}
-               
-              />
-            ))}
           </div>
         </div>
       </section>
