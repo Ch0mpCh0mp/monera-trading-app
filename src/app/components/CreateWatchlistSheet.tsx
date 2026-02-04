@@ -35,8 +35,11 @@ export default function CreateWatchlistSheet({
 
 // WENN GESCHLOSSEN, NAME ZURÜCKSETZEN
   useEffect(() => {
-    if (!open) setName('');
-  }, [open]);
+  if (!open) {
+    const t = setTimeout(() => setName(''), 0);
+    return () => clearTimeout(t);
+  }
+}, [open]);
 
   if (!open) return null;
 
