@@ -22,7 +22,7 @@ export default function FeaturedConversationCard({
   secondaryCta,
 }: Props) {
   return (
-    <article className="rounded-2xl border border-white/10 bg-white/5 p-4">
+    <article className="h-[280px] flex flex-col rounded-2xl border border-white/10 bg-white/5 p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-full bg-white/10" />
@@ -40,7 +40,7 @@ export default function FeaturedConversationCard({
       <div className="mt-3 grid grid-cols-[1fr_96px] gap-3">
         <div className="min-w-0">
           <h3 className="text-white font-semibold leading-snug">{headline}</h3>
-          <p className="mt-1 text-white/60 text-sm leading-relaxed">{excerpt}</p>
+          <p className="mt-1 text-white/60 text-sm leading-relaxed line-clamp-2">{excerpt}</p>
 
           <div className="mt-3 flex items-center gap-4 text-white/50 text-xs">
             <span>♥ {stats.likes}</span>
