@@ -96,6 +96,16 @@ export default function SocialScreen() {
       <section className="mt-4 pb-8">
         {tab === 'feed' ? (
           <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/10">
+                🔥
+              </span>
+
+              <h2 className="text-white font-semibold tracking-wide">
+                {featuredCards[0].sectionTitle}
+              </h2>
+            </div>
+
             <div
               className={`flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}
               style={{ WebkitOverflowScrolling: 'touch' }}
