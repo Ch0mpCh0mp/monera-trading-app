@@ -11,7 +11,7 @@ import FloatingComposeButton from './FloatingComposeButton';
 export default function SocialScreen() {
   const [tab, setTab] = useState<SocialTabKey>('feed');
 
-  // Dummy Content (später durch echte Daten ersetzen)
+  // MOCK DATEN HIER
   const featuredCards = useMemo(
     () => [
       {
@@ -23,8 +23,8 @@ export default function SocialScreen() {
         stats: { likes: 161, comments: 301, time: '1T' },
         groupName: 'ETFs',
         groupMembers: '95.000 Mitglieder',
-        primaryCta: 'Join',
-        secondaryCta: 'Follow',
+        join: 'Join',
+        follow: 'Follow',
       },
       {
         sectionTitle: 'Most Popular',
@@ -34,8 +34,8 @@ export default function SocialScreen() {
         stats: { likes: 98, comments: 120, time: '6h' },
         groupName: 'Macro',
         groupMembers: '41.000 Mitglieder',
-        primaryCta: 'Join',
-        secondaryCta: 'Follow',
+        join: 'Join',
+        follow: 'Follow',
       },
       {
         sectionTitle: 'Most Popular',
@@ -46,8 +46,8 @@ export default function SocialScreen() {
         stats: { likes: 161, comments: 301, time: '1T' },
         groupName: 'ETFs',
         groupMembers: '95.000 Mitglieder',
-        primaryCta: 'Join',
-        secondaryCta: 'Follow',
+        join: 'Join',
+        follow: 'Follow',
       },
       {
         sectionTitle: 'Most Popular',
@@ -57,8 +57,8 @@ export default function SocialScreen() {
         stats: { likes: 98, comments: 120, time: '6h' },
         groupName: 'Macro',
         groupMembers: '41.000 Mitglieder',
-        primaryCta: 'Join',
-        secondaryCta: 'Follow',
+        join: 'Join',
+        follow: 'Follow',
       },
     ],
     []
@@ -128,8 +128,7 @@ export default function SocialScreen() {
 
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
               <p className="text-white/70 text-sm">
-                Platzhalter: Hier kommen eure Communities (Listen/Filter/Search)
-                rein.
+                Hier nachher unsere Communities rein machen
               </p>
             </div>
           </div>
