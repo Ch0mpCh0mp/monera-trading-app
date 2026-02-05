@@ -8,6 +8,7 @@ type Props = {
   excerpt: string;
   stats: { likes: number; comments: number; time: string };
   coverImageUrl?: string;
+  groupImageUrl?: string;
   groupName: string;
   groupMembers: string;
   join: string;
@@ -23,13 +24,15 @@ export default function FeaturedConversationCard({
   excerpt,
   stats,
   coverImageUrl,
+  groupImageUrl,
   groupName,
   groupMembers,
- join,
+  join,
 }: Props) {
   return (
     <article className="h-[280px] flex flex-col rounded-2xl border border-white/10 bg-white/5 p-4">
       <div className="flex items-start justify-between gap-3">
+        {/* AUTHOR ZEILE */}
         <div className="flex items-center gap-3">
           <div className="relative h-10 w-10 rounded-full bg-white/10 overflow-hidden shrink-0">
             {authorAvatarUrl ? (
@@ -55,6 +58,7 @@ export default function FeaturedConversationCard({
         </button>
       </div>
 
+      {/* TITELZEILEN BEREICH */}
       <div className="mt-3 grid grid-cols-[1fr_96px] gap-3">
         <div className="min-w-0">
           <h3 className="text-white font-semibold leading-snug">{headline}</h3>
@@ -62,6 +66,7 @@ export default function FeaturedConversationCard({
             {excerpt}
           </p>
 
+          {/* LIKE UND KOMMENTARE ZEILE */}
           <div className="mt-3 flex items-center gap-4 text-white/50 text-xs">
             <span>♥ {stats.likes}</span>
             <span>💬 {stats.comments}</span>
@@ -80,8 +85,19 @@ export default function FeaturedConversationCard({
         <div className="h-px bg-white/10" />
 
         <div className="mt-4 flex items-center justify-between gap-3">
+          {/* GRUPPEN ZEILE */}
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-white/10" />
+            <div className="relative h-9 w-9 rounded-xl bg-white/10 overflow-hidden shrink-0">
+              {groupImageUrl ? (
+                <Image
+                  src={groupImageUrl}
+                  alt={`${groupName} icon`}
+                  fill
+                  className="object-cover"
+                />
+              ) : null}
+            </div>
+
             <div className="leading-tight">
               <p className="text-white font-medium">{groupName}</p>
               <p className="text-white/50 text-xs">{groupMembers}</p>
