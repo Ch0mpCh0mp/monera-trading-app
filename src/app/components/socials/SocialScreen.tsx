@@ -70,16 +70,34 @@ export default function SocialScreen() {
     []
   );
 
-  const newsPost = useMemo(
-    () => ({
-      badge: 'USA 30 News',
-      verified: true,
-      meta: 'Official Top News',
-      time: '1S',
-      title:
-        'Traders Await Labor Market Data as US Equity Futures Waver Pre-Bell',
-      body: 'US equity futures were little changed pre-bell Wednesday as traders awaited labor market data...',
-    }),
+  const newsPosts = useMemo(
+    () => [
+      {
+        badge: 'USA 30 News',
+        verified: true,
+        meta: 'Official Top News',
+        time: '1S',
+        title:
+          'Traders Await Labor Market Data as US Equity Futures Waver Pre-Bell',
+        body: 'US equity futures were little changed pre-bell Wednesday as traders awaited labor market data...',
+      },
+      {
+        badge: 'Market Brief',
+        verified: false,
+        meta: 'Top Story',
+        time: '12m',
+        title: 'Oil edges higher as traders weigh supply risks',
+        body: 'Crude prices rose modestly as markets assessed geopolitical risk and inventory data...',
+      },
+      {
+        badge: 'Macro',
+        verified: true,
+        meta: 'Official',
+        time: '1h',
+        title: 'Euro dips after inflation surprise',
+        body: 'The euro weakened as fresh data shifted expectations around rate cuts...',
+      },
+    ],
     []
   );
 
@@ -128,7 +146,11 @@ export default function SocialScreen() {
 
             <div className="h-px bg-white/10" />
 
-            <NewsPostCard {...newsPost} />
+            <div className="space-y-3">
+              {newsPosts.map((post, idx) => (
+                <NewsPostCard key={idx} {...post} />
+              ))}
+            </div>
           </div>
         ) : (
           <div className="space-y-3">
