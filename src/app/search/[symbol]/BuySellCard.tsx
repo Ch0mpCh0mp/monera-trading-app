@@ -1,31 +1,10 @@
-<<<<<<< HEAD
-'use client';
-
-=======
 import { useState } from 'react';
->>>>>>> origin/main
 import type { ReactNode } from 'react';
 
 
 type BuySellCardProps = {
   sellLabel?: string;
   buyLabel?: string;
-<<<<<<< HEAD
-  sellPrice: number;
-  buyPrice: number;
-  assetIcon?: ReactNode;
-  assetIconAriaLabel?: string;
-
-  // 🔹 Interaktive Buttons
-  onBuy?: () => void;
-  onSell?: () => void;
-  position?: {
-    amount: number;
-    entryPrice: number;
-    pnl: number;
-    currentPrice: number;
-  };
-=======
   sellPrice: number; // Ändere von string zu number für numerische Berechnungen
   buyPrice: number; // Ändere von string zu number für numerische Berechnungen
   assetIcon?: ReactNode;
@@ -35,7 +14,6 @@ type BuySellCardProps = {
   onSell?: (amount: number) => void;
 
   position?: PositionPreview;
->>>>>>> origin/main
   onClosePosition?: () => void;
 };
 
@@ -69,38 +47,18 @@ export default function BuySellCard({
         <div className="grid grid-cols-2 overflow-hidden">
           {/* LINKS – SELL */}
           <div className="rounded-l-2xl bg-green-600 px-4 py-4 pr-10">
-<<<<<<< HEAD
-            <button
-              onClick={onSell}
-              className="text-md font-semibold text-white/90 w-full text-left"
-            >
-              {sellLabel}
-            </button>
-            <p className="mt-1 text-lg font-semibold text-white">€{sellPrice.toFixed(2)}</p>
-=======
             <p className="text-md font-semibold text-white/90">{sellLabel}</p>
             <p className="mt-1 text-lg font-semibold text-white">
               {safeSellPrice.toFixed(2)}
             </p>
->>>>>>> origin/main
           </div>
 
           {/* RECHTS – BUY */}
           <div className="rounded-r-2xl bg-green-600 px-4 py-4 pl-10 text-right">
-<<<<<<< HEAD
-            <button
-              onClick={onBuy}
-              className="text-md font-semibold text-white/90 w-full text-right"
-            >
-              {buyLabel}
-            </button>
-            <p className="mt-1 text-lg font-semibold text-white">€{buyPrice.toFixed(2)}</p>
-=======
             <p className="text-md font-semibold text-white/90">{buyLabel}</p>
             <p className="mt-1 text-lg font-semibold text-white">
               {safeBuyPrice.toFixed(2)}
             </p>
->>>>>>> origin/main
           </div>
         </div>
 
