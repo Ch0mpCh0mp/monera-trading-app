@@ -1,37 +1,59 @@
 'use client';
 
-<<<<<<< HEAD
-import React, { useState, useContext } from 'react';
-=======
-import { use, useMemo } from 'react';
->>>>>>> origin/main
+import React, { useState, useContext, useMemo } from 'react';
+
 import AppShell from '@/app/components/layout/AppShell';
 import SymbolHeader from './SymbolHeader';
 import BuySellCard from './BuySellCard';
 import { Gem } from 'lucide-react';
 import PerformanceRow from './PerformanceRow';
 import ChartCard, { type ChartPoint } from './ChartCard';
-<<<<<<< HEAD
 import TradeModal from './TradeModal';
+
 import { usePortfolio } from '@/app/context/PortfolioContext';
-import { useParams } from 'next/navigation';
 import { MarketsContext } from '@/app/context/MarketsContext';
+import { useParams } from 'next/navigation';
 
 export default function SymbolPage() {
+  /* =====================
+     PARAMS
+  ===================== */
   const params = useParams();
   const rawSymbol = params?.symbol;
   const symbol = Array.isArray(rawSymbol) ? rawSymbol[0] : rawSymbol;
 
+  const safeSymbol = symbol?.toUpperCase() ?? '';
+
+  /* =====================
+     CONTEXTS
+  ===================== */
   const { buy, sell, positions, closePosition } = usePortfolio();
   const { crypto, stocks, gold } = useContext(MarketsContext);
 
-  const allAssets = [...crypto, ...stocks, ...gold];
-  const asset = allAssets.find(a => a.symbol === symbol?.toUpperCase());
+  /* =====================
+     STATE
+  ===================== */
+  const [tradeType, setTradeType] = useState<'buy' | 'sell' | null>(null);
+
+  /* =====================
+     DATA
+  ===================== */
+  const allAssets = useMemo(
+    () => [...crypto, ...stocks, ...gold],
+    [crypto, stocks, gold]
+  );
+
+  const asset = useMemo(
+    () => allAssets.find(a => a.symbol === safeSymbol),
+    [allAssets, safeSymbol]
+  );
+
   const currentPrice = asset?.price ?? 0;
 
-  const assetPosition = positions.find(p => p.symbol === symbol?.toUpperCase());
-
-  const [tradeType, setTradeType] = useState<'buy' | 'sell' | null>(null);
+  const assetPosition = useMemo(
+    () => positions.find(p => p.symbol === safeSymbol),
+    [positions, safeSymbol]
+  );
 
   const positionPreview = assetPosition
     ? {
@@ -41,38 +63,10 @@ export default function SymbolPage() {
         currentPrice: assetPosition.currentPrice,
       }
     : undefined;
-=======
-import { usePortfolio } from '../../context/PortfolioContext';
 
-// =====================
-// PAGE
-// =====================
-export default function SymbolPage({
-  params,
-}: {
-  params: Promise<{ symbol: string }>;
-}) {
-  // ✅ Next.js 15: params korrekt entpacken
-  const { symbol } = use(params);
->>>>>>> origin/main
-
-  const { buy, sell, positions, balance } = usePortfolio();
-
-  // =====================
-  // ABGELEITETER STATE (KEIN useEffect, KEIN setState)
-  // =====================
-  const asset = useMemo(
-    () => positions.find(p => p.symbol === symbol),
-    [positions, symbol]
-  );
-
-  const sellPrice = asset ? asset.avgPrice - 0.5 : 4442.64;
-  const buyPrice  = asset ? asset.avgPrice + 0.5 : 4443.65;
-  const position  = asset ? asset.amount : 0;
-
-  // =====================
-  // DEMO CHART DATEN
-  // =====================
+  /* =====================
+     CHART DEMO
+  ===================== */
   const demoPoints: ChartPoint[] = [
     { t: '1', p: currentPrice - 20 },
     { t: '2', p: currentPrice - 10 },
@@ -81,27 +75,20 @@ export default function SymbolPage({
     { t: '5', p: currentPrice },
   ];
 
-<<<<<<< HEAD
-  if (!symbol) return <p className="text-white p-6">Kein Symbol angegeben</p>;
-
-=======
-  // =====================
-  // BUY / SELL
-  // =====================
-  function handleBuy(amount: number) {
-    buy(symbol, buyPrice, amount);
+  /* =====================
+     SAFETY CHECK
+  ===================== */
+  if (!safeSymbol) {
+    return <p className="text-white p-6">Kein Symbol angegeben</p>;
   }
 
-  function handleSell(amount: number) {
-    sell(symbol, sellPrice, amount);
-  }
-
-  // =====================
-  // RENDER
-  // =====================
->>>>>>> origin/main
+  /* =====================
+     RENDER
+  ===================== */
   return (
     <AppShell>
+
+      {/* TRADE MODAL */}
       {tradeType && (
         <TradeModal
           type={tradeType}
@@ -109,51 +96,45 @@ export default function SymbolPage({
           onClose={() => setTradeType(null)}
           onConfirm={(amount, leverage) => {
             if (tradeType === 'buy') {
-              buy(symbol.toUpperCase(), currentPrice, amount, leverage);
+              buy(safeSymbol, currentPrice, amount, leverage);
             } else {
-              sell(symbol.toUpperCase(), currentPrice, amount, leverage);
+              sell(safeSymbol, currentPrice, amount, leverage);
             }
+
             setTradeType(null);
           }}
         />
       )}
 
       <SymbolHeader />
-<<<<<<< HEAD
 
+      {/* TITLE */}
       <h1 className="text-white text-2xl font-semibold text-center mt-2">
-=======
-      <h1 className="text-white/90 text-2xl font-semibold text-center mt-2">
->>>>>>> origin/main
-        {symbol.toUpperCase()}
+        {safeSymbol}
       </h1>
 
+      {/* BUY / SELL CARD */}
       <BuySellCard
         buyPrice={currentPrice}
         sellPrice={currentPrice}
         assetIcon={<Gem className="w-6 h-6 text-yellow-400" />}
-        onBuy={() => setTradeType('buy')}   // ✅ Button funktioniert
-        onSell={() => setTradeType('sell')} // ✅ Button funktioniert
+        onBuy={() => setTradeType('buy')}
+        onSell={() => setTradeType('sell')}
         position={positionPreview}
         onClosePosition={() => {
-          if (assetPosition && confirm(`Position ${symbol} schließen?`)) {
+          if (assetPosition && confirm(`Position ${safeSymbol} schließen?`)) {
             closePosition(assetPosition.symbol);
           }
         }}
       />
 
-<<<<<<< HEAD
-      <PerformanceRow value={positionPreview?.pnl ?? 0} percent={0} />
-=======
-      {/* Aktuelle Position */}
-      <div className="mt-2 text-center text-white/90">
-        Aktuelle Position: {position.toFixed(2)} {symbol}
-      </div>
+      {/* PERFORMANCE */}
+      <PerformanceRow
+        value={positionPreview?.pnl ?? 0}
+        percent={0}
+      />
 
-      {/* Performance */}
-      <PerformanceRow value={242.14} percent={5.76} />
->>>>>>> origin/main
-
+      {/* CHART */}
       <ChartCard
         points={demoPoints}
         currentPrice={currentPrice}
