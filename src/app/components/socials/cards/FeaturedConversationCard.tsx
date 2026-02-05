@@ -9,7 +9,7 @@ type Props = {
   secondaryCta: string;
 };
 
-const GREEN = "rgba(0, 166, 62, 1)";
+const GREEN = 'rgba(0, 166, 62, 1)';
 
 export default function FeaturedConversationCard({
   authorName,
@@ -26,7 +26,9 @@ export default function FeaturedConversationCard({
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-full bg-white/10" />
-          <p className="text-white font-medium leading-tight truncate">{authorName}</p>
+          <p className="text-white font-medium leading-tight truncate">
+            {authorName}
+          </p>
         </div>
 
         <button
@@ -40,7 +42,9 @@ export default function FeaturedConversationCard({
       <div className="mt-3 grid grid-cols-[1fr_96px] gap-3">
         <div className="min-w-0">
           <h3 className="text-white font-semibold leading-snug">{headline}</h3>
-          <p className="mt-1 text-white/60 text-sm leading-relaxed line-clamp-2">{excerpt}</p>
+          <p className="mt-1 text-white/60 text-sm leading-relaxed line-clamp-2">
+            {excerpt}
+          </p>
 
           <div className="mt-3 flex items-center gap-4 text-white/50 text-xs">
             <span>♥ {stats.likes}</span>
@@ -52,24 +56,29 @@ export default function FeaturedConversationCard({
         <div className="h-20 w-24 rounded-xl bg-white/10" />
       </div>
 
-      <div className="mt-4 h-px bg-white/10" />
+      {/* <div className="mt-4 h-px bg-white/10" />
 
-      <div className="mt-4 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-xl bg-white/10" />
-          <div className="leading-tight">
-            <p className="text-white font-medium">{groupName}</p>
-            <p className="text-white/50 text-xs">{groupMembers}</p>
+      <div className="mt-4 flex items-center justify-between gap-3"> */}
+      <div className="mt-auto">
+        <div className="h-px bg-white/10" />
+
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-white/10" />
+            <div className="leading-tight">
+              <p className="text-white font-medium">{groupName}</p>
+              <p className="text-white/50 text-xs">{groupMembers}</p>
+            </div>
           </div>
-        </div>
 
-        <button
-          className="rounded-full px-4 py-2 text-sm font-semibold text-black"
-          style={{ backgroundColor: GREEN }}
-          type="button"
-        >
-          {primaryCta}
-        </button>
+          <button
+            className="rounded-full px-4 py-2 text-sm font-semibold text-black"
+            style={{ backgroundColor: GREEN }}
+            type="button"
+          >
+            {primaryCta}
+          </button>
+        </div>
       </div>
     </article>
   );
