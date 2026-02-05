@@ -84,7 +84,7 @@ export default function SocialScreen() {
   );
 
   return (
-    <AppShell className='overflow-auto' containerClassName="relative">
+    <AppShell className="overflow-auto" containerClassName="relative">
       <div className="pt-2">
         <SocialHeader />
       </div>
@@ -96,13 +96,21 @@ export default function SocialScreen() {
       <section className="mt-4 pb-8">
         {tab === 'feed' ? (
           <div className="space-y-4">
-            <h2 className="text-white font-semibold tracking-wide">
-              {featuredCards[0].sectionTitle}
-            </h2>
+            <div
+              className={`flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}
+              style={{ WebkitOverflowScrolling: 'touch' }}
+            >
+              {featuredCards.map((card, idx) => (
+                <div
+                  key={idx}
+                  className="snap-start shrink-0 w-[280px] sm:w-[320px]"
+                >
+                  <FeaturedConversationCard {...card} />
+                </div>
+              ))}
 
-            {featuredCards.map((card, idx) => (
-              <FeaturedConversationCard key={idx} {...card} />
-            ))}
+              <div className="shrink-0 w-2" />
+            </div>
 
             <p className="text-white/35 text-xs leading-relaxed">
               {disclaimer}
