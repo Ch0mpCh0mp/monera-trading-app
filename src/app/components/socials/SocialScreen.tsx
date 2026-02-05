@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import AppShell from '../layout/AppShell';
 import SocialHeader from './SocialHeader';
 import SocialTabs, { type SocialTabKey } from './SocialTabs';
@@ -10,6 +10,30 @@ import FloatingComposeButton from './FloatingComposeButton';
 
 export default function SocialScreen() {
   const [tab, setTab] = useState<SocialTabKey>('feed');
+
+  const [fabLeft, setFabLeft] = useState<number | null>(null);
+
+  useEffect(() => {
+    const updateFab = () => {
+      const menuEl = document.querySelector(
+        '[data-nav-item="menu"]'
+      ) as HTMLElement | null;
+      if (!menuEl) return;
+
+      const rect = menuEl.getBoundingClientRect();
+      setFabLeft(rect.left + rect.width / 2);
+    };
+
+    updateFab();
+
+    window.addEventListener('resize', updateFab);
+    window.addEventListener('scroll', updateFab, { passive: true });
+
+    return () => {
+      window.removeEventListener('resize', updateFab);
+      window.removeEventListener('scroll', updateFab);
+    };
+  }, []);
 
   // MOCK DATEN HIER
   const featuredCards = useMemo(
@@ -167,7 +191,20 @@ export default function SocialScreen() {
         )}
       </section>
 
-      <FloatingComposeButton />
+      {fabLeft !== null && (
+        <div
+          className="fixed z-50 pointer-events-none"
+          style={{
+            left: fabLeft,
+            bottom: 96,
+            transform: 'translateX(-50%)',
+          }}
+        >
+          <div className="pointer-events-auto">
+            <FloatingComposeButton />
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }
