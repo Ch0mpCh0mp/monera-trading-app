@@ -10,7 +10,7 @@ import ChartCard, { type ChartPoint } from './ChartCard';
 import TradeModal from './TradeModal';
 import { usePortfolio } from '@/app/context/PortfolioContext';
 import { useParams } from 'next/navigation';
-import { MarketsContext } from '@/app/context/MarketsContext';
+import { MarketsContext } from '../../context/MerketContext';
 
 export default function SymbolPage() {
   const params = useParams();
