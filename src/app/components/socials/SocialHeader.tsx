@@ -7,7 +7,7 @@ export default function SocialHeader() {
         aria-label="Profile"
         className="justify-self-start text-white/80 hover:text-white transition"
       >
-        <UserCircle2 size={30} />
+        <UserCircle2 size={30} strokeWidth={1.25} />
       </button>
 
       <h1 className="justify-self-center text-white/80 font-md tracking-wide text-xl">
@@ -18,7 +18,7 @@ export default function SocialHeader() {
         aria-label="Notifications"
         className="justify-self-end text-white/80 hover:text-white transition"
       >
-        <Bell size={26} />
+        <Bell size={30} strokeWidth={1.25}/>
       </button>
     </header>
   );
