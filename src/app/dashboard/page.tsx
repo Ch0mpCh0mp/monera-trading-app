@@ -236,15 +236,20 @@ export default function DashboardPage() {
               </div>
             ) : (
               assetsByTab[activeTab]?.map((asset) => (
-                <AssetRow
+                <Link
                   key={asset.symbol}
-                  name={asset.name}
-                  symbol={asset.symbol}
-                  price={asset.price}
-                  changePct={asset.changePct}
-                  trend={asset.trend}
-                  image={asset.image}
-                />
+                  href={`/search/${asset.symbol}`}
+                  className="block"
+                >
+                  <AssetRow
+                    name={asset.name}
+                    symbol={asset.symbol}
+                    price={asset.price}
+                    changePct={asset.changePct}
+                    trend={asset.trend}
+                    image={asset.image}
+                  />
+                </Link>
               ))
             )}
           </div>
