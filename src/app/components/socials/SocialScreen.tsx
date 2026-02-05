@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import AppShell from '../layout/AppShell';
 import SocialHeader from './SocialHeader';
 import SocialTabs, { type SocialTabKey } from './SocialTabs';
@@ -11,7 +11,31 @@ import FloatingComposeButton from './FloatingComposeButton';
 export default function SocialScreen() {
   const [tab, setTab] = useState<SocialTabKey>('feed');
 
-  // Dummy Content (später durch echte Daten ersetzen)
+  const [fabLeft, setFabLeft] = useState<number | null>(null);
+
+  useEffect(() => {
+    const updateFab = () => {
+      const menuEl = document.querySelector(
+        '[data-nav-item="menu"]'
+      ) as HTMLElement | null;
+      if (!menuEl) return;
+
+      const rect = menuEl.getBoundingClientRect();
+      setFabLeft(rect.left + rect.width / 2);
+    };
+
+    updateFab();
+
+    window.addEventListener('resize', updateFab);
+    window.addEventListener('scroll', updateFab, { passive: true });
+
+    return () => {
+      window.removeEventListener('resize', updateFab);
+      window.removeEventListener('scroll', updateFab);
+    };
+  }, []);
+
+  // MOCK DATEN HIER
   const featuredCards = useMemo(
     () => [
       {
@@ -23,8 +47,8 @@ export default function SocialScreen() {
         stats: { likes: 161, comments: 301, time: '1T' },
         groupName: 'ETFs',
         groupMembers: '95.000 Mitglieder',
-        primaryCta: 'Join',
-        secondaryCta: 'Follow',
+        join: 'Join',
+        follow: 'Follow',
       },
       {
         sectionTitle: 'Most Popular',
@@ -34,8 +58,8 @@ export default function SocialScreen() {
         stats: { likes: 98, comments: 120, time: '6h' },
         groupName: 'Macro',
         groupMembers: '41.000 Mitglieder',
-        primaryCta: 'Join',
-        secondaryCta: 'Follow',
+        join: 'Join',
+        follow: 'Follow',
       },
       {
         sectionTitle: 'Most Popular',
@@ -46,8 +70,8 @@ export default function SocialScreen() {
         stats: { likes: 161, comments: 301, time: '1T' },
         groupName: 'ETFs',
         groupMembers: '95.000 Mitglieder',
-        primaryCta: 'Join',
-        secondaryCta: 'Follow',
+        join: 'Join',
+        follow: 'Follow',
       },
       {
         sectionTitle: 'Most Popular',
@@ -57,8 +81,8 @@ export default function SocialScreen() {
         stats: { likes: 98, comments: 120, time: '6h' },
         groupName: 'Macro',
         groupMembers: '41.000 Mitglieder',
-        primaryCta: 'Join',
-        secondaryCta: 'Follow',
+        join: 'Join',
+        follow: 'Follow',
       },
     ],
     []
@@ -70,21 +94,39 @@ export default function SocialScreen() {
     []
   );
 
-  const newsPost = useMemo(
-    () => ({
-      badge: 'USA 30 News',
-      verified: true,
-      meta: 'Official Top News',
-      time: '1S',
-      title:
-        'Traders Await Labor Market Data as US Equity Futures Waver Pre-Bell',
-      body: 'US equity futures were little changed pre-bell Wednesday as traders awaited labor market data...',
-    }),
+  const newsPosts = useMemo(
+    () => [
+      {
+        badge: 'USA 30 News',
+        verified: true,
+        meta: 'Official Top News',
+        time: '1S',
+        title:
+          'Traders Await Labor Market Data as US Equity Futures Waver Pre-Bell',
+        body: 'US equity futures were little changed pre-bell Wednesday as traders awaited labor market data...',
+      },
+      {
+        badge: 'Market Brief',
+        verified: false,
+        meta: 'Top Story',
+        time: '12m',
+        title: 'Oil edges higher as traders weigh supply risks',
+        body: 'Crude prices rose modestly as markets assessed geopolitical risk and inventory data...',
+      },
+      {
+        badge: 'Macro',
+        verified: true,
+        meta: 'Official',
+        time: '1h',
+        title: 'Euro dips after inflation surprise',
+        body: 'The euro weakened as fresh data shifted expectations around rate cuts...',
+      },
+    ],
     []
   );
 
   return (
-    <AppShell className='overflow-auto' containerClassName="relative">
+    <AppShell className="overflow-auto" containerClassName="relative">
       <div className="pt-2">
         <SocialHeader />
       </div>
@@ -96,13 +138,31 @@ export default function SocialScreen() {
       <section className="mt-4 pb-8">
         {tab === 'feed' ? (
           <div className="space-y-4">
-            <h2 className="text-white font-semibold tracking-wide">
-              {featuredCards[0].sectionTitle}
-            </h2>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/10">
+                🔥
+              </span>
 
-            {featuredCards.map((card, idx) => (
-              <FeaturedConversationCard key={idx} {...card} />
-            ))}
+              <h2 className="text-white font-semibold tracking-wide">
+                {featuredCards[0].sectionTitle}
+              </h2>
+            </div>
+
+            <div
+              className={`flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}
+              style={{ WebkitOverflowScrolling: 'touch' }}
+            >
+              {featuredCards.map((card, idx) => (
+                <div
+                  key={idx}
+                  className="snap-start shrink-0 w-[280px] sm:w-[320px]"
+                >
+                  <FeaturedConversationCard {...card} />
+                </div>
+              ))}
+
+              <div className="shrink-0 w-2" />
+            </div>
 
             <p className="text-white/35 text-xs leading-relaxed">
               {disclaimer}
@@ -110,7 +170,11 @@ export default function SocialScreen() {
 
             <div className="h-px bg-white/10" />
 
-            <NewsPostCard {...newsPost} />
+            <div className="space-y-3">
+              {newsPosts.map((post, idx) => (
+                <NewsPostCard key={idx} {...post} />
+              ))}
+            </div>
           </div>
         ) : (
           <div className="space-y-3">
@@ -120,15 +184,27 @@ export default function SocialScreen() {
 
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
               <p className="text-white/70 text-sm">
-                Platzhalter: Hier kommen eure Communities (Listen/Filter/Search)
-                rein.
+                Hier nachher unsere Communities rein machen
               </p>
             </div>
           </div>
         )}
       </section>
 
-      <FloatingComposeButton />
+      {fabLeft !== null && (
+        <div
+          className="fixed z-50 pointer-events-none"
+          style={{
+            left: fabLeft,
+            bottom: 96,
+            transform: 'translateX(-50%)',
+          }}
+        >
+          <div className="pointer-events-auto">
+            <FloatingComposeButton />
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }

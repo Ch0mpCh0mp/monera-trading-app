@@ -24,6 +24,7 @@ export default function BottomNav() {
             <Link
               href={href}
               aria-label={label}
+              data-nav-item={label === 'Menu' ? 'menu' : undefined}
               className={pathname === href ? 'nav-item active' : 'nav-item'}
             >
               <Icon size={28} />
