@@ -14,8 +14,13 @@ type AssetRowProps = {
   changePct: number;
   trend: Trend;
   image?: string;
+<<<<<<< HEAD
   sparklineData?: number[];
   onClick?: () => void;
+=======
+  sparklineData?: number[]; // kleine Linie
+   onClick?: () => void;
+>>>>>>> origin/main
 };
 
 export default function AssetRow({

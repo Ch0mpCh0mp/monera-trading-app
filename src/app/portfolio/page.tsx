@@ -36,7 +36,7 @@ function PromoCard({
         <button
           type="button"
           onClick={onClick}
-          className="mt-3 inline-flex items-center rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white text-xs px-4 py-2"
+          className="mt-3 inline-flex items-center rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white text-xs  px-4 py-2"
         >
           {cta}
         </button>
@@ -49,26 +49,33 @@ function PromoCard({
 }
 
 export default function PortfolioPage() {
-  const { balance, equity, openPositions, closePosition } = usePortfolio();
-  const positions = openPositions();
+
+  // ✅ FIX: useAccountSummary → usePortfolio
+  const {
+    balance,
+    positions,
+    closePosition,
+  } = usePortfolio();
+
+  const equity = balance;
+
+  // ✅ FIX: nur einmal berechnen
+  const totalPnL = positions.reduce(
+    (sum: number, pos: any) => sum + (pos.pnl || 0),
+    0
+  );
+
   const router = useRouter();
 
-  // 🔹 Markiere, dass die Komponente auf dem Client gemountet ist
+  const [mounted, setMounted] = useState(false);
 
-const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      setMounted(true);
+    });
 
-useEffect(() => {
-  // 🔹 Delay den State-Update, damit kein synchroner Render passiert
-  const id = requestAnimationFrame(() => {
-    setMounted(true);
-  });
-
-  return () => cancelAnimationFrame(id);
-}, []);
-
-
-  // 🔹 Berechne Total PnL
-  const totalPnL = positions.reduce((sum, pos) => sum + (pos.pnl || 0), 0);
+    return () => cancelAnimationFrame(id);
+  }, []);
 
   return (
     <AppShell containerClassName="space-y-6">
@@ -79,21 +86,27 @@ useEffect(() => {
         <div className="flex items-start justify-between">
           <div>
             <p className="text-white/70 text-lg">Wert</p>
-            {/* 🔹 KRITISCHER FIX: Zeige EQUITY statt BALANCE */}
+
             <p className="text-white text-4xl font-light mt-1">
-              {formatCurrency(typeof equity === 'number' ? equity: 0, 'EUR')}
+              {formatCurrency(typeof equity === 'number' ? equity : 0, 'EUR')}
             </p>
-            {/* 🔹 NEU: Zeige Balance & PnL separat */}
+
             <div className="mt-2 space-y-1">
               <p className="text-white/50 text-sm">
                 Cash: {formatCurrency(balance, 'EUR')}
               </p>
-              <p className={`text-sm font-semibold ${totalPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-  PnL: {totalPnL >= 0 ? '+' : ''}{formatCurrency(totalPnL ?? 0, 'EUR')}
-</p>
 
+              <p
+                className={`text-sm font-semibold ${
+                  totalPnL >= 0 ? 'text-green-400' : 'text-red-400'
+                }`}
+              >
+                PnL: {totalPnL >= 0 ? '+' : ''}
+                {formatCurrency(totalPnL ?? 0, 'EUR')}
+              </p>
             </div>
           </div>
+
           <button
             type="button"
             aria-label="Add"
@@ -118,15 +131,17 @@ useEffect(() => {
       {positions.length > 0 && (
         <section className="space-y-3">
           <h2 className="text-white/70 text-sm">Offene Positionen</h2>
-          {positions.map((pos, index) => (
+
+          {positions.map((pos: any, index: number) => (
             <div
               key={`${pos.symbol}-${pos.type}-${pos.entryPrice}-${index}`}
               className="bg-white/5 border border-white/10 p-4 rounded-xl relative group"
             >
-              {/* 🔹 SCHLIESSEN-BUTTON */}
+              {/* SCHLIESSEN */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
+
                   if (confirm(`Position ${pos.symbol} schließen?`)) {
                     closePosition(pos.symbol);
                   }
@@ -137,7 +152,9 @@ useEffect(() => {
               </button>
 
               <div
-                onClick={() => router.push(`/search/${pos.symbol}?type=${pos.type}`)}
+                onClick={() =>
+                  router.push(`/search/${pos.symbol}?type=${pos.type}`)
+                }
                 className="cursor-pointer"
               >
                 <div className="flex justify-between items-start">
@@ -145,19 +162,36 @@ useEffect(() => {
                     <p className="text-white font-semibold">
                       {pos.symbol} ({pos.type.toUpperCase()})
                     </p>
+
                     <p className="text-white/70 text-sm mt-1">
                       Menge: {pos.amount} • Entry: €{pos.entryPrice.toFixed(2)}
                     </p>
+
                     <p className="text-white/50 text-xs mt-1">
                       Margin: €{pos.margin.toFixed(2)} • Hebel: {pos.leverage}x
                     </p>
                   </div>
+
                   <div className="text-right">
-                    <p className={`font-semibold ${pos.currentPrice >= pos.entryPrice ? 'text-green-400' : 'text-red-400'}`}>
+                    <p
+                      className={`font-semibold ${
+                        pos.currentPrice >= pos.entryPrice
+                          ? 'text-green-400'
+                          : 'text-red-400'
+                      }`}
+                    >
                       €{pos.currentPrice.toFixed(2)}
                     </p>
-                    <p className={`text-sm font-semibold mt-1 ${(pos.pnl || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {(pos.pnl || 0) >= 0 ? '+' : ''}€{(pos.pnl || 0).toFixed(2)}
+
+                    <p
+                      className={`text-sm font-semibold mt-1 ${
+                        (pos.pnl || 0) >= 0
+                          ? 'text-green-400'
+                          : 'text-red-400'
+                      }`}
+                    >
+                      {(pos.pnl || 0) >= 0 ? '+' : ''}
+                      €{(pos.pnl || 0).toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -172,25 +206,32 @@ useEffect(() => {
         <PromoCard
           title="Handel mit über 9.000 Aktien, long und short Positionen"
           cta="Aktien durchsuchen"
-          icon={<Boxes className="text-white/90" size={28} />}
+          icon={<Boxes className="text-white/90" size={28} strokeWidth={1.25} />}
           onClick={() => router.push('/search')}
         />
+
         <PromoCard
           title="Trade die wichtigsten Indizes der Welt wie den USA 500, USA 30 und UK 100"
           cta="Indizes durchsuchen"
-          icon={<Globe className="text-white/90" size={28} />}
+          icon={<Globe className="text-white/90" size={28} strokeWidth={1.25} />}
           onClick={() => router.push('/search')}
         />
+
         <PromoCard
           title="Handel mit Rohstoffen wie Edelmetallen, Öl, Holz, Vieh und mehr"
           cta="Durchstöbere Rohstoffe"
-          icon={<Droplets className="text-white/90" size={28} />}
+          icon={
+            <Droplets className="text-white/90" size={28} strokeWidth={1.25} />
+          }
           onClick={() => router.push('/search')}
         />
+
         <PromoCard
           title="Handel mit Forex – über 180 Paare verfügbar 24/5"
           cta="Forex durchsuchen"
-          icon={<DollarSign className="text-white/90" size={28} />}
+          icon={
+            <DollarSign className="text-white/90" size={28} strokeWidth={1.25} />
+          }
           onClick={() => router.push('/search')}
         />
       </section>

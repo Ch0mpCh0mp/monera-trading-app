@@ -37,7 +37,7 @@ export default function AppShell({
 
   return (
     <BalanceContext.Provider value={{ balance, setBalance }}>
-      <main className={`h-screen overflow-hidden bg-black pt-6 pb-24 ${className}`}>
+      <main className={`min-h-screen bg-black pt-6 pb-24 ${className}`}>
         <Container className={`mt-4 ${containerClassName}`}>
           {children}
         </Container>
