@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useState, useEffect } from 'react'; 
+import { useState, useEffect } from 'react';
 
 import AppShell from '../components/layout/AppShell';
 import {
@@ -49,13 +49,8 @@ function PromoCard({
 }
 
 export default function PortfolioPage() {
-
   // ✅ FIX: useAccountSummary → usePortfolio
-  const {
-    balance,
-    positions,
-    closePosition,
-  } = usePortfolio();
+  const { balance, positions, closePosition } = usePortfolio();
 
   const equity = balance;
 
@@ -82,7 +77,51 @@ export default function PortfolioPage() {
       <TopBar />
 
       {/* VALUE + PLUS BUTTON */}
+      {/* VALUE + PLUS BUTTON */}
       <section>
+        <p className="text-white/70 text-lg">Wert</p>
+
+        <div className="mt-1 flex items-center justify-between gap-4">
+          <p className="text-white text-4xl font-light leading-none">
+            {formatCurrency(typeof equity === 'number' ? equity : 0, 'EUR')}
+          </p>
+
+          <button
+            type="button"
+            aria-label="Add"
+            onClick={() => router.push('/deposit')}
+            className="shrink-0 w-12 h-12 rounded-full bg-[rgba(0,166,62,1)] hover:bg-[rgba(0,166,62,0.85)] flex items-center justify-center text-white"
+          >
+            <Plus size={22} />
+          </button>
+        </div>
+
+        <div className="mt-2 space-y-1">
+          <p className="text-white/50 text-sm">
+            Cash: {formatCurrency(balance, 'EUR')}
+          </p>
+
+          <p
+            className={`text-sm font-semibold ${
+              totalPnL >= 0 ? 'text-green-400' : 'text-red-400'
+            }`}
+          >
+            PnL: {totalPnL >= 0 ? '+' : ''}
+            {formatCurrency(totalPnL ?? 0, 'EUR')}
+          </p>
+        </div>
+
+        {/* MARGIN LEVEL PILL */}
+        <button
+          type="button"
+          className="mt-5 w-full rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white py-3 flex items-center justify-center gap-2 text-sm"
+        >
+          Margin-Level • 0 %
+          <ChevronDown size={16} className="text-white/90" />
+        </button>
+      </section>
+
+      {/* <section>
         <div className="flex items-start justify-between">
           <div>
             <p className="text-white/70 text-lg">Wert</p>
@@ -117,7 +156,6 @@ export default function PortfolioPage() {
           </button>
         </div>
 
-        {/* MARGIN LEVEL PILL */}
         <button
           type="button"
           className="mt-5 w-full rounded-full bg-[rgba(0,166,62,0.9)] hover:bg-[rgba(0,166,62,1)] text-white py-3 flex items-center justify-center gap-2 text-sm"
@@ -125,7 +163,7 @@ export default function PortfolioPage() {
           Margin-Level • 0 %
           <ChevronDown size={16} className="text-white/90" />
         </button>
-      </section>
+      </section> */}
 
       {/* OFFENE POSITIONEN */}
       {positions.length > 0 && (
@@ -185,13 +223,11 @@ export default function PortfolioPage() {
 
                     <p
                       className={`text-sm font-semibold mt-1 ${
-                        (pos.pnl || 0) >= 0
-                          ? 'text-green-400'
-                          : 'text-red-400'
+                        (pos.pnl || 0) >= 0 ? 'text-green-400' : 'text-red-400'
                       }`}
                     >
-                      {(pos.pnl || 0) >= 0 ? '+' : ''}
-                      €{(pos.pnl || 0).toFixed(2)}
+                      {(pos.pnl || 0) >= 0 ? '+' : ''}€
+                      {(pos.pnl || 0).toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -206,14 +242,18 @@ export default function PortfolioPage() {
         <PromoCard
           title="Handel mit über 9.000 Aktien, long und short Positionen"
           cta="Aktien durchsuchen"
-          icon={<Boxes className="text-white/90" size={28} strokeWidth={1.25} />}
+          icon={
+            <Boxes className="text-white/90" size={28} strokeWidth={1.25} />
+          }
           onClick={() => router.push('/search')}
         />
 
         <PromoCard
           title="Trade die wichtigsten Indizes der Welt wie den USA 500, USA 30 und UK 100"
           cta="Indizes durchsuchen"
-          icon={<Globe className="text-white/90" size={28} strokeWidth={1.25} />}
+          icon={
+            <Globe className="text-white/90" size={28} strokeWidth={1.25} />
+          }
           onClick={() => router.push('/search')}
         />
 
@@ -230,7 +270,11 @@ export default function PortfolioPage() {
           title="Handel mit Forex – über 180 Paare verfügbar 24/5"
           cta="Forex durchsuchen"
           icon={
-            <DollarSign className="text-white/90" size={28} strokeWidth={1.25} />
+            <DollarSign
+              className="text-white/90"
+              size={28}
+              strokeWidth={1.25}
+            />
           }
           onClick={() => router.push('/search')}
         />
